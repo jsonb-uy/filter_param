@@ -4,30 +4,46 @@ module FilterParam
   class Filter < Parslet::Parser
     rule(:space) { match("\s").repeat(1) }
     rule(:space?) { space.maybe }
-    rule(:double_quote) { str('"') }
+    rule(:dot) { str(".") }
+    rule(:escape) { str("\\") }
+    rule(:double_quote) { str("\"") }
     rule(:single_quote) { str("'") }
-    rule(:digit) { match("[0-9]") }
+    rule(:any_digit) { match("[0-9]") }
+    rule(:non_zero_digit) { match("[1-9]") }
+    rule(:negative_sign) { str("-") }
+    rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
+    rule(:table_name) { identifier.repeat(1) >> dot }
+    rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
 
-    rule(:db_identifier) { match("[a-zA-Z_]") >> digit.maybe }
-    rule(:table) { db_identifier.repeat(1) >> str(".") }
-    rule(:field) { table.maybe >> db_identifier.repeat(1) >> space }
+    rule(:integer) do
+      (
+        (negative_sign >> non_zero_digit.repeat(1)) |
+        (negative_sign.absent? >> any_digit.repeat(1))
+      ).as(:int_value)
+    end
 
-    rule(:integer) { digit.repeat(1).as(:int) }
+    rule(:string_single_quote_char) do
+      (single_quote.absent? >> any) | str('\\\'') # TODO: handle escaped quote
+    end
     rule(:string_single_quoted) do
-      single_quote >> (single_quote.absent? >> any).repeat.as(:str) >> single_quote
+      single_quote >> string_single_quote_char.repeat.as(:string_value) >> single_quote
+    end
+    rule(:string_double_quote_char) do
+      (double_quote.absent? >> any) | str('\\\"') # TODO: handle escaped quote
     end
     rule(:string_double_quoted) do
-      double_quote >> (double_quote.absent? >> any).repeat.as(:str) >> double_quote
+      double_quote >> string_double_quote_char.repeat.as(:string_value) >> double_quote
     end
     rule(:string) { string_single_quoted | string_double_quoted }
+
     rule(:value) { integer | string }
 
-    rule(:eq) { str("eq").as(:eq) >> space }
-    rule(:neq) { str("neq").as(:neq) >> space }
-    rule(:operator) { eq | neq }
-    rule(:filter_expression) { field.as(:field) >> operator >> value >> space? }
+    rule(:eq) { str("eq") }
+    rule(:neq) { str("neq") }
+    rule(:operator) { space >> (eq | neq).as(:op) >> space }
+    rule(:filter_expression) { field_name >> operator >> value }
 
-    rule(:expression) { value }
+    rule(:expression) { filter_expression }
     root(:expression)
   end
 end
