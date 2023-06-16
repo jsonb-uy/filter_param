@@ -5,8 +5,8 @@ module FilterParam
     rule(:space) { match("\s").repeat(1) }
     rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
-    rule(:escape) { str("\\") }
-    rule(:double_quote) { str("\"") }
+    rule(:escaped_char) { str('\\').present? >> str('\\') >> any }
+    rule(:double_quote) { str('"') }
     rule(:single_quote) { str("'") }
     rule(:any_digit) { match("[0-9]") }
     rule(:non_zero_digit) { match("[1-9]") }
@@ -22,17 +22,11 @@ module FilterParam
       ).as(:int_value)
     end
 
-    rule(:string_single_quote_char) do
-      (single_quote.absent? >> any) | str('\\\'') # TODO: handle escaped quote
-    end
     rule(:string_single_quoted) do
-      single_quote >> string_single_quote_char.repeat.as(:string_value) >> single_quote
-    end
-    rule(:string_double_quote_char) do
-      (double_quote.absent? >> any) | str('\\\"') # TODO: handle escaped quote
+      single_quote >> (escaped_char | match("[^\']")).repeat.as(:string_value) >> single_quote
     end
     rule(:string_double_quoted) do
-      double_quote >> string_double_quote_char.repeat.as(:string_value) >> double_quote
+      double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_value) >> double_quote
     end
     rule(:string) { string_single_quoted | string_double_quoted }
 
