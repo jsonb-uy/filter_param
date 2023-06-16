@@ -5,6 +5,8 @@ module FilterParam
     rule(:space) { match("\s").repeat(1) }
     rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
+    rule(:lparen) { space? >> str("(") >> space? }
+    rule(:rparen) { space? >> str(")") >> space? }
     rule(:escaped_char) { str('\\').present? >> str('\\') >> any }
     rule(:double_quote) { str('"') }
     rule(:single_quote) { str("'") }
@@ -15,6 +17,7 @@ module FilterParam
     rule(:table_name) { identifier.repeat(1) >> dot }
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
 
+    # Literals
     rule(:integer) do
       (
         (negative_sign >> non_zero_digit.repeat(1)) |
@@ -31,13 +34,22 @@ module FilterParam
     rule(:string) { string_single_quoted | string_double_quoted }
 
     rule(:value) { integer | string }
+    rule(:value_parenthesized) { lparen >> (value | value_parenthesized) >> rparen }
 
+    # Operations
     rule(:eq) { str("eq") }
     rule(:neq) { str("neq") }
-    rule(:operator) { space >> (eq | neq).as(:op) >> space }
-    rule(:filter_expression) { field_name >> operator >> value }
+    rule(:operator) { (eq | neq).as(:op) }
+    rule(:value_operation) do
+      operator >>
+        (
+          (space >> value) | value_parenthesized
+        )
+    end
 
-    rule(:expression) { filter_expression }
-    root(:expression)
+    rule(:filter) { field_name >> space >> value_operation }
+    rule(:expression) { filter | (lparen >> expression >> rparen) }
+    rule(:filter_expression) { expression }
+    root(:filter_expression)
   end
 end
