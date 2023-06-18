@@ -37,12 +37,34 @@ RSpec.describe FilterParam::Filter do
       end
     end
 
-    it "recognizes :eq operation" do
-      expect(parse("name eq 1")[:filter_op].str).to eql("eq")
+    it "parses :eq operation" do
+      expect(parse("name eq 'john'")[:filter_op].str).to eql("eq")
+      expect(parse("name eq('john')")[:filter_op].str).to eql("eq")
+      expect(parse("name   eq  'john'")[:filter_op].str).to eql("eq")
     end
 
-    it "recognizes :neq operation" do
-      expect(parse("name neq 1")[:filter_op].str).to eql("neq")
+    it "parses :neq operation" do
+      expect(parse("name neq 'john'")[:filter_op].str).to eql("neq")
+      expect(parse("name neq('john')")[:filter_op].str).to eql("neq")
+      expect(parse("name  neq  'john'")[:filter_op].str).to eql("neq")
+    end
+
+    context "when value is a string" do
+      it "parses the value" do
+        expect(parse("name  eq 'john'")[:string_literal].str).to eql("john")
+        expect(parse("name eq \"john\"")[:string_literal].str).to eql("john")
+        expect(parse("name eq (\"john\")")[:string_literal].str).to eql("john")
+        expect(parse("name eq (  (  \"john\" ))")[:string_literal].str).to eql("john")
+        expect(parse("name eq( (('john' )))")[:string_literal].str).to eql("john")
+        expect(parse("name eq ('john')")[:string_literal].str).to eql("john")
+        expect(parse("name eq('john')")[:string_literal].str).to eql("john")
+      end
+    end
+
+    context "with :or operation" do
+      it "parses the expression correctly" do
+        expect(parse("name eq 'john' or name eq 'jane'")[:string_literal].str).to eql("john")
+      end
     end
   end
 end

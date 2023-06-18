@@ -25,33 +25,28 @@ module FilterParam
       (
         (negative_sign >> non_zero_digit.repeat(1)) |
         (negative_sign.absent? >> any_digit.repeat(1))
-      ).as(:int_value)
+      ).as(:int_literal)
     end
 
     rule(:string_single_quoted) do
-      single_quote >> (escaped_char | match("[^\']")).repeat.as(:string_value) >> single_quote
+      single_quote >> (escaped_char | match("[^\']")).repeat.as(:string_literal) >> single_quote
     end
     rule(:string_double_quoted) do
-      double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_value) >> double_quote
+      double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote
     end
     rule(:string) { string_single_quoted | string_double_quoted }
-
-    rule(:value) { integer | string }
-    rule(:value_parenthesized) { lparen >> (value | value_parenthesized) >> rparen }
+    rule(:literal) { integer | string }
+    rule(:literal_paren) { lparen >> (literal | literal_paren) >> rparen }
 
     # Operations
     rule(:eq) { str("eq") }
     rule(:neq) { str("neq") }
     rule(:filter_op) { (eq | neq).as(:filter_op) }
-    rule(:value_operation) do
-      filter_op >>
-        (
-          (space >> value) | value_parenthesized
-        )
-    end
 
     rule(:expression) do
-      field_name >> space >> value_operation
+      field_name >> space >> filter_op >> (
+        (space >> (literal_paren | literal)) | literal_paren
+      )
     end
     rule(:expression_group) do
       space? >>
