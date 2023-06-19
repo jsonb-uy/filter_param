@@ -16,8 +16,8 @@ module FilterParam
     rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
     rule(:table_name) { identifier.repeat(1) >> dot }
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
-    rule(:op_and) { str("AND") | str("and") }
-    rule(:op_or) { str("OR") | str("or") }
+    rule(:op_and) { str("and").as(:logical_operator) }
+    rule(:op_or) { str("or").as(:logical_operator) }
     rule(:logical_op) { op_and | op_or }
 
     # Literals
@@ -55,12 +55,12 @@ module FilterParam
     rule(:expression_group) do
       space? >>
       (
-        expression |
+        expression.as(:lexp) >>
         (
-          expression >> space >> logical_op >> space >> expression
+          (space >> logical_op >> space >> expression.as(:rexp)) |
+          space?
         )
-      ) >>
-      space?
+      )
     end
     root(:expression_group)
   end

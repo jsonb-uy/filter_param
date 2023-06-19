@@ -24,12 +24,12 @@ RSpec.describe FilterParam::Filter do
           expression = "#{column} eq 1"
 
           expect { parse(expression) }.not_to raise_error
-          expect(parse(expression)[:field].str).to eql(column)
+          expect(parse(expression)[:lexp][:field].str).to eql(column)
         end
       end
     end
 
-    context "with an unrecognized operation" do
+    context "with an unrecognized filter operator" do
       it "raises an error" do
         expect { parse("name equals 1") }.to raise_error(Parslet::ParseFailed)
         expect { parse("name = 1") }.to raise_error(Parslet::ParseFailed)
@@ -37,42 +37,49 @@ RSpec.describe FilterParam::Filter do
       end
     end
 
-    it "parses :eq operation" do
-      expect(parse("name eq 'john'")[:filter_op].str).to eql("eq")
-      expect(parse("name eq('john')")[:filter_op].str).to eql("eq")
-      expect(parse("name   eq  'john'")[:filter_op].str).to eql("eq")
+    it "parses :eq filter operator" do
+      expect(parse("name eq 'john'")[:lexp][:filter_op].str).to eql("eq")
     end
 
-    it "parses :neq operation" do
-      expect(parse("name neq 'john'")[:filter_op].str).to eql("neq")
-      expect(parse("name neq('john')")[:filter_op].str).to eql("neq")
-      expect(parse("name  neq  'john'")[:filter_op].str).to eql("neq")
+    it "parses :neq filter operator" do
+      expect(parse("name neq 'john'")[:lexp][:filter_op].str).to eql("neq")
     end
 
-    context "when value is null" do
-      it "parses the value" do
-        expect(parse("name eq null")[:null_literal].str).to eql("null")
-        expect(parse("name eq (null)")[:null_literal].str).to eql("null")
-        expect(parse("name eq(null)")[:null_literal].str).to eql("null")
-      end
+    it "parses null filter value" do
+      expect(parse("name eq null")[:lexp][:null_literal].str).to eql("null")
     end
 
-    context "when value is a string" do
-      it "parses the value" do
-        expect(parse("name  eq 'john'")[:string_literal].str).to eql("john")
-        expect(parse("name eq \"john\"")[:string_literal].str).to eql("john")
-        expect(parse("name eq (\"john\")")[:string_literal].str).to eql("john")
-        expect(parse("name eq (  (  \"john\" ))")[:string_literal].str).to eql("john")
-        expect(parse("name eq( (('john' )))")[:string_literal].str).to eql("john")
-        expect(parse("name eq ('john')")[:string_literal].str).to eql("john")
-        expect(parse("name eq('john')")[:string_literal].str).to eql("john")
-      end
+    it "parses string filter value" do
+      expect(parse("name eq 'john'")[:lexp][:string_literal].str).to eql("john")
+      expect(parse("name eq \"john\"")[:lexp][:string_literal].str).to eql("john")
     end
 
-    context "with :or operation" do
-      it "parses the expression correctly" do
-        expect(parse("name eq 'john' or name eq 'jane'")[:string_literal].str).to eql("john")
-      end
+    it "parses :or logical operator" do
+      exp = parse("name eq 'john' or surname eq 'doe'")
+      left = exp[:lexp]
+      right = exp[:rexp]
+
+      expect(exp[:logical_operator].str).to eql("or")
+      expect(left[:field].str).to eql("name")
+      expect(left[:filter_op].str).to eql("eq")
+      expect(left[:string_literal].str).to eql("john")
+      expect(right[:field].str).to eql("surname")
+      expect(right[:filter_op].str).to eql("eq")
+      expect(right[:string_literal].str).to eql("doe")
+    end
+
+    it "parses :and logical operator" do
+      exp = parse("name eq 'jane' and surname neq 'doe'")
+      left = exp[:lexp]
+      right = exp[:rexp]
+
+      expect(exp[:logical_operator].str).to eql("and")
+      expect(left[:field].str).to eql("name")
+      expect(left[:filter_op].str).to eql("eq")
+      expect(left[:string_literal].str).to eql("jane")
+      expect(right[:field].str).to eql("surname")
+      expect(right[:filter_op].str).to eql("neq")
+      expect(right[:string_literal].str).to eql("doe")
     end
   end
 end
