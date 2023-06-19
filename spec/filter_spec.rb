@@ -49,6 +49,11 @@ RSpec.describe FilterParam::Filter do
       expect(parse("name eq null")[:lexp][:null_literal].str).to eql("null")
     end
 
+    it "parses boolean filter value" do
+      expect(parse("name eq true")[:lexp][:boolean_literal].str).to eql("true")
+      expect(parse("name eq false")[:lexp][:boolean_literal].str).to eql("false")
+    end
+
     it "parses string filter value" do
       expect(parse("name eq 'john'")[:lexp][:string_literal].str).to eql("john")
       expect(parse("name eq \"john\"")[:lexp][:string_literal].str).to eql("john")

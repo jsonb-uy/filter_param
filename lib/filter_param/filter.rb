@@ -18,13 +18,11 @@ module FilterParam
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
     rule(:op_and) { str("and").as(:logical_operator) }
     rule(:op_or) { str("or").as(:logical_operator) }
-    rule(:logical_op) { op_and | op_or }
+    rule(:logical_op) { space >> (op_and | op_or) >> space }
 
     # Literals
-    rule(:null) do
-      str("null").as(:null_literal)
-    end
-
+    rule(:null) { str("null").as(:null_literal) }
+    rule(:boolean) { (str("true") | str("false")).as(:boolean_literal) }
     rule(:integer) do
       (
         (negative_sign >> non_zero_digit.repeat(1)) |
@@ -39,7 +37,7 @@ module FilterParam
       double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote
     end
     rule(:string) { string_single_quoted | string_double_quoted }
-    rule(:literal) { null | integer | string }
+    rule(:literal) { null | boolean | integer | string }
     rule(:literal_paren) { lparen >> (literal | literal_paren) >> rparen }
 
     # Operations
@@ -54,14 +52,17 @@ module FilterParam
     end
     rule(:expression_group) do
       space? >>
-      (
-        expression.as(:lexp) >>
+        (lparen >> expression_group >> rparen) |
         (
-          (space >> logical_op >> space >> expression.as(:rexp)) |
-          space?
+          expression.as(:lexp) >>
+          (
+            (logical_op >> expression_group.as(:rexp)) |
+            space?
+          )
         )
-      )
     end
     root(:expression_group)
   end
 end
+
+# (name eq false or name eq true) and (name neq false and name neq true)
