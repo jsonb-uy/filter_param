@@ -21,6 +21,10 @@ module FilterParam
     rule(:logical_op) { op_and | op_or }
 
     # Literals
+    rule(:null) do
+      str("null").as(:null_literal)
+    end
+
     rule(:integer) do
       (
         (negative_sign >> non_zero_digit.repeat(1)) |
@@ -35,7 +39,7 @@ module FilterParam
       double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote
     end
     rule(:string) { string_single_quoted | string_double_quoted }
-    rule(:literal) { integer | string }
+    rule(:literal) { null | integer | string }
     rule(:literal_paren) { lparen >> (literal | literal_paren) >> rparen }
 
     # Operations

@@ -49,6 +49,14 @@ RSpec.describe FilterParam::Filter do
       expect(parse("name  neq  'john'")[:filter_op].str).to eql("neq")
     end
 
+    context "when value is null" do
+      it "parses the value" do
+        expect(parse("name eq null")[:null_literal].str).to eql("null")
+        expect(parse("name eq (null)")[:null_literal].str).to eql("null")
+        expect(parse("name eq(null)")[:null_literal].str).to eql("null")
+      end
+    end
+
     context "when value is a string" do
       it "parses the value" do
         expect(parse("name  eq 'john'")[:string_literal].str).to eql("john")
