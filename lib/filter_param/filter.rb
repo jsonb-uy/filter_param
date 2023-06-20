@@ -18,7 +18,7 @@ module FilterParam
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
     rule(:op_and) { str("and").as(:logical_operator) }
     rule(:op_or) { str("or").as(:logical_operator) }
-    rule(:logical_op) { space >> (op_and | op_or) >> space }
+    rule(:logical_op) { op_and | op_or }
 
     # Literals
     rule(:null) { str("null").as(:null_literal) }
@@ -45,24 +45,38 @@ module FilterParam
     rule(:neq) { str("neq") }
     rule(:filter_op) { (eq | neq).as(:filter_op) }
 
-    rule(:expression) do
-      (
-        field_name >> space >> filter_op >> (
-          (space >> (literal_paren | literal)) | literal_paren
-        )
+    rule(:filter_expression) do
+      field_name >> space >> filter_op >> (
+        (space >> (literal | literal_paren)) | literal_paren
       )
     end
+    rule(:filter_expression_paren) do
+      lparen >> (filter_expression | filter_expression_paren) >> rparen
+    end
+    rule(:filter_expressions) do
+      filter_expression | filter_expression_paren
+    end
+
+    rule(:logical_expression) do
+      filter_expressions.as(:lexp) >> ((space >> logical_op >> space) >> filter_expressions.as(:rexp)).maybe
+    end
+
+    rule(:logical_expression_paren) do
+      lparen >> (logical_expression | logical_expression_paren) >> rparen
+    end
+
+    rule(:logical_expressions) do
+      logical_expression | logical_expression_paren
+    end
+
     rule(:expression_group) do
       space? >>
-        (lparen.present? >> lparen >> expression >> rparen) |
         (
-          expression.as(:lexp) >>
-          (
-            (logical_op >> expression_group.as(:rexp)) |
-            space?
-          )
-        )
+          logical_expressions
+        ) >>
+      space?
     end
+
     root(:expression_group)
   end
 end
