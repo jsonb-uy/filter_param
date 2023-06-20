@@ -86,5 +86,21 @@ RSpec.describe FilterParam::Filter do
       expect(right[:filter_op].str).to eql("neq")
       expect(right[:string_literal].str).to eql("doe")
     end
+
+    context "value parenthesization" do
+      it "correctly parses different formats" do
+        expect(parse("id eq(42)")[:lexp][:int_literal].str).to eql("42")
+        expect(parse("id eq (42)")[:lexp][:int_literal].str).to eql("42")
+        expect(parse("id eq ((42))")[:lexp][:int_literal].str).to eql("42")
+        expect(parse("id eq ( (   ( 42)) )")[:lexp][:int_literal].str).to eql("42")
+      end
+
+      it "requires parentheses to be pairs" do
+        expect { parse("id eq(42") }.to raise_error(Parslet::ParseFailed)
+        expect { parse("id eq ((42)") }.to raise_error(Parslet::ParseFailed)
+        expect { parse("id eq 42)") }.to raise_error(Parslet::ParseFailed)
+        expect { parse("id eq (42))") }.to raise_error(Parslet::ParseFailed)
+      end
+    end
   end
 end

@@ -5,8 +5,8 @@ module FilterParam
     rule(:space) { match("\s").repeat(1) }
     rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
-    rule(:lparen) { str("(") >> space? }
-    rule(:rparen) { space? >> str(")") }
+    rule(:lparen) { str("(").as(:lparen) >> space? }
+    rule(:rparen) { space? >> str(")").as(:rparen) }
     rule(:escaped_char) { str('\\').present? >> str('\\') >> any }
     rule(:double_quote) { str('"') }
     rule(:single_quote) { str("'") }
@@ -46,13 +46,15 @@ module FilterParam
     rule(:filter_op) { (eq | neq).as(:filter_op) }
 
     rule(:expression) do
-      field_name >> space >> filter_op >> (
-        (space >> (literal_paren | literal)) | literal_paren
+      (
+        field_name >> space >> filter_op >> (
+          (space >> (literal_paren | literal)) | literal_paren
+        )
       )
     end
     rule(:expression_group) do
       space? >>
-        (lparen >> expression_group >> rparen) |
+        (lparen.present? >> lparen >> expression >> rparen) |
         (
           expression.as(:lexp) >>
           (
