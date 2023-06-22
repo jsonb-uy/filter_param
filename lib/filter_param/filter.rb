@@ -45,20 +45,28 @@ module FilterParam
     rule(:neq) { str("neq") }
     rule(:filter_op) { (eq | neq).as(:filter_op) }
 
-    rule(:filter_expression) do
-      field_name >> space >> filter_op >> (
-        (space >> (literal | literal_paren)) | literal_paren
+    rule(:filter) do
+      (
+        field_name >> space >> filter_op >> (
+          (space >> (literal | literal_paren)) | literal_paren
+        )
+      ) |
+      (
+        lparen.present? >> lparen >> filter >> rparen
       )
-    end
-    rule(:filter_expression_paren) do
-      lparen >> (filter_expression | filter_expression_paren) >> rparen
-    end
-    rule(:filter_expressions) do
-      filter_expression | filter_expression_paren
     end
 
     rule(:logical_expression) do
-      filter_expressions.as(:lexp) >> ((space >> logical_op >> space) >> filter_expressions.as(:rexp)).maybe
+      (
+        (
+          logical_op.present? >> (
+            logical_expression.as(:lexp) >> space >> logical_op.as(:logical_op) >> space >> logical_expression.as(:rexp)
+          )
+        ) |
+        (
+          filter.as(:filter)
+        )
+      ).as(:logical_expression)
     end
 
     rule(:logical_expression_paren) do
@@ -72,7 +80,7 @@ module FilterParam
     rule(:expression_group) do
       space? >>
         (
-          logical_expressions
+          logical_expressions.repeat(1)
         ) >>
       space?
     end

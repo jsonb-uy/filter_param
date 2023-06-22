@@ -102,5 +102,25 @@ RSpec.describe FilterParam::Filter do
         expect { parse("id eq (42))") }.to raise_error(Parslet::ParseFailed)
       end
     end
+
+    context "expression parenthesization", rr: true do
+      it "correctly parses different formats" do
+        expect { parse("id eq 1") }.not_to raise_error
+        expect { parse("(id eq 1)") }.not_to raise_error
+        expect { parse("((id eq 1))") }.not_to raise_error
+        expect { parse("(id eq (1))") }.not_to raise_error
+        expect { parse("((id eq (1)))") }.not_to raise_error
+        expect { parse("(id eq(1))") }.not_to raise_error
+        expect { parse("((id eq(1)))") }.not_to raise_error
+
+        expect { parse("id neq 1 and name neq 'John'") }.not_to raise_error
+        expect { parse("(id neq 1) and (name neq 'John')") }.not_to raise_error
+        expect { parse("((id neq 1)) and ((name neq 'John'))") }.not_to raise_error
+        expect { parse("(id neq 1 and name neq 'John')") }.not_to raise_error
+        expect { parse("((id neq 1 and name neq 'John'))") }.not_to raise_error
+        expect { parse("(((id neq 1) and (name neq 'John')))") }.not_to raise_error
+        expect { parse("id neq 1 and name neq 'John' and name neq 'Jane") }.not_to raise_error
+      end
+    end
   end
 end
