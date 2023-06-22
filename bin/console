@@ -8,4 +8,5 @@ require "filter_param"
 # with your gem easier. You can also use a different console, if you like.
 
 require "irb"
+require "pp"
 IRB.start(__FILE__)

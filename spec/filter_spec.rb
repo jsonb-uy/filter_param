@@ -119,7 +119,7 @@ RSpec.describe FilterParam::Filter do
         expect { parse("(id neq 1 and name neq 'John')") }.not_to raise_error
         expect { parse("((id neq 1 and name neq 'John'))") }.not_to raise_error
         expect { parse("(((id neq 1) and (name neq 'John')))") }.not_to raise_error
-        expect { parse("id neq 1 and name neq 'John' and name neq 'Jane") }.not_to raise_error
+        expect { parse("id neq 1 and name neq 'John' and name neq 'Jane'") }.not_to raise_error
       end
     end
   end
