@@ -16,9 +16,6 @@ module FilterParam
     rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
     rule(:table_name) { identifier.repeat(1) >> dot }
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
-    rule(:and_op) { str("and") }
-    rule(:or_op) { str("or") }
-    rule(:logical_op) { (and_op | or_op).as(:logical_op) }
 
     # Literals
     rule(:null) { str("null").as(:null) }
@@ -34,7 +31,7 @@ module FilterParam
         (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
     rule(:literal) do
-      null | boolean | integer | string
+      (null | boolean | integer | string).as(:value)
     end
     rule(:literal_paren) do
       lparen >> (literal | literal_paren) >> rparen
@@ -44,28 +41,26 @@ module FilterParam
     rule(:filter_op) do
       (str("eq") | str("neq") | str("lte") | str("lt") | str("gte") | str("gt")).as(:filter_op)
     end
+    rule(:filter_value) do
+      (space >> (literal | literal_paren)) | literal_paren
+    end
     rule(:filter_exp) do
-      grouping | (
-        field_name >> space >> filter_op >>
-          ((space.present? >> space >> (literal | literal_paren).as(:value)) | literal_paren.as(:value))
-      ).as(:exp)
-    end
-    rule(:right_exp) do
-      (space >> logical_exp) | (lparen.present? >> logical_exp)
+      grouping | (field_name >> space >> filter_op >> filter_value).as(:exp)
     end
 
-    rule(:grouping) do
-      (lparen >> expression >> rparen).as(:group)
-    end
-
-    rule(:logical_exp) do
+    rule(:logic_op) { (str("and") | str("or")).as(:logic_op) }
+    rule(:logic_exp) do
       (
-        filter_exp.as(:left) >> space >> logical_op >> right_exp.as(:right)
+        filter_exp.as(:left) >> space >> logic_op >> logic_right_exp.as(:right)
       ).as(:exp) |
       filter_exp
     end
+    rule(:logic_right_exp) do
+      (space >> logic_exp) | (lparen.present? >> logic_exp)
+    end
 
-    rule(:expression) { space? >> logical_exp >> space? }
+    rule(:grouping) { (lparen >> expression >> rparen).as(:group) }
+    rule(:expression) { space? >> logic_exp >> space? }
     root(:expression)
   end
 end
