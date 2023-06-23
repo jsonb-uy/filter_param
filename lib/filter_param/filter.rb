@@ -29,21 +29,18 @@ module FilterParam
         (negative_sign.absent? >> any_digit.repeat(1))
       ).as(:int_literal)
     end
-
-    rule(:string_single_quoted) do
-      single_quote >> (escaped_char | match("[^\']")).repeat.as(:string_literal) >> single_quote
+    rule(:string) do
+      (single_quote >> (escaped_char | match("[^\']")).repeat.as(:string_literal) >> single_quote) |
+        (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote)
     end
-    rule(:string_double_quoted) do
-      double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote
-    end
-    rule(:string) { string_single_quoted | string_double_quoted }
     rule(:literal) { null | boolean | integer | string }
     rule(:literal_paren) { lparen >> (literal | literal_paren) >> rparen }
 
     # Operations
-    rule(:eq) { str("eq") }
-    rule(:neq) { str("neq") }
-    rule(:filter_op) { (eq | neq).as(:filter_op) }
+    rule(:equality) { (str("eq") | str("neq")).as(:equality) }
+    rule(:comparison) { (str("lt") | str("lte") | str("gt") | str("gte")).as(:comparison) }
+
+    rule(:filter_op) { equality | comparison }
     rule(:filter) do
       (
         field_name >> space >> filter_op >> (
