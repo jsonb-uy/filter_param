@@ -48,7 +48,10 @@ module FilterParam
       grouping | (
         field_name >> space >> filter_op >>
           ((space.present? >> space >> (literal | literal_paren).as(:value)) | literal_paren.as(:value))
-      ).as(:filter)
+      ).as(:exp)
+    end
+    rule(:right_exp) do
+      (space >> logical_exp) | (lparen.present? >> logical_exp)
     end
 
     rule(:grouping) do
@@ -56,10 +59,13 @@ module FilterParam
     end
 
     rule(:logical_exp) do
-      (filter_exp.as(:left) >> (space.present? >> space >> logical_op >> space >> filter_exp.as(:right)).repeat(0))
+      (
+        filter_exp.as(:left) >> space >> logical_op >> right_exp.as(:right)
+      ).as(:exp) |
+      filter_exp
     end
 
-    rule(:expression) { space? >> logical_exp.as(:expression) >> space? }
+    rule(:expression) { space? >> logical_exp >> space? }
     root(:expression)
   end
 end

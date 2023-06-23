@@ -57,6 +57,8 @@ RSpec.describe FilterParam::Filter do
     it "parses string filter value" do
       expect(parse("name eq 'john'")[:lexp][:string_literal].str).to eql("john")
       expect(parse("name eq \"john\"")[:lexp][:string_literal].str).to eql("john")
+      expect(parse('name eq \'john\'')[:lexp][:string_literal].str).to eql("john")
+      expect(parse('name eq "john"')[:lexp][:string_literal].str).to eql("john")
     end
 
     it "parses :or logical operator" do
