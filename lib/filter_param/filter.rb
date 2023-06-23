@@ -3,6 +3,7 @@ require "parslet"
 module FilterParam
   class Filter < Parslet::Parser
     rule(:space) { match("\s").repeat(1) }
+    rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
     rule(:lparen) { str("(") }
     rule(:rparen) { str(")") }
@@ -33,7 +34,7 @@ module FilterParam
       (null | boolean | integer | string).as(:val)
     end
     rule(:literal_paren) do
-      lparen >> (literal | literal_paren) >> rparen
+      lparen >> space? >> (literal | literal_paren) >> space? >> rparen
     end
 
     # Operations
@@ -41,7 +42,7 @@ module FilterParam
       (str("eq") | str("neq") | str("lte") | str("lt") | str("gte") | str("gt")).as(:f_op)
     end
     rule(:f_val) do
-      (space >> (literal | literal_paren)) | literal_paren
+      literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
       grouping | (field_name >> space >> f_op >> f_val).as(:exp)
@@ -55,11 +56,11 @@ module FilterParam
       f_exp
     end
     rule(:l_rexp) do
-      (space >> l_exp) | (lparen.present? >> l_exp)
+      (space | lparen.present?) >> l_exp
     end
 
     rule(:grouping) { (lparen >> expression >> rparen).as(:group) }
-    rule(:expression) { space.maybe >> l_exp >> space.maybe }
+    rule(:expression) { space? >> l_exp >> space? }
     root(:expression)
   end
 end
