@@ -3,7 +3,6 @@ require "parslet"
 module FilterParam
   class Filter < Parslet::Parser
     rule(:space) { match("\s").repeat(1) }
-    rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
     rule(:lparen) { str("(") }
     rule(:rparen) { str(")") }
@@ -60,7 +59,7 @@ module FilterParam
     end
 
     rule(:grouping) { (lparen >> expression >> rparen).as(:group) }
-    rule(:expression) { space? >> logic_exp >> space? }
+    rule(:expression) { space.maybe >> logic_exp >> space.maybe }
     root(:expression)
   end
 end

@@ -24,7 +24,7 @@ RSpec.describe FilterParam::Filter do
           expression = "#{column} eq 1"
 
           expect { parse(expression) }.not_to raise_error
-          expect(parse(expression)[:lexp][:field].str).to eql(column)
+          expect(parse(expression)[:exp][:field].str).to eql(column)
         end
       end
     end
@@ -38,63 +38,63 @@ RSpec.describe FilterParam::Filter do
     end
 
     it "parses :eq filter operator" do
-      expect(parse("name eq 'john'")[:lexp][:filter_op].str).to eql("eq")
+      expect(parse("name eq 'john'")[:exp][:filter_op].str).to eql("eq")
     end
 
     it "parses :neq filter operator" do
-      expect(parse("name neq 'john'")[:lexp][:filter_op].str).to eql("neq")
+      expect(parse("name neq 'john'")[:exp][:filter_op].str).to eql("neq")
     end
 
     it "parses null filter value" do
-      expect(parse("name eq null")[:lexp][:null_literal].str).to eql("null")
+      expect(parse("name eq null")[:exp][:value][:null].str).to eql("null")
     end
 
     it "parses boolean filter value" do
-      expect(parse("name eq true")[:lexp][:boolean_literal].str).to eql("true")
-      expect(parse("name eq false")[:lexp][:boolean_literal].str).to eql("false")
+      expect(parse("name eq true")[:exp][:value][:boolean].str).to eql("true")
+      expect(parse("name eq false")[:exp][:value][:boolean].str).to eql("false")
     end
 
     it "parses string filter value" do
-      expect(parse("name eq 'john'")[:lexp][:string_literal].str).to eql("john")
-      expect(parse("name eq \"john\"")[:lexp][:string_literal].str).to eql("john")
-      expect(parse('name eq \'john\'')[:lexp][:string_literal].str).to eql("john")
-      expect(parse('name eq "john"')[:lexp][:string_literal].str).to eql("john")
+      expect(parse("name eq 'john'")[:exp][:value][:string].str).to eql("john")
+      expect(parse("name eq \"john\"")[:exp][:value][:string].str).to eql("john")
+      expect(parse('name eq \'john\'')[:exp][:value][:string].str).to eql("john")
+      expect(parse('name eq "john"')[:exp][:value][:string].str).to eql("john")
     end
 
     it "parses :or logical operator" do
-      exp = parse("name eq 'john' or surname eq 'doe'")
-      left = exp[:lexp]
-      right = exp[:rexp]
+      exp = parse("name eq 'john' or surname eq 'doe'")[:exp]
+      left = exp[:left][:exp]
+      right = exp[:right][:exp]
 
-      expect(exp[:logical_operator].str).to eql("or")
+      expect(exp[:logic_op].str).to eql("or")
       expect(left[:field].str).to eql("name")
       expect(left[:filter_op].str).to eql("eq")
-      expect(left[:string_literal].str).to eql("john")
+      expect(left[:value][:string].str).to eql("john")
       expect(right[:field].str).to eql("surname")
       expect(right[:filter_op].str).to eql("eq")
-      expect(right[:string_literal].str).to eql("doe")
+      expect(right[:value][:string].str).to eql("doe")
     end
 
     it "parses :and logical operator" do
-      exp = parse("name eq 'jane' and surname neq 'doe'")
-      left = exp[:lexp]
-      right = exp[:rexp]
+      exp = parse("name eq 'jane' and surname neq 'doe'")[:exp]
+      left = exp[:left][:exp]
+      right = exp[:right][:exp]
 
-      expect(exp[:logical_operator].str).to eql("and")
+      expect(exp[:logic_op].str).to eql("and")
       expect(left[:field].str).to eql("name")
       expect(left[:filter_op].str).to eql("eq")
-      expect(left[:string_literal].str).to eql("jane")
+      expect(left[:value][:string].str).to eql("jane")
       expect(right[:field].str).to eql("surname")
       expect(right[:filter_op].str).to eql("neq")
-      expect(right[:string_literal].str).to eql("doe")
+      expect(right[:value][:string].str).to eql("doe")
     end
 
     context "value parenthesization" do
       it "correctly parses different formats" do
-        expect(parse("id eq(42)")[:lexp][:int_literal].str).to eql("42")
-        expect(parse("id eq (42)")[:lexp][:int_literal].str).to eql("42")
-        expect(parse("id eq ((42))")[:lexp][:int_literal].str).to eql("42")
-        expect(parse("id eq ( (   ( 42)) )")[:lexp][:int_literal].str).to eql("42")
+        expect(parse("id eq(42)")[:exp][:value][:int].str).to eql("42")
+        expect(parse("id eq (42)")[:exp][:value][:int].str).to eql("42")
+        expect(parse("id eq ((42))")[:exp][:value][:int].str).to eql("42")
+        expect(parse("id eq ( (   ( 42)) )")[:exp][:value][:int].str).to eql("42")
       end
 
       it "requires parentheses to be pairs" do
@@ -105,7 +105,7 @@ RSpec.describe FilterParam::Filter do
       end
     end
 
-    context "expression parenthesization", rr: true do
+    context "expression parenthesization" do
       it "correctly parses different formats" do
         expect { parse("id eq 1") }.not_to raise_error
         expect { parse("(id eq 1)") }.not_to raise_error
@@ -122,6 +122,7 @@ RSpec.describe FilterParam::Filter do
         expect { parse("((id neq 1 and name neq 'John'))") }.not_to raise_error
         expect { parse("(((id neq 1) and (name neq 'John')))") }.not_to raise_error
         expect { parse("id neq 1 and name neq 'John' and name neq 'Jane'") }.not_to raise_error
+        expect { parse("id neq 1 and(name eq 'John' or name eq 'Jane')") }.not_to raise_error
       end
     end
   end
