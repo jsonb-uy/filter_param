@@ -16,9 +16,9 @@ module FilterParam
     rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
     rule(:table_name) { identifier.repeat(1) >> dot }
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
-    rule(:op_and) { str("and").as(:logical_operator) }
-    rule(:op_or) { str("or").as(:logical_operator) }
-    rule(:logical_op) { op_and | op_or }
+    rule(:and_op) { str("and") }
+    rule(:or_op) { str("or") }
+    rule(:logical_op) { space >> (and_op | or_op).as(:logical_op) >> space }
 
     # Literals
     rule(:null) { str("null").as(:null_literal) }
@@ -44,48 +44,35 @@ module FilterParam
     rule(:eq) { str("eq") }
     rule(:neq) { str("neq") }
     rule(:filter_op) { (eq | neq).as(:filter_op) }
-
     rule(:filter) do
       (
         field_name >> space >> filter_op >> (
           (space >> (literal | literal_paren)) | literal_paren
         )
-      ) |
-      (
-        lparen.present? >> lparen >> filter >> rparen
-      )
+      ).as(:filter)
+    end
+    rule(:grouping) do
+      lparen >> expression >> rparen
     end
 
-    rule(:logical_expression) do
-      (
-        (
-          logical_op.present? >> (
-            logical_expression.as(:lexp) >> space >> logical_op.as(:logical_op) >> space >> logical_expression.as(:rexp)
-          )
-        ) |
-        (
-          filter.as(:filter)
-        )
-      ).as(:logical_expression)
+    rule(:logical_exp) do
+      logical_op.present? >>
+        (expression.as(:left) >> logical_op.as(:logical_op) >> expression.as(:right))
     end
 
-    rule(:logical_expression_paren) do
-      lparen >> (logical_expression | logical_expression_paren) >> rparen
+    rule(:expression) do
+      logical_exp | filter | grouping
     end
 
-    rule(:logical_expressions) do
-      logical_expression | logical_expression_paren
-    end
-
-    rule(:expression_group) do
+    rule(:expressions) do
       space? >>
         (
-          logical_expressions.repeat(1)
+          expression
         ) >>
       space?
     end
 
-    root(:expression_group)
+    root(:expressions)
   end
 end
 
