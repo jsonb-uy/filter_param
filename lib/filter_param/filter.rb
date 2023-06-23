@@ -14,7 +14,7 @@ module FilterParam
     rule(:negative_sign) { str("-") }
     rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
     rule(:table_name) { identifier.repeat(1) >> dot }
-    rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
+    rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:f) }
 
     # Literals
     rule(:null) { str("null").as(:null) }
@@ -30,36 +30,36 @@ module FilterParam
         (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
     rule(:literal) do
-      (null | boolean | integer | string).as(:value)
+      (null | boolean | integer | string).as(:val)
     end
     rule(:literal_paren) do
       lparen >> (literal | literal_paren) >> rparen
     end
 
     # Operations
-    rule(:filter_op) do
-      (str("eq") | str("neq") | str("lte") | str("lt") | str("gte") | str("gt")).as(:filter_op)
+    rule(:f_op) do
+      (str("eq") | str("neq") | str("lte") | str("lt") | str("gte") | str("gt")).as(:f_op)
     end
-    rule(:filter_value) do
+    rule(:f_val) do
       (space >> (literal | literal_paren)) | literal_paren
     end
-    rule(:filter_exp) do
-      grouping | (field_name >> space >> filter_op >> filter_value).as(:exp)
+    rule(:f_exp) do
+      grouping | (field_name >> space >> f_op >> f_val).as(:exp)
     end
 
-    rule(:logic_op) { (str("and") | str("or")).as(:logic_op) }
-    rule(:logic_exp) do
+    rule(:l_op) { (str("and") | str("or")).as(:l_op) }
+    rule(:l_exp) do
       (
-        filter_exp.as(:left) >> space >> logic_op >> logic_right_exp.as(:right)
+        f_exp.as(:l_lexp) >> space >> l_op >> l_rexp.as(:l_rexp)
       ).as(:exp) |
-      filter_exp
+      f_exp
     end
-    rule(:logic_right_exp) do
-      (space >> logic_exp) | (lparen.present? >> logic_exp)
+    rule(:l_rexp) do
+      (space >> l_exp) | (lparen.present? >> l_exp)
     end
 
     rule(:grouping) { (lparen >> expression >> rparen).as(:group) }
-    rule(:expression) { space.maybe >> logic_exp >> space.maybe }
+    rule(:expression) { space.maybe >> l_exp >> space.maybe }
     root(:expression)
   end
 end
