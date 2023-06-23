@@ -18,41 +18,49 @@ module FilterParam
     rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:field) }
     rule(:and_op) { str("and") }
     rule(:or_op) { str("or") }
-    rule(:logical_op) { space >> (and_op | or_op).as(:logical_op) >> space }
+    rule(:logical_op) { (and_op | or_op).as(:logical_op) }
 
     # Literals
-    rule(:null) { str("null").as(:null_literal) }
-    rule(:boolean) { (str("true") | str("false")).as(:boolean_literal) }
+    rule(:null) { str("null").as(:null) }
+    rule(:boolean) { (str("true") | str("false")).as(:boolean) }
     rule(:integer) do
       (
         (negative_sign >> non_zero_digit.repeat(1)) |
         (negative_sign.absent? >> any_digit.repeat(1))
-      ).as(:int_literal)
+      ).as(:int)
     end
     rule(:string) do
-      (single_quote >> (escaped_char | match("[^\']")).repeat.as(:string_literal) >> single_quote) |
-        (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote)
+      (single_quote >> (escaped_char | match("[^\']")).repeat.as(:string) >> single_quote) |
+        (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
-    rule(:literal) { null | boolean | integer | string }
+    rule(:literal) do
+      null | boolean | integer | string
+    end
+    rule(:literal_paren) do
+      lparen >> (literal | literal_paren) >> rparen
+    end
+
     rule(:grouping) do
       lparen >> expression >> rparen
     end
-    rule(:primary) { literal | grouping }
 
     # Operations
-    rule(:equality_op) { (str("eq") | str("neq")).as(:equality) }
-    rule(:comparison_op) { (str("lt") | str("lte") | str("gt") | str("gte")).as(:comparison) }
-    rule(:filter_op) { equality_op | comparison_op }
-    rule(:filter) do
+    rule(:equality_op) { (str("eq") | str("neq")) }
+    rule(:comparison_op) { (str("lt") | str("lte") | str("gt") | str("gte")) }
+    rule(:filter_op) { (equality_op | comparison_op).as(:filter_op) }
+    rule(:filter_exp) do
       (
         field_name >> space >> filter_op >>
-          ((space.present? >> space >> primary.as(:right)) | grouping.as(:right))
-      ).as(:filter) |
-      primary
+          ((space.present? >> space >> (literal | literal_paren).as(:value)) | literal_paren.as(:value))
+      ) |
+      grouping
     end
 
-    rule(:expression) { space? >> filter >> space? }
+    rule(:logical_exp) do
+      filter_exp >> (space.present? >> space >> logical_op >> space >> logical_exp).repeat(0)
+    end
 
+    rule(:expression) { space? >> logical_exp >> space? }
     root(:expression)
   end
 end
