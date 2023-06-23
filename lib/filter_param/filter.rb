@@ -40,30 +40,26 @@ module FilterParam
       lparen >> (literal | literal_paren) >> rparen
     end
 
-    rule(:grouping) do
-      lparen >> expression >> rparen
-    end
-
     # Operations
-    rule(:equality_op) { (str("eq") | str("neq")) }
-    rule(:comparison_op) { (str("lt") | str("lte") | str("gt") | str("gte")) }
-    rule(:filter_op) { (equality_op | comparison_op).as(:filter_op) }
+    rule(:filter_op) do
+      (str("eq") | str("neq") | str("lte") | str("lt") | str("gte") | str("gt")).as(:filter_op)
+    end
     rule(:filter_exp) do
-      (
+      grouping | (
         field_name >> space >> filter_op >>
           ((space.present? >> space >> (literal | literal_paren).as(:value)) | literal_paren.as(:value))
-      ) |
-      grouping
+      ).as(:filter)
+    end
+
+    rule(:grouping) do
+      (lparen >> expression >> rparen).as(:group)
     end
 
     rule(:logical_exp) do
-      filter_exp >> (space.present? >> space >> logical_op >> space >> logical_exp).repeat(0)
+      (filter_exp.as(:left) >> (space.present? >> space >> logical_op >> space >> filter_exp.as(:right)).repeat(0))
     end
 
-    rule(:expression) { space? >> logical_exp >> space? }
+    rule(:expression) { space? >> logical_exp.as(:expression) >> space? }
     root(:expression)
   end
 end
-
-#where paid = (name = 'wa')
-# (name eq false or name eq true) and (name neq false and name neq true)
