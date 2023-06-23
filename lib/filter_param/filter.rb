@@ -5,8 +5,8 @@ module FilterParam
     rule(:space) { match("\s").repeat(1) }
     rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
-    rule(:lparen) { str("(").as(:lparen) >> space? }
-    rule(:rparen) { space? >> str(")").as(:rparen) }
+    rule(:lparen) { str("(") }
+    rule(:rparen) { str(")") }
     rule(:escaped_char) { str('\\').present? >> str('\\') >> any }
     rule(:double_quote) { str('"') }
     rule(:single_quote) { str("'") }
@@ -34,43 +34,28 @@ module FilterParam
         (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string_literal) >> double_quote)
     end
     rule(:literal) { null | boolean | integer | string }
-    rule(:literal_paren) { lparen >> (literal | literal_paren) >> rparen }
-
-    # Operations
-    rule(:equality) { (str("eq") | str("neq")).as(:equality) }
-    rule(:comparison) { (str("lt") | str("lte") | str("gt") | str("gte")).as(:comparison) }
-
-    rule(:filter_op) { equality | comparison }
-    rule(:filter) do
-      (
-        field_name >> space >> filter_op >> (
-          (space >> (literal | literal_paren)) | literal_paren
-        )
-      ).as(:filter)
-    end
     rule(:grouping) do
       lparen >> expression >> rparen
     end
+    rule(:primary) { literal | grouping }
 
-    rule(:logical_exp) do
-      logical_op.present? >>
-        (expression.as(:left) >> logical_op.as(:logical_op) >> expression.as(:right))
+    # Operations
+    rule(:equality_op) { (str("eq") | str("neq")).as(:equality) }
+    rule(:comparison_op) { (str("lt") | str("lte") | str("gt") | str("gte")).as(:comparison) }
+    rule(:filter_op) { equality_op | comparison_op }
+    rule(:filter) do
+      (
+        field_name >> space >> filter_op >>
+          ((space.present? >> space >> primary.as(:right)) | grouping.as(:right))
+      ).as(:filter) |
+      primary
     end
 
-    rule(:expression) do
-      logical_exp | filter | grouping
-    end
+    rule(:expression) { space? >> filter >> space? }
 
-    rule(:expressions) do
-      space? >>
-        (
-          expression
-        ) >>
-      space?
-    end
-
-    root(:expressions)
+    root(:expression)
   end
 end
 
+#where paid = (name = 'wa')
 # (name eq false or name eq true) and (name neq false and name neq true)
