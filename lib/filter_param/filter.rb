@@ -45,7 +45,7 @@ module FilterParam
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
-      empty_group.ignore | group | (field_name >> space >> f_op >> f_val).as(:exp)
+      group | (field_name >> space >> f_op >> f_val).as(:exp)
     end
 
     rule(:l_op) { (str("and") | str("or")).as(:l_op) }
@@ -61,7 +61,7 @@ module FilterParam
     rule(:empty_group) do
       (lparen >> space? >> rparen) | (lparen >> space? >> empty_group >> space? >> rparen)
     end
-    rule(:group) { (lparen >> expression >> rparen).as(:group) }
+    rule(:group) { empty_group.ignore | (lparen >> expression >> rparen).as(:group) }
     rule(:expression) { (space? >> l_exp >> space?) }
     root(:expression)
   end
