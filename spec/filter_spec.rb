@@ -124,6 +124,13 @@ RSpec.describe FilterParam::Filter do
         expect { parse("id neq 1 and name neq 'John' and name neq 'Jane'") }.not_to raise_error
         expect { parse("id neq 1 and(name eq 'John' or name eq 'Jane')") }.not_to raise_error
       end
+
+      it "ignores empty parentheses" do
+        expect(parse(" () ")).to eql("")
+        expect(parse(" (  ) ")).to eql("")
+        expect(parse(" ( ( )) ")).to eql("")
+        expect(parse("(())")).to eql("")
+      end
     end
   end
 end
