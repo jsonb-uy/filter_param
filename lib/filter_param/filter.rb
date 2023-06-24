@@ -2,8 +2,8 @@ require "parslet"
 
 module FilterParam
   class Filter < Parslet::Parser
-    rule(:space) { match("\s").repeat(1) }
-    rule(:space?) { space.maybe.ignore }
+    rule(:space) { match("\s").repeat(1).ignore }
+    rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
     rule(:lparen) { str("(") }
     rule(:rparen) { str(")") }
@@ -14,8 +14,8 @@ module FilterParam
     rule(:non_zero_digit) { match("[1-9]") }
     rule(:negative_sign) { str("-") }
     rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
-    rule(:table_name) { identifier.repeat(1) >> dot }
-    rule(:field_name) { (table_name.maybe >> identifier.repeat(1)).as(:f) }
+    rule(:table) { identifier.repeat(1) >> dot }
+    rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
 
     # Literals
     rule(:null) { str("null").as(:null) }
@@ -45,7 +45,7 @@ module FilterParam
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
-      group | (field_name >> space >> f_op >> f_val).as(:exp)
+      group | (field >> space >> f_op >> f_val).as(:exp)
     end
 
     rule(:l_op) { (str("and") | str("or")).as(:l_op) }
@@ -55,14 +55,12 @@ module FilterParam
       ).as(:exp) |
       f_exp
     end
-    rule(:l_rexp) do
-      (space | lparen.present?) >> l_exp
-    end
+    rule(:l_rexp) { (space | lparen.present?) >> l_exp }
     rule(:empty_group) do
-      (lparen >> space? >> rparen) | (lparen >> space? >> empty_group >> space? >> rparen)
+      (lparen >> space? >> empty_group >> space? >> rparen) | (lparen >> space? >> rparen)
     end
     rule(:group) { empty_group.ignore | (lparen >> expression >> rparen).as(:group) }
-    rule(:expression) { (space? >> l_exp >> space?) }
+    rule(:expression) { space? >> l_exp >> space? }
     root(:expression)
   end
 end
