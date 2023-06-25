@@ -11,7 +11,10 @@ module FilterParam
     rule(:double_quote) { str('"') }
     rule(:single_quote) { str("'") }
     rule(:any_digit) { match("[0-9]") }
+    rule(:zero_digit) { str("0") }
     rule(:non_zero_digit) { match("[1-9]") }
+    rule(:sig_number) { non_zero_digit >> any_digit.repeat(1).maybe }
+    rule(:zero_nonsig) { zero_digit.repeat(0).maybe.ignore }
     rule(:negative_sign) { str("-") }
     rule(:identifier) { match("[a-zA-Z_]") >> any_digit.maybe }
     rule(:table) { identifier.repeat(1) >> dot }
@@ -22,16 +25,23 @@ module FilterParam
     rule(:boolean) { (str("true") | str("false")).as(:boolean) }
     rule(:integer) do
       (
-        (negative_sign >> non_zero_digit.repeat(1)) |
-        (negative_sign.absent? >> any_digit.repeat(1))
+        (negative_sign >> zero_nonsig >> sig_number) |
+        (zero_nonsig >> sig_number) |
+        (negative_sign.maybe.ignore >> zero_digit >> zero_nonsig)
       ).as(:int)
+    end
+    rule(:decimal) do
+      (
+        (negative_sign >> non_zero_digit.repeat(1) >> dot >> any_digit.repeat(1)) |
+        (any_digit.repeat(1) >> dot >> any_digit.repeat(1))
+      ).as(:decimal)
     end
     rule(:string) do
       (single_quote >> (escaped_char | match("[^\']")).repeat.as(:string) >> single_quote) |
         (double_quote >> (escaped_char | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
     rule(:literal) do
-      (null | boolean | integer | string).as(:val)
+      (null | boolean | decimal | integer | string).as(:val)
     end
     rule(:literal_paren) do
       lparen >> space? >> (literal | literal_paren) >> space? >> rparen

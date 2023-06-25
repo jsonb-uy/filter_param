@@ -54,6 +54,34 @@ RSpec.describe FilterParam::Filter do
       expect(parse("name eq false")[:exp][:val][:boolean].str).to eql("false")
     end
 
+    it "parses positive integer filter value" do
+      expect(parse("age gte 1")[:exp][:val][:int].str).to eql("1")
+      expect(parse("age gte 420")[:exp][:val][:int].str).to eql("420")
+      expect(parse("age gte 100003")[:exp][:val][:int].str).to eql("100003")
+      expect(parse("age gte 01")[:exp][:val][:int].str).to eql("1")
+      expect(parse("age gte 00023")[:exp][:val][:int].str).to eql("23")
+      expect(parse("age gte 000230")[:exp][:val][:int].str).to eql("230")
+      expect(parse("age gte 02301")[:exp][:val][:int].str).to eql("2301")
+    end
+
+    it "parses zero integer filter value" do
+      expect(parse("age gte 00000")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age gte 00")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age gte 0")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age gte -0")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age gte -000")[:exp][:val][:int].str).to eql("0")
+    end
+
+    it "parses negative integer filter value" do
+      expect(parse("age gte -1")[:exp][:val][:int].str).to eql("-1")
+      expect(parse("age gte -420")[:exp][:val][:int].str).to eql("-420")
+      expect(parse("age gte -100003")[:exp][:val][:int].str).to eql("-100003")
+      expect(parse("age gte -01")[:exp][:val][:int].str).to eql("-1")
+      expect(parse("age gte -00023")[:exp][:val][:int].str).to eql("-23")
+      expect(parse("age gte -000230")[:exp][:val][:int].str).to eql("-230")
+      expect(parse("age gte -02301")[:exp][:val][:int].str).to eql("-2301")
+    end
+
     it "parses string filter value" do
       expect(parse("name eq 'john'")[:exp][:val][:string].str).to eql("john")
       expect(parse("name eq \"john\"")[:exp][:val][:string].str).to eql("john")
