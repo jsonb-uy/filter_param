@@ -82,6 +82,17 @@ RSpec.describe FilterParam::Filter do
       expect(parse("age gte -02301")[:exp][:val][:int].str).to eql("-2301")
     end
 
+    it "parses positive decimal filter value" do
+      expect(parse("age gte 1.0")[:exp][:val][:decimal].str).to eql("1.0")
+      expect(parse("age gte 1.00000")[:exp][:val][:decimal].str).to eql("1.0")
+      expect(parse("age gte 420.101")[:exp][:val][:decimal].str).to eql("420.101")
+      expect(parse("age gte 58456.100003")[:exp][:val][:decimal].str).to eql("58456.100003")
+      expect(parse("age gte 09.01")[:exp][:val][:decimal].str).to eql("9.01")
+      expect(parse("age gte 00900.00023")[:exp][:val][:decimal].str).to eql("900.00023")
+      expect(parse("age gte 8765432.000230")[:exp][:val][:decimal].str).to eql("8765432.00023")
+      expect(parse("age gte +73.02301")[:exp][:val][:decimal].str).to eql("73.02301")
+    end
+
     it "parses string filter value" do
       expect(parse("name eq 'john'")[:exp][:val][:string].str).to eql("john")
       expect(parse("name eq \"john\"")[:exp][:val][:string].str).to eql("john")
@@ -159,6 +170,11 @@ RSpec.describe FilterParam::Filter do
         expect(parse(" ( ( )) ")).to eql("")
         expect(parse("(())")).to eql("")
       end
+    end
+
+    xit "ignores whitespace sequences" do
+      expect(parse(" ")).to eql("")
+      expect(parse("          ")).to eql("")
     end
   end
 end
