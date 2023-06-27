@@ -16,7 +16,6 @@ module FilterParam
     rule(:sig_number) { non_zero_digit >> digit.repeat(1).maybe }
     rule(:zero_nonsig) { zero_digit.repeat(0).maybe.ignore }
     rule(:negative_sign) { str("-") }
-    rule(:numeric_sign) { negative_sign | str("+") }
     rule(:identifier) { match("[a-zA-Z_]") >> digit.maybe }
     rule(:table) { identifier.repeat(1) >> dot }
     rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
@@ -32,8 +31,8 @@ module FilterParam
     end
     rule(:decimal) do
       (
-        (numeric_sign.maybe >> zero_nonsig >> sig_number >> dot >> zero_digit >> zero_nonsig) |
-        (numeric_sign.maybe >> zero_nonsig >> sig_number >> dot >> (zero_digit | digit.repeat(1)))
+        (negative_sign.maybe >> zero_nonsig >> sig_number >> dot >> digit.repeat(1)) |
+        (negative_sign.maybe >> zero_digit >> zero_nonsig >> dot >> digit.repeat(1))
       ).as(:decimal)
     end
     rule(:string) do
