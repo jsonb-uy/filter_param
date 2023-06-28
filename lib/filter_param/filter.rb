@@ -19,6 +19,16 @@ module FilterParam
     rule(:identifier) { match("[a-zA-Z_]") >> digit.maybe }
     rule(:table) { identifier.repeat(1) >> dot }
     rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
+    rule(:date_year) { digit.repeat(4) }
+    rule(:date_month) do
+      (str("0") >> match("[1-9]")) | (str("1") >> match("[0-2]"))
+    end
+    rule(:date_monthday) do
+      (str("0") >> match("[1-9]")) |
+        (match("[1-2]") >> match("[0-9]")) |
+        (str("3") >> match("[0-1]"))
+    end
+    rule(:date_sep) { str("-") }
 
     # Literals
     rule(:null) { str("null").as(:null) }
@@ -39,8 +49,11 @@ module FilterParam
       (single_quote >> (escape_seq | match("[^\']")).repeat.as(:string) >> single_quote) |
         (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
+    rule(:date) do
+      (date_year >> date_sep >> date_month >> date_sep >> date_monthday).as(:date)
+    end
     rule(:literal) do
-      (null | boolean | decimal | integer | string).as(:val)
+      (null | boolean | date | decimal | integer | string).as(:val)
     end
     rule(:literal_paren) do
       lparen >> space? >> (literal | literal_paren) >> space? >> rparen

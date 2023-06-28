@@ -117,6 +117,14 @@ RSpec.describe FilterParam::Filter do
       expect(parse('name eq "john"')[:exp][:val][:string].str).to eql("john")
     end
 
+    it "parses date filter value" do
+      expect(parse("birthdate eq 2023-04-23")[:exp][:val][:date].str).to eql("2023-04-23")
+    end
+
+    xit "parses datetime filter value" do
+      expect(parse("birthdate eq 2023-04-23")[:exp][:val][:date].str).to eql("2023-04-23")
+    end
+
     it "parses :or logical operator" do
       exp = parse("name eq 'john' or surname eq 'doe'")[:exp]
       left = exp[:l_lexp][:exp]
