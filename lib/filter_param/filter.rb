@@ -73,7 +73,7 @@ module FilterParam
     end
 
     rule(:literal) do
-      (null | boolean | datetime | date | decimal | integer | string).as(:val)
+      (null | boolean | decimal | integer | datetime | date | string).as(:val)
     end
     rule(:literal_paren) do
       lparen >> space? >> (literal | literal_paren) >> space? >> rparen
@@ -81,13 +81,17 @@ module FilterParam
 
     # Operations
     rule(:f_op) do
-      (str("eq") | str("neq") | str("lte") | str("lt") | str("gte") | str("gt")).as(:f_op)
+      (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
+        str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:f_op)
+    end
+    rule(:f_opu) do
+      str("pr")
     end
     rule(:f_val) do
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
-      group | (field >> space >> f_op >> f_val).as(:exp)
+      group | (field >> space >> ((f_op >> f_val) | f_opu)).as(:exp)
     end
 
     rule(:l_op) { (str("and") | str("or")).as(:l_op) }

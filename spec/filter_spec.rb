@@ -41,8 +41,44 @@ RSpec.describe FilterParam::Filter do
       expect(parse("name eq 'john'")[:exp][:f_op].str).to eql("eq")
     end
 
+    it "parses :eq_ci filter operator" do
+      expect(parse("name eq_ci 'JoHn'")[:exp][:f_op].str).to eql("eq_ci")
+    end
+
     it "parses :neq filter operator" do
       expect(parse("name neq 'john'")[:exp][:f_op].str).to eql("neq")
+    end
+
+    it "parses :co filter operator" do
+      expect(parse("name co 'john'")[:exp][:f_op].str).to eql("co")
+    end
+
+    it "parses :sw filter operator" do
+      expect(parse("name sw 'jo'")[:exp][:f_op].str).to eql("sw")
+    end
+
+    it "parses :ew filter operator" do
+      expect(parse("name ew 'hn'")[:exp][:f_op].str).to eql("ew")
+    end
+
+    it "parses :gt filter operator" do
+      expect(parse("age gt 3")[:exp][:f_op].str).to eql("gt")
+    end
+
+    it "parses :ge filter operator" do
+      expect(parse("age ge 5")[:exp][:f_op].str).to eql("ge")
+    end
+
+    it "parses :lt filter operator" do
+      expect(parse("age lt 42")[:exp][:f_op].str).to eql("lt")
+    end
+
+    it "parses :le filter operator" do
+      expect(parse("age le 20")[:exp][:f_op].str).to eql("le")
+    end
+
+    it "parses :pr filter operator" do
+      expect(parse("surname pr")[:exp][:f_op].str).to eql("pr")
     end
 
     it "parses null filter value" do
@@ -55,59 +91,59 @@ RSpec.describe FilterParam::Filter do
     end
 
     it "parses positive integer filter value" do
-      expect(parse("age gte 1")[:exp][:val][:int].str).to eql("1")
-      expect(parse("age gte 420")[:exp][:val][:int].str).to eql("420")
-      expect(parse("age gte 100003")[:exp][:val][:int].str).to eql("100003")
-      expect(parse("age gte 01")[:exp][:val][:int].str).to eql("1")
-      expect(parse("age gte 00023")[:exp][:val][:int].str).to eql("23")
-      expect(parse("age gte 000230")[:exp][:val][:int].str).to eql("230")
-      expect(parse("age gte 02301")[:exp][:val][:int].str).to eql("2301")
+      expect(parse("age ge 1")[:exp][:val][:int].str).to eql("1")
+      expect(parse("age ge 420")[:exp][:val][:int].str).to eql("420")
+      expect(parse("age ge 100003")[:exp][:val][:int].str).to eql("100003")
+      expect(parse("age ge 01")[:exp][:val][:int].str).to eql("1")
+      expect(parse("age ge 00023")[:exp][:val][:int].str).to eql("23")
+      expect(parse("age ge 000230")[:exp][:val][:int].str).to eql("230")
+      expect(parse("age ge 02301")[:exp][:val][:int].str).to eql("2301")
     end
 
     it "parses zero integer filter value" do
-      expect(parse("age gte 00000")[:exp][:val][:int].str).to eql("0")
-      expect(parse("age gte 00")[:exp][:val][:int].str).to eql("0")
-      expect(parse("age gte 0")[:exp][:val][:int].str).to eql("0")
-      expect(parse("age gte -0")[:exp][:val][:int].str).to eql("0")
-      expect(parse("age gte -000")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age ge 00000")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age ge 00")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age ge 0")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age ge -0")[:exp][:val][:int].str).to eql("0")
+      expect(parse("age ge -000")[:exp][:val][:int].str).to eql("0")
     end
 
     it "parses negative integer filter value" do
-      expect(parse("age gte -1")[:exp][:val][:int].str).to eql("-1")
-      expect(parse("age gte -420")[:exp][:val][:int].str).to eql("-420")
-      expect(parse("age gte -100003")[:exp][:val][:int].str).to eql("-100003")
-      expect(parse("age gte -01")[:exp][:val][:int].str).to eql("-1")
-      expect(parse("age gte -00023")[:exp][:val][:int].str).to eql("-23")
-      expect(parse("age gte -000230")[:exp][:val][:int].str).to eql("-230")
-      expect(parse("age gte -02301")[:exp][:val][:int].str).to eql("-2301")
+      expect(parse("age ge -1")[:exp][:val][:int].str).to eql("-1")
+      expect(parse("age ge -420")[:exp][:val][:int].str).to eql("-420")
+      expect(parse("age ge -100003")[:exp][:val][:int].str).to eql("-100003")
+      expect(parse("age ge -01")[:exp][:val][:int].str).to eql("-1")
+      expect(parse("age ge -00023")[:exp][:val][:int].str).to eql("-23")
+      expect(parse("age ge -000230")[:exp][:val][:int].str).to eql("-230")
+      expect(parse("age ge -02301")[:exp][:val][:int].str).to eql("-2301")
     end
 
     it "parses positive decimal filter value" do
-      expect(parse("age gte 1.0")[:exp][:val][:decimal].str).to eql("1.0")
-      expect(parse("age gte 420.101")[:exp][:val][:decimal].str).to eql("420.101")
-      expect(parse("age gte 58456.100003")[:exp][:val][:decimal].str).to eql("58456.100003")
-      expect(parse("age gte 09.01")[:exp][:val][:decimal].str).to eql("9.01")
-      expect(parse("age gte 00900.00023")[:exp][:val][:decimal].str).to eql("900.00023")
-      expect(parse("age gte 73.02301")[:exp][:val][:decimal].str).to eql("73.02301")
-      expect(parse("age gte 0.0958")[:exp][:val][:decimal].str).to eql("0.0958")
+      expect(parse("age ge 1.0")[:exp][:val][:decimal].str).to eql("1.0")
+      expect(parse("age ge 420.101")[:exp][:val][:decimal].str).to eql("420.101")
+      expect(parse("age ge 58456.100003")[:exp][:val][:decimal].str).to eql("58456.100003")
+      expect(parse("age ge 09.01")[:exp][:val][:decimal].str).to eql("9.01")
+      expect(parse("age ge 00900.00023")[:exp][:val][:decimal].str).to eql("900.00023")
+      expect(parse("age ge 73.02301")[:exp][:val][:decimal].str).to eql("73.02301")
+      expect(parse("age ge 0.0958")[:exp][:val][:decimal].str).to eql("0.0958")
     end
 
     it "parses negative decimal filter value" do
-      expect(parse("age gte -1.0")[:exp][:val][:decimal].str).to eql("-1.0")
-      expect(parse("age gte -420.101")[:exp][:val][:decimal].str).to eql("-420.101")
-      expect(parse("age gte -58456.100003")[:exp][:val][:decimal].str).to eql("-58456.100003")
-      expect(parse("age gte -09.01")[:exp][:val][:decimal].str).to eql("-9.01")
-      expect(parse("age gte -00900.00023")[:exp][:val][:decimal].str).to eql("-900.00023")
-      expect(parse("age gte -73.02301")[:exp][:val][:decimal].str).to eql("-73.02301")
-      expect(parse("age gte -0.0958")[:exp][:val][:decimal].str).to eql("-0.0958")
+      expect(parse("age ge -1.0")[:exp][:val][:decimal].str).to eql("-1.0")
+      expect(parse("age ge -420.101")[:exp][:val][:decimal].str).to eql("-420.101")
+      expect(parse("age ge -58456.100003")[:exp][:val][:decimal].str).to eql("-58456.100003")
+      expect(parse("age ge -09.01")[:exp][:val][:decimal].str).to eql("-9.01")
+      expect(parse("age ge -00900.00023")[:exp][:val][:decimal].str).to eql("-900.00023")
+      expect(parse("age ge -73.02301")[:exp][:val][:decimal].str).to eql("-73.02301")
+      expect(parse("age ge -0.0958")[:exp][:val][:decimal].str).to eql("-0.0958")
     end
 
     it "parses zero decimal filter value" do
-      expect(parse("age gte 00.000")[:exp][:val][:decimal].str).to eql("0.000")
-      expect(parse("age gte 0.00")[:exp][:val][:decimal].str).to eql("0.00")
-      expect(parse("age gte 0.0")[:exp][:val][:decimal].str).to eql("0.0")
-      expect(parse("age gte -0.0")[:exp][:val][:decimal].str).to eql("-0.0")
-      expect(parse("age gte -0.00")[:exp][:val][:decimal].str).to eql("-0.00")
+      expect(parse("age ge 00.000")[:exp][:val][:decimal].str).to eql("0.000")
+      expect(parse("age ge 0.00")[:exp][:val][:decimal].str).to eql("0.00")
+      expect(parse("age ge 0.0")[:exp][:val][:decimal].str).to eql("0.0")
+      expect(parse("age ge -0.0")[:exp][:val][:decimal].str).to eql("-0.0")
+      expect(parse("age ge -0.00")[:exp][:val][:decimal].str).to eql("-0.00")
     end
 
     it "parses string filter value" do
@@ -125,20 +161,20 @@ RSpec.describe FilterParam::Filter do
     end
 
     it "parses datetime filter value" do
-      expect(parse("created_at lte \"2017-06-04T10:15:30Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
-      expect(parse("created_at gte \"2017-06-04T10:15:30.999Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
-      expect(parse("created_at lte '2017-06-04T10:15:30Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
-      expect(parse("created_at gte '2017-06-04T10:15:30.999Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
-      expect(parse("created_at lte \"2017-06-04T10:15:30+09:00\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+09:00")
-      expect(parse("created_at gte \"2017-06-04T10:15:30.999-08:30\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-08:30")
-      expect(parse("created_at lte '2017-06-04T10:15:30+00:30'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+00:30")
-      expect(parse("created_at lte '2017-06-04T10:15:30+00:00'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+00:00")
-      expect(parse("created_at gte '2017-06-04T10:15:30.999-07:00'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-07:00")
-      expect(parse("created_at lte \"2017-06-04T10:15:30+0900\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0900")
-      expect(parse("created_at gte \"2017-06-04T10:15:30.999-0830\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-0830")
-      expect(parse("created_at lte '2017-06-04T10:15:30+0030'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0030")
-      expect(parse("created_at lte '2017-06-04T10:15:30+0000'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0000")
-      expect(parse("created_at gte '2017-06-04T10:15:30.999-0700'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-0700")
+      expect(parse("created_at le \"2017-06-04T10:15:30Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
+      expect(parse("created_at ge \"2017-06-04T10:15:30.999Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
+      expect(parse("created_at le '2017-06-04T10:15:30Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
+      expect(parse("created_at ge '2017-06-04T10:15:30.999Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
+      expect(parse("created_at le \"2017-06-04T10:15:30+09:00\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+09:00")
+      expect(parse("created_at ge \"2017-06-04T10:15:30.999-08:30\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-08:30")
+      expect(parse("created_at le '2017-06-04T10:15:30+00:30'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+00:30")
+      expect(parse("created_at le '2017-06-04T10:15:30+00:00'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+00:00")
+      expect(parse("created_at ge '2017-06-04T10:15:30.999-07:00'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-07:00")
+      expect(parse("created_at le \"2017-06-04T10:15:30+0900\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0900")
+      expect(parse("created_at ge \"2017-06-04T10:15:30.999-0830\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-0830")
+      expect(parse("created_at le '2017-06-04T10:15:30+0030'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0030")
+      expect(parse("created_at le '2017-06-04T10:15:30+0000'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0000")
+      expect(parse("created_at ge '2017-06-04T10:15:30.999-0700'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-0700")
     end
 
     it "parses :or logical operator" do
