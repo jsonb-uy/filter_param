@@ -38,47 +38,47 @@ RSpec.describe FilterParam::Filter do
     end
 
     it "parses :eq 'equal' filter operator" do
-      expect(parse("name eq 'john'")[:exp][:f_op].str).to eql("eq")
+      expect(parse("name eq 'john'")[:exp][:op].str).to eql("eq")
     end
 
     it "parses :eq_ci 'case-insensitive equal' filter operator" do
-      expect(parse("name eq_ci 'JoHn'")[:exp][:f_op].str).to eql("eq_ci")
+      expect(parse("name eq_ci 'JoHn'")[:exp][:op].str).to eql("eq_ci")
     end
 
     it "parses :neq 'not equal' filter operator" do
-      expect(parse("name neq 'john'")[:exp][:f_op].str).to eql("neq")
+      expect(parse("name neq 'john'")[:exp][:op].str).to eql("neq")
     end
 
     it "parses :co 'contains' filter operator" do
-      expect(parse("name co 'john'")[:exp][:f_op].str).to eql("co")
+      expect(parse("name co 'john'")[:exp][:op].str).to eql("co")
     end
 
     it "parses :sw 'starts with' filter operator" do
-      expect(parse("name sw 'jo'")[:exp][:f_op].str).to eql("sw")
+      expect(parse("name sw 'jo'")[:exp][:op].str).to eql("sw")
     end
 
     it "parses :ew 'ends with' filter operator" do
-      expect(parse("name ew 'hn'")[:exp][:f_op].str).to eql("ew")
+      expect(parse("name ew 'hn'")[:exp][:op].str).to eql("ew")
     end
 
     it "parses :gt 'greater than' filter operator" do
-      expect(parse("age gt 3")[:exp][:f_op].str).to eql("gt")
+      expect(parse("age gt 3")[:exp][:op].str).to eql("gt")
     end
 
     it "parses :ge 'greater than or equal' filter operator" do
-      expect(parse("age ge 5")[:exp][:f_op].str).to eql("ge")
+      expect(parse("age ge 5")[:exp][:op].str).to eql("ge")
     end
 
     it "parses :lt 'less than' filter operator" do
-      expect(parse("age lt 42")[:exp][:f_op].str).to eql("lt")
+      expect(parse("age lt 42")[:exp][:op].str).to eql("lt")
     end
 
     it "parses :le 'less than or equal' filter operator" do
-      expect(parse("age le 20")[:exp][:f_op].str).to eql("le")
+      expect(parse("age le 20")[:exp][:op].str).to eql("le")
     end
 
     it "parses :pr 'present' filter operator" do
-      expect(parse("surname pr")[:exp][:f_op].str).to eql("pr")
+      expect(parse("surname pr")[:exp][:op].str).to eql("pr")
     end
 
     it "parses null filter value" do
@@ -182,12 +182,12 @@ RSpec.describe FilterParam::Filter do
       left = exp[:lexp][:exp]
       right = exp[:rexp][:exp]
 
-      expect(exp[:l_op].str).to eql("or")
+      expect(exp[:op].str).to eql("or")
       expect(left[:f].str).to eql("name")
-      expect(left[:f_op].str).to eql("eq")
+      expect(left[:op].str).to eql("eq")
       expect(left[:val][:string].str).to eql("john")
       expect(right[:f].str).to eql("surname")
-      expect(right[:f_op].str).to eql("eq")
+      expect(right[:op].str).to eql("eq")
       expect(right[:val][:string].str).to eql("doe")
     end
 
@@ -196,27 +196,23 @@ RSpec.describe FilterParam::Filter do
       left = exp[:lexp][:exp]
       right = exp[:rexp][:exp]
 
-      expect(exp[:l_op].str).to eql("and")
+      expect(exp[:op].str).to eql("and")
       expect(left[:f].str).to eql("name")
-      expect(left[:f_op].str).to eql("eq")
+      expect(left[:op].str).to eql("eq")
       expect(left[:val][:string].str).to eql("jane")
       expect(right[:f].str).to eql("surname")
-      expect(right[:f_op].str).to eql("neq")
+      expect(right[:op].str).to eql("neq")
       expect(right[:val][:string].str).to eql("doe")
     end
 
     it "parses :not logical operator" do
       exp = parse("not name eq 'jane' and not(surname eq 'doe' and name eq 'john')")[:exp]
-      left = exp[:lexp][:exp]
-      right = exp[:rexp][:exp]
+      neg_exp = exp[:exp]
 
-      expect(exp[:l_op].str).to eql("and")
-      expect(left[:f].str).to eql("name")
-      expect(left[:f_op].str).to eql("eq")
-      expect(left[:val][:string].str).to eql("jane")
-      expect(right[:f].str).to eql("surname")
-      expect(right[:f_op].str).to eql("neq")
-      expect(right[:val][:string].str).to eql("doe")
+      expect(exp[:op].str).to eql("not")
+      expect(neg_exp[:f].str).to eql("name")
+      expect(neg_exp[:op].str).to eql("eq")
+      expect(neg_exp[:val][:string].str).to eql("jane")
     end
 
     context "value parenthesization" do

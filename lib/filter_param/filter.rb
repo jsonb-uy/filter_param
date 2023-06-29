@@ -20,7 +20,7 @@ module FilterParam
     rule(:table) { identifier.repeat(1) >> dot }
     rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
 
-    # Literals
+    # Literals / types
     rule(:null) { str("null").as(:null) }
     rule(:boolean) { (str("true") | str("false")).as(:boolean) }
 
@@ -82,26 +82,27 @@ module FilterParam
     # Operations
     rule(:f_opb) do
       (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
-        str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:f_op)
+        str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:op)
     end
     rule(:f_opu) do
-      str("pr").as(:f_op)
+      str("pr").as(:op)
     end
+    rule(:l_opb) { (str("and") | str("or")).as(:op) }
+    rule(:l_opu) { str("not").as(:op) }
+
+    # Expressions
     rule(:f_val) do
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
       group | (field >> space >> (f_opu | (f_opb >> f_val))).as(:exp)
     end
-
-    rule(:l_opb) { (str("and") | str("or")).as(:l_op) }
-    rule(:l_opu) { str("not").as(:l_op) }
     rule(:exp) do
       (
         f_exp.as(:lexp) >> space >> l_opb >> rexp.as(:rexp)
       ).as(:exp) |
-      (l_opu >> (space | lparen.present?) >> exp).as(:exp) |
-      f_exp
+        (l_opu >> (space | lparen.present?) >> exp).as(:exp) |
+        f_exp
     end
     rule(:rexp) { (space | lparen.present?) >> exp }
     rule(:empty_group) do
