@@ -19,41 +19,63 @@ module FilterParam
     rule(:identifier) { match("[a-zA-Z_]") >> digit.maybe }
     rule(:table) { identifier.repeat(1) >> dot }
     rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
-    rule(:date_year) { digit.repeat(4) }
-    rule(:date_month) do
-      (str("0") >> match("[1-9]")) | (str("1") >> match("[0-2]"))
-    end
-    rule(:date_monthday) do
-      (str("0") >> match("[1-9]")) |
-        (match("[1-2]") >> match("[0-9]")) |
-        (str("3") >> match("[0-1]"))
-    end
-    rule(:date_sep) { str("-") }
 
     # Literals
     rule(:null) { str("null").as(:null) }
     rule(:boolean) { (str("true") | str("false")).as(:boolean) }
+
     rule(:integer) do
       (
         (negative_sign.maybe >> zero_nonsig >> sig_number) |
         (negative_sign.maybe.ignore >> zero_digit >> zero_nonsig)
       ).as(:int)
     end
+
     rule(:decimal) do
       (
         (negative_sign.maybe >> zero_nonsig >> sig_number >> dot >> digit.repeat(1)) |
         (negative_sign.maybe >> zero_digit >> zero_nonsig >> dot >> digit.repeat(1))
       ).as(:decimal)
     end
+
     rule(:string) do
       (single_quote >> (escape_seq | match("[^\']")).repeat.as(:string) >> single_quote) |
         (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
-    rule(:date) do
-      (date_year >> date_sep >> date_month >> date_sep >> date_monthday).as(:date)
+
+    rule(:date_yyyy) { digit.repeat(4) }
+    rule(:date_mm) do
+      (str("0") >> match("[1-9]")) | (str("1") >> match("[0-2]"))
     end
+    rule(:date_md) do
+      (str("0") >> match("[1-9]")) |
+        (match("[1-2]") >> match("[0-9]")) |
+        (str("3") >> match("[0-1]"))
+    end
+    rule(:date_sep) { str("-") }
+    rule(:date) do
+      (date_yyyy >> date_sep >> date_mm >> date_sep >> date_md)
+    end
+
+    rule(:time_hh) do
+      (str("0") >> match("[0-9]")) |
+        (str("1") >> match("[0-9]")) |
+        (str("2") >> match("[0-3]"))
+    end
+    rule(:time_mi) do
+      (str("0") >> match("[0-9]")) |
+        (match("[1-5]") >> match("[0-9]"))
+    end
+    rule(:time_tz) do
+      str("Z")
+    end
+    rule(:time_sep) { str(":") }
+    rule(:datetime) do
+      date >> str("T") >> time_hh >> time_sep >> time_mi >> time_sep >> time_mi >> time_tz
+    end
+
     rule(:literal) do
-      (null | boolean | date | decimal | integer | string).as(:val)
+      (null | boolean | datetime.as(:datetime) | date.as(:date) | decimal | integer | string).as(:val)
     end
     rule(:literal_paren) do
       lparen >> space? >> (literal | literal_paren) >> space? >> rparen
