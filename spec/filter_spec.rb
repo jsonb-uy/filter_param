@@ -37,47 +37,47 @@ RSpec.describe FilterParam::Filter do
       end
     end
 
-    it "parses :eq filter operator" do
+    it "parses :eq 'equal' filter operator" do
       expect(parse("name eq 'john'")[:exp][:f_op].str).to eql("eq")
     end
 
-    it "parses :eq_ci filter operator" do
+    it "parses :eq_ci 'case-insensitive equal' filter operator" do
       expect(parse("name eq_ci 'JoHn'")[:exp][:f_op].str).to eql("eq_ci")
     end
 
-    it "parses :neq filter operator" do
+    it "parses :neq 'not equal' filter operator" do
       expect(parse("name neq 'john'")[:exp][:f_op].str).to eql("neq")
     end
 
-    it "parses :co filter operator" do
+    it "parses :co 'contains' filter operator" do
       expect(parse("name co 'john'")[:exp][:f_op].str).to eql("co")
     end
 
-    it "parses :sw filter operator" do
+    it "parses :sw 'starts with' filter operator" do
       expect(parse("name sw 'jo'")[:exp][:f_op].str).to eql("sw")
     end
 
-    it "parses :ew filter operator" do
+    it "parses :ew 'ends with' filter operator" do
       expect(parse("name ew 'hn'")[:exp][:f_op].str).to eql("ew")
     end
 
-    it "parses :gt filter operator" do
+    it "parses :gt 'greater than' filter operator" do
       expect(parse("age gt 3")[:exp][:f_op].str).to eql("gt")
     end
 
-    it "parses :ge filter operator" do
+    it "parses :ge 'greater than or equal' filter operator" do
       expect(parse("age ge 5")[:exp][:f_op].str).to eql("ge")
     end
 
-    it "parses :lt filter operator" do
+    it "parses :lt 'less than' filter operator" do
       expect(parse("age lt 42")[:exp][:f_op].str).to eql("lt")
     end
 
-    it "parses :le filter operator" do
+    it "parses :le 'less than or equal' filter operator" do
       expect(parse("age le 20")[:exp][:f_op].str).to eql("le")
     end
 
-    it "parses :pr filter operator" do
+    it "parses :pr 'present' filter operator" do
       expect(parse("surname pr")[:exp][:f_op].str).to eql("pr")
     end
 
@@ -179,8 +179,8 @@ RSpec.describe FilterParam::Filter do
 
     it "parses :or logical operator" do
       exp = parse("name eq 'john' or surname eq 'doe'")[:exp]
-      left = exp[:l_lexp][:exp]
-      right = exp[:l_rexp][:exp]
+      left = exp[:lexp][:exp]
+      right = exp[:rexp][:exp]
 
       expect(exp[:l_op].str).to eql("or")
       expect(left[:f].str).to eql("name")
@@ -193,8 +193,22 @@ RSpec.describe FilterParam::Filter do
 
     it "parses :and logical operator" do
       exp = parse("name eq 'jane' and surname neq 'doe'")[:exp]
-      left = exp[:l_lexp][:exp]
-      right = exp[:l_rexp][:exp]
+      left = exp[:lexp][:exp]
+      right = exp[:rexp][:exp]
+
+      expect(exp[:l_op].str).to eql("and")
+      expect(left[:f].str).to eql("name")
+      expect(left[:f_op].str).to eql("eq")
+      expect(left[:val][:string].str).to eql("jane")
+      expect(right[:f].str).to eql("surname")
+      expect(right[:f_op].str).to eql("neq")
+      expect(right[:val][:string].str).to eql("doe")
+    end
+
+    it "parses :not logical operator" do
+      exp = parse("not name eq 'jane' and not(surname eq 'doe' and name eq 'john')")[:exp]
+      left = exp[:lexp][:exp]
+      right = exp[:rexp][:exp]
 
       expect(exp[:l_op].str).to eql("and")
       expect(left[:f].str).to eql("name")

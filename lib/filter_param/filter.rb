@@ -80,33 +80,35 @@ module FilterParam
     end
 
     # Operations
-    rule(:f_op) do
+    rule(:f_opb) do
       (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
         str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:f_op)
     end
     rule(:f_opu) do
-      str("pr")
+      str("pr").as(:f_op)
     end
     rule(:f_val) do
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
-      group | (field >> space >> ((f_op >> f_val) | f_opu)).as(:exp)
+      group | (field >> space >> (f_opu | (f_opb >> f_val))).as(:exp)
     end
 
-    rule(:l_op) { (str("and") | str("or")).as(:l_op) }
-    rule(:l_exp) do
+    rule(:l_opb) { (str("and") | str("or")).as(:l_op) }
+    rule(:l_opu) { str("not").as(:l_op) }
+    rule(:exp) do
       (
-        f_exp.as(:l_lexp) >> space >> l_op >> l_rexp.as(:l_rexp)
+        f_exp.as(:lexp) >> space >> l_opb >> rexp.as(:rexp)
       ).as(:exp) |
+      (l_opu >> (space | lparen.present?) >> exp).as(:exp) |
       f_exp
     end
-    rule(:l_rexp) { (space | lparen.present?) >> l_exp }
+    rule(:rexp) { (space | lparen.present?) >> exp }
     rule(:empty_group) do
       (lparen >> space? >> empty_group >> space? >> rparen) | (lparen >> space? >> rparen)
     end
     rule(:group) { empty_group.ignore | (lparen >> expression >> rparen).as(:group) }
-    rule(:expression) { space? >> l_exp >> space? }
+    rule(:expression) { space? >> exp >> space? }
     root(:expression)
   end
 end
