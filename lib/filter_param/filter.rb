@@ -46,23 +46,24 @@ module FilterParam
     rule(:date_yyyy) { digit.repeat(4) }
     rule(:date_mm) { (zero_digit >> non_zero_digit) | (str("1") >> match("[0-2]")) }
     rule(:date_md) { (zero_digit >> non_zero_digit) | (match("[1-2]") >> digit) | (str("3") >> match("[0-1]")) }
-    rule(:date_yyyymmdd) { date_yyyy >> hyphen >> date_mm >> hyphen >> date_md }
+    rule(:date_iso8601) { date_yyyy >> hyphen >> date_mm >> hyphen >> date_md }
     rule(:date) do
-      (single_quote >> date_yyyymmdd.as(:date) >> single_quote) |
-        (double_quote >> date_yyyymmdd.as(:date) >> double_quote)
+      (single_quote >> date_iso8601.as(:date) >> single_quote) |
+        (double_quote >> date_iso8601.as(:date) >> double_quote)
+    end
+    rule(:time_hh_mi) do
+      (((zero_digit | str("1")) >> digit) | (str("2") >> match("[0-3]"))) >>
+        str(":").maybe >> ((zero_digit >> digit) | (match("[1-5]") >> digit))
     end
     rule(:time_hh_mi_ss) do
       (
-        ((zero_digit >> digit) | (str("1") >> digit) | (str("2") >> match("[0-3]"))) >>
-        (
-          str(":") >> ((zero_digit >> digit) | (match("[1-5]") >> digit))
-        ).repeat(2, 2)
+        time_hh_mi >> str(":") >> ((zero_digit >> digit) | (match("[1-5]") >> digit))
       )
     end
     rule(:time_hh_mi_ss_sss) { time_hh_mi_ss >> dot >> digit.repeat(3, 3) }
-    rule(:time_tz) { str("Z") }
+    rule(:time_tz) { str("Z") | (match("[\+\-]") >> time_hh_mi) }
     rule(:datetime_iso8601) do
-      (date_yyyymmdd >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz)
+      (date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz)
     end
     rule(:datetime) do
       (

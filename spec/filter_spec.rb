@@ -129,6 +129,16 @@ RSpec.describe FilterParam::Filter do
       expect(parse("created_at gte \"2017-06-04T10:15:30.999Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
       expect(parse("created_at lte '2017-06-04T10:15:30Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
       expect(parse("created_at gte '2017-06-04T10:15:30.999Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
+      expect(parse("created_at lte \"2017-06-04T10:15:30+09:00\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+09:00")
+      expect(parse("created_at gte \"2017-06-04T10:15:30.999-08:30\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-08:30")
+      expect(parse("created_at lte '2017-06-04T10:15:30+00:30'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+00:30")
+      expect(parse("created_at lte '2017-06-04T10:15:30+00:00'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+00:00")
+      expect(parse("created_at gte '2017-06-04T10:15:30.999-07:00'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-07:00")
+      expect(parse("created_at lte \"2017-06-04T10:15:30+0900\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0900")
+      expect(parse("created_at gte \"2017-06-04T10:15:30.999-0830\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-0830")
+      expect(parse("created_at lte '2017-06-04T10:15:30+0030'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0030")
+      expect(parse("created_at lte '2017-06-04T10:15:30+0000'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30+0000")
+      expect(parse("created_at gte '2017-06-04T10:15:30.999-0700'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999-0700")
     end
 
     it "parses :or logical operator" do
