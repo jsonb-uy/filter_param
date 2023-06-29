@@ -118,11 +118,17 @@ RSpec.describe FilterParam::Filter do
     end
 
     it "parses date filter value" do
-      expect(parse("birthdate eq 2023-04-23")[:exp][:val][:date].str).to eql("2023-04-23")
+      expect(parse("birthdate eq \"2023-04-23\"")[:exp][:val][:date].str).to eql("2023-04-23")
+      expect(parse("birthdate eq '2023-04-23'")[:exp][:val][:date].str).to eql("2023-04-23")
+      expect(parse("birthdate eq \"2023-01-01\"")[:exp][:val][:date].str).to eql("2023-01-01")
+      expect(parse("birthdate eq '2023-12-31'")[:exp][:val][:date].str).to eql("2023-12-31")
     end
 
     it "parses datetime filter value" do
-      expect(parse("birthdate eq 2017-06-04T10:15:30Z")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
+      expect(parse("created_at lte \"2017-06-04T10:15:30Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
+      expect(parse("created_at gte \"2017-06-04T10:15:30.999Z\"")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
+      expect(parse("created_at lte '2017-06-04T10:15:30Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30Z")
+      expect(parse("created_at gte '2017-06-04T10:15:30.999Z'")[:exp][:val][:datetime].str).to eql("2017-06-04T10:15:30.999Z")
     end
 
     it "parses :or logical operator" do
