@@ -209,7 +209,7 @@ RSpec.describe FilterParam::Filter do
       exp = parse("not name eq 'jane' and not(surname eq 'doe' and name eq 'john')")[:exp]
       neg_exp = exp[:exp]
 
-      expect(exp[:op].str).to eql("not")
+      expect(exp[:op].str).to eql("and")
       expect(neg_exp[:f].str).to eql("name")
       expect(neg_exp[:op].str).to eql("eq")
       expect(neg_exp[:val][:string].str).to eql("jane")

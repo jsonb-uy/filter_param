@@ -80,28 +80,28 @@ module FilterParam
     end
 
     # Operations
-    rule(:f_opb) do
+    rule(:op_field_bin) do
       (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
         str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:op)
     end
-    rule(:f_opu) do
+    rule(:op_field_ur) do
       str("pr").as(:op)
     end
-    rule(:l_opb) { (str("and") | str("or")).as(:op) }
-    rule(:l_opu) { str("not").as(:op) }
+    rule(:op_logic_bin) { (str("and") | str("or")).as(:op) }
+    rule(:op_logic_ul) { str("not").as(:op) }
 
     # Expressions
     rule(:f_val) do
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
-      group | (field >> space >> (f_opu | (f_opb >> f_val))).as(:exp)
+      (group | (field >> space >> (op_field_ur | (op_field_bin >> f_val))).as(:exp)) |
+        (op_logic_ul >> (space | lparen.present?) >> f_exp).as(:exp)
     end
     rule(:exp) do
       (
-        f_exp.as(:lexp) >> space >> l_opb >> rexp.as(:rexp)
+        f_exp.as(:lexp) >> space >> op_logic_bin >> rexp.as(:rexp)
       ).as(:exp) |
-        (l_opu >> (space | lparen.present?) >> exp).as(:exp) |
         f_exp
     end
     rule(:rexp) { (space | lparen.present?) >> exp }
