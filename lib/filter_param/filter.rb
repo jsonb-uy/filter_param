@@ -95,20 +95,24 @@ module FilterParam
       literal_paren | (space >> (literal | literal_paren))
     end
     rule(:f_exp) do
-      (group | (field >> space >> (op_field_ur | (op_field_bin >> value))).as(:exp)) |
+      (exp_group | (field >> space >> (op_field_ur | (op_field_bin >> value))).as(:exp)) |
         (op_logic_ul >> (space | lparen.present?) >> f_exp).as(:exp)
     end
+    rule(:logical_exp) do
+      f_exp.as(:lexp) >> space >> op_logic_bin >> ((space | lparen.present?) >> exp).as(:rexp)
+    end
+
     rule(:exp) do
+      space? >>
       (
-        f_exp.as(:lexp) >> space >> op_logic_bin >> ((space | lparen.present?) >> exp).as(:rexp)
-      ).as(:exp) |
-        f_exp
+        logical_exp.as(:exp) | f_exp
+      ) >>
+      space?
     end
     rule(:empty_group) do
       (lparen >> space? >> empty_group >> space? >> rparen) | (lparen >> space? >> rparen)
     end
-    rule(:group) { empty_group.ignore | (lparen >> expression >> rparen).as(:group) }
-    rule(:expression) { space? >> exp >> space? }
-    root(:expression)
+    rule(:exp_group) { empty_group.ignore | (lparen >> exp >> rparen).as(:group) }
+    root(:exp)
   end
 end
