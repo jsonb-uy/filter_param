@@ -207,12 +207,23 @@ RSpec.describe FilterParam::Filter do
 
     it "parses :not logical operator" do
       exp = parse("not name eq 'jane' and not(surname eq 'doe' and name eq 'john')")[:exp]
-      neg_exp = exp[:exp]
+      left_neg_exp = exp[:lexp][:exp]
+      right_neg_exp = exp[:rexp][:exp][:group][:exp]
 
       expect(exp[:op].str).to eql("and")
-      expect(neg_exp[:f].str).to eql("name")
-      expect(neg_exp[:op].str).to eql("eq")
-      expect(neg_exp[:val][:string].str).to eql("jane")
+      expect(left_neg_exp[:op].str).to eql("not")
+      expect(left_neg_exp[:exp][:f].str).to eql("name")
+      expect(left_neg_exp[:exp][:op].str).to eql("eq")
+      expect(left_neg_exp[:exp][:val][:string].str).to eql("jane")
+
+      expect(exp[:rexp][:exp][:op].str).to eql("not")
+      expect(right_neg_exp[:op].str).to eql("and")
+      expect(right_neg_exp[:lexp][:exp][:op].str).to eql("eq")
+      expect(right_neg_exp[:lexp][:exp][:f].str).to eql("surname")
+      expect(right_neg_exp[:lexp][:exp][:val][:string].str).to eql("doe")
+      expect(right_neg_exp[:rexp][:exp][:op].str).to eql("eq")
+      expect(right_neg_exp[:rexp][:exp][:f].str).to eql("name")
+      expect(right_neg_exp[:rexp][:exp][:val][:string].str).to eql("john")
     end
 
     context "value parenthesization" do
