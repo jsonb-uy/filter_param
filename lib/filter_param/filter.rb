@@ -42,15 +42,11 @@ module FilterParam
       (single_quote >> (escape_seq | match("[^\']")).repeat.as(:string) >> single_quote) |
         (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
-
     rule(:date_yyyy) { digit.repeat(4) }
     rule(:date_mm) { (zero_digit >> non_zero_digit) | (str("1") >> match("[0-2]")) }
     rule(:date_md) { (zero_digit >> non_zero_digit) | (match("[1-2]") >> digit) | (str("3") >> match("[0-1]")) }
     rule(:date_iso8601) { date_yyyy >> hyphen >> date_mm >> hyphen >> date_md }
-    rule(:date) do
-      (single_quote >> date_iso8601.as(:date) >> single_quote) |
-        (double_quote >> date_iso8601.as(:date) >> double_quote)
-    end
+    rule(:date) { quoted date_iso8601.as(:date) }
     rule(:time_hh_mi) do
       (((zero_digit | str("1")) >> digit) | (str("2") >> match("[0-3]"))) >>
         str(":").maybe >> ((zero_digit >> digit) | (match("[1-5]") >> digit))
@@ -65,12 +61,7 @@ module FilterParam
     rule(:datetime_iso8601) do
       (date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz)
     end
-    rule(:datetime) do
-      (
-        (single_quote >> datetime_iso8601.as(:datetime) >> single_quote) |
-          (double_quote >> datetime_iso8601.as(:datetime) >> double_quote)
-      )
-    end
+    rule(:datetime) { quoted datetime_iso8601.as(:datetime) }
 
     rule(:literal) do
       (null | boolean | decimal | integer | datetime | date | string).as(:val)
@@ -84,35 +75,45 @@ module FilterParam
       (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
         str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:op)
     end
-    rule(:op_field_ur) do
-      str("pr").as(:op)
-    end
+    rule(:op_field_unar) { str("pr").as(:op) }
     rule(:op_logic_bin) { (str("and") | str("or")).as(:op) }
-    rule(:op_logic_ul) { str("not").as(:op) }
+    rule(:op_negation) { str("not").as(:op) }
 
     # Expressions
     rule(:value) do
       literal_paren | (space >> (literal | literal_paren))
     end
-    rule(:f_exp) do
-      (exp_group | (field >> space >> (op_field_ur | (op_field_bin >> value))).as(:exp)) |
-        (op_logic_ul >> (space | lparen.present?) >> f_exp).as(:exp)
+    rule(:negation_exp) do
+      (op_negation >> (space | lparen.present?) >> (group | field_exp).as(:right)).as(:exp)
+    end
+    rule(:field_exp) do
+      (field >> space >> (op_field_unar | (op_field_bin >> value))).as(:exp)
     end
     rule(:logical_exp) do
-      f_exp.as(:lexp) >> space >> op_logic_bin >> ((space | lparen.present?) >> exp).as(:rexp)
-    end
-
-    rule(:exp) do
-      space? >>
       (
-        logical_exp.as(:exp) | f_exp
-      ) >>
-      space?
+        (group | negation_exp | field_exp).as(:left) >>
+          space >> op_logic_bin >> ((space | lparen.present?) >> exp).as(:right)
+      ).as(:exp)
+    end
+    rule(:group) do
+      empty_group.ignore |
+        (lparen >> (logical_exp | negation_exp | field_exp) >> rparen).as(:group) |
+        (lparen >> group >> rparen)
     end
     rule(:empty_group) do
       (lparen >> space? >> empty_group >> space? >> rparen) | (lparen >> space? >> rparen)
     end
-    rule(:exp_group) { empty_group.ignore | (lparen >> exp >> rparen).as(:group) }
-    root(:exp)
+
+    rule(:exp) do
+      space? >> (logical_exp | group | negation_exp | field_exp) >> space?
+    end
+    rule(:exp_root) { exp.as(:root) }
+    root(:exp_root)
+
+    private
+
+    def quoted(atom_or_seq)
+      (single_quote >> atom_or_seq >> single_quote) | (double_quote >> atom_or_seq >> double_quote)
+    end
   end
 end
