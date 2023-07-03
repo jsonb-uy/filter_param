@@ -30,16 +30,16 @@ RSpec.describe FilterParam::Definition do
     end
   end
 
-  xdescribe "#field" do
-    it "whitelists a sort field and sets its default options" do
-      definition.field(:email, nulls: :first)
-      definition.field(:first_name, nulls: :last)
+  describe "#field" do
+    it "whitelists a filter field and sets its configuration" do
+      definition.field(:email, some_option: "someval1")
+      definition.field(:first_name, some_option: "someval2")
       definition.field(:last_name)
 
       expect(definition.fields_hash).to eql(
         {
-          "email" => { nulls: :first },
-          "first_name" => { nulls: :last },
+          "email" => { some_option: "someval1" },
+          "first_name" => { some_option: "someval2" },
           "last_name" => {}
         }
       )
@@ -52,7 +52,7 @@ RSpec.describe FilterParam::Definition do
       expect(definition.fields_hash).to be_empty
     end
 
-    it "returns the same Field instance" do
+    it "returns the Definition instance" do
       expect(definition.field(:name)).to eql(definition)
     end
 
@@ -70,12 +70,12 @@ RSpec.describe FilterParam::Definition do
 
     context "with Proc :rename option value" do
       it "sets the :rename value to the transformed :name" do
-        definition.field(:email, nulls: :last, rename: ->(name) { "users.#{name}" })
+        definition.field(:email, rename: ->(name) { "users.#{name}" })
         definition.field(:last_name, rename: ->(_) { "surname" })
 
         expect(definition.fields_hash).to eql(
           {
-            "email" => { nulls: :last, rename: "users.email" },
+            "email" => { rename: "users.email" },
             "last_name" => { rename: "surname" }
           }
         )
@@ -83,23 +83,23 @@ RSpec.describe FilterParam::Definition do
     end
   end
 
-  xdescribe "#fields" do
+  describe "#fields" do
     it "whitelists a list of sort fields with the same default options" do
-      definition.fields(:first_name, :last_name, nulls: :last)
-      definition.fields(:phone, nulls: :first)
+      definition.fields(:first_name, :last_name, some_option: "someval1")
+      definition.fields(:phone, some_option: "someval2")
       definition.fields(:email)
 
       expect(definition.fields_hash).to eql(
         {
           "email" => {},
-          "first_name" => { nulls: :last },
-          "last_name" => { nulls: :last },
-          "phone" => { nulls: :first }
+          "first_name" => { some_option: "someval1" },
+          "last_name" => { some_option: "someval1" },
+          "phone" => { some_option: "someval2" }
         }
       )
     end
 
-    it "returns the same Field instance" do
+    it "returns the same Definition instance" do
       expect(definition.fields(:name)).to eql(definition)
     end
 
@@ -111,29 +111,29 @@ RSpec.describe FilterParam::Definition do
 
     context "with Proc :rename option value" do
       it "sets the :rename value to the transformed :name" do
-        definition.fields(:first_name, :last_name, nulls: :last, rename: ->(name) { "users.#{name}" })
-        definition.fields(:phone, nulls: :first)
+        definition.fields(:first_name, :last_name, some_option: "someval1", rename: ->(name) { "users.#{name}" })
+        definition.fields(:phone, some_option: "someval2")
         definition.fields(:email)
 
         expect(definition.fields_hash).to eql(
           {
             "email" => {},
-            "first_name" => { nulls: :last, rename: "users.first_name" },
-            "last_name" => { nulls: :last, rename: "users.last_name" },
-            "phone" => { nulls: :first }
+            "first_name" => { some_option: "someval1", rename: "users.first_name" },
+            "last_name" => { some_option: "someval1", rename: "users.last_name" },
+            "phone" => { some_option: "someval2" }
           }
         )
       end
     end
   end
 
-  xdescribe "#field_defaults" do
-    it "returns the field's configured default options" do
+  describe "#field_options" do
+    it "returns the field's configured options" do
       definition.field(:email, nulls: :first, rename: "eadd")
       definition.field(:last_name)
 
-      expect(definition.field_defaults("email")).to eql(nulls: :first, rename: "eadd")
-      expect(definition.field_defaults("last_name")).to eql({})
+      expect(definition.field_options("email")).to eql(nulls: :first, rename: "eadd")
+      expect(definition.field_options("last_name")).to eql({})
     end
   end
 end
