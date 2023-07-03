@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-RSpec.describe FilterParam::ExpressionParser do
+RSpec.describe FilterParam::Expression do
   def parse(expression)
-    described_class.new.parse(expression)[:root]
+    described_class.new(expression).tree[:root]
   end
 
   def parse_value(expression, type)
     parse(expression)[:exp][:val][type].str
   end
 
-  describe "#parse" do
+  describe "#tree" do
     context "with invalid column name format" do
       it "raises an error" do
         invalid_column_names = [1, "a.1", "a a", ".a", "!", "a!", "'", "a.a.a"]
