@@ -1,6 +1,6 @@
 require "parslet"
 
 module FilterParam
-  class Filter
+  class Definition
   end
 end

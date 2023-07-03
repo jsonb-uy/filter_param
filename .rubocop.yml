@@ -15,7 +15,7 @@ Style/RaiseArgs:
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 Layout/LineLength:
-  Max: 105
+  Max: 110
   Exclude:
     - "spec/**/*.rb"
 Metrics/BlockLength:

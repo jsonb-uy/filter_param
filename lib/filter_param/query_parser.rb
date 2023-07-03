@@ -11,10 +11,10 @@ module FilterParam
     rule(:double_quote) { str('"') }
     rule(:single_quote) { str("'") }
     rule(:digit) { match("[0-9]") }
-    rule(:zero_digit) { str("0") }
+    rule(:zero) { str("0") }
     rule(:non_zero_digit) { match("[1-9]") }
     rule(:sig_number) { non_zero_digit >> digit.repeat(1).maybe }
-    rule(:zero_nonsig) { zero_digit.repeat(0).maybe.ignore }
+    rule(:zero_nonsig) { zero.repeat(0).maybe.ignore }
     rule(:hyphen) { str("-") }
     rule(:identifier) { match("[a-zA-Z_]") >> digit.maybe }
     rule(:table) { identifier.repeat(1) >> dot }
@@ -27,14 +27,14 @@ module FilterParam
     rule(:integer) do
       (
         (hyphen.maybe >> zero_nonsig >> sig_number) |
-        (hyphen.maybe.ignore >> zero_digit >> zero_nonsig)
+        (hyphen.maybe.ignore >> zero >> zero_nonsig)
       ).as(:int)
     end
 
     rule(:decimal) do
       (
         (hyphen.maybe >> zero_nonsig >> sig_number >> dot >> digit.repeat(1)) |
-        (hyphen.maybe >> zero_digit >> zero_nonsig >> dot >> digit.repeat(1))
+        (hyphen.maybe >> zero >> zero_nonsig >> dot >> digit.repeat(1))
       ).as(:decimal)
     end
 
@@ -43,32 +43,19 @@ module FilterParam
         (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:string) >> double_quote)
     end
     rule(:date_yyyy) { digit.repeat(4) }
-    rule(:date_mm) { (zero_digit >> non_zero_digit) | (str("1") >> match("[0-2]")) }
-    rule(:date_md) { (zero_digit >> non_zero_digit) | (match("[1-2]") >> digit) | (str("3") >> match("[0-1]")) }
+    rule(:date_mm) { (zero >> non_zero_digit) | (str("1") >> match("[0-2]")) }
+    rule(:date_md) { (zero >> non_zero_digit) | (match("[1-2]") >> digit) | (str("3") >> match("[0-1]")) }
     rule(:date_iso8601) { date_yyyy >> hyphen >> date_mm >> hyphen >> date_md }
     rule(:date) { quoted date_iso8601.as(:date) }
     rule(:time_hh_mi) do
-      (((zero_digit | str("1")) >> digit) | (str("2") >> match("[0-3]"))) >>
-        str(":").maybe >> ((zero_digit >> digit) | (match("[1-5]") >> digit))
+      (((zero | str("1")) >> digit) | (str("2") >> match("[0-3]"))) >>
+        str(":").maybe >> ((zero >> digit) | (match("[1-5]") >> digit))
     end
-    rule(:time_hh_mi_ss) do
-      (
-        time_hh_mi >> str(":") >> ((zero_digit >> digit) | (match("[1-5]") >> digit))
-      )
-    end
+    rule(:time_hh_mi_ss) { time_hh_mi >> str(":") >> ((zero >> digit) | (match("[1-5]") >> digit)) }
     rule(:time_hh_mi_ss_sss) { time_hh_mi_ss >> dot >> digit.repeat(3, 3) }
     rule(:time_tz) { str("Z") | (match("[\+\-]") >> time_hh_mi) }
-    rule(:datetime_iso8601) do
-      (date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz)
-    end
+    rule(:datetime_iso8601) { date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz }
     rule(:datetime) { quoted datetime_iso8601.as(:datetime) }
-
-    rule(:literal) do
-      (null | boolean | decimal | integer | datetime | date | string).as(:val)
-    end
-    rule(:literal_paren) do
-      lparen >> space? >> (literal | literal_paren) >> space? >> rparen
-    end
 
     # Operations
     rule(:op_field_bin) do
@@ -80,14 +67,12 @@ module FilterParam
     rule(:op_negation) { str("not").as(:op) }
 
     # Expressions
-    rule(:value) do
-      literal_paren | (space >> (literal | literal_paren))
-    end
+    rule(:literal) { (null | boolean | decimal | integer | datetime | date | string).as(:val) }
+    rule(:literal_paren) { lparen >> space? >> (literal | literal_paren) >> space? >> rparen }
+    rule(:value) { literal_paren | (space >> (literal | literal_paren)) }
+    rule(:field_exp) { (field >> space >> (op_field_unar | (op_field_bin >> value))).as(:exp) }
     rule(:negation_exp) do
       (op_negation >> (space | lparen.present?) >> (group | field_exp).as(:right)).as(:exp)
-    end
-    rule(:field_exp) do
-      (field >> space >> (op_field_unar | (op_field_bin >> value))).as(:exp)
     end
     rule(:logical_exp) do
       (
@@ -104,9 +89,7 @@ module FilterParam
       (lparen >> space? >> empty_group >> space? >> rparen) | (lparen >> space? >> rparen)
     end
 
-    rule(:exp) do
-      space? >> (logical_exp | group | negation_exp | field_exp) >> space?
-    end
+    rule(:exp) { space? >> (logical_exp | group | negation_exp | field_exp) >> space? }
     rule(:exp_root) { exp.as(:root) }
     root(:exp_root)
 
