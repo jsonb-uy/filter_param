@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FilterParam::QueryParser do
+RSpec.describe FilterParam::ExpressionParser do
   def parse(expression)
     described_class.new.parse(expression)[:root]
   end

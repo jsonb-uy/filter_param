@@ -1,7 +1,7 @@
 require "parslet"
 
 module FilterParam
-  class QueryParser < Parslet::Parser
+  class ExpressionParser < Parslet::Parser
     rule(:space) { match("\s").repeat(1).ignore }
     rule(:space?) { space.maybe }
     rule(:dot) { str(".") }
