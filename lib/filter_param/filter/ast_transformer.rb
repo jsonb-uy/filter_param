@@ -21,7 +21,7 @@ module FilterParam
         BinaryExpression.new(Identifier.new(f), op, val)
       end
       rule(f: simple(:f), op: simple(:op)) { UnaryExpression.new(Identifier.new(f), op) }
-      rule(group: simple(:exp)) { GroupingExpression.new(exp) }
+      rule(group: simple(:exp)) { GroupExpression.new(exp) }
       rule(exp: simple(:exp)) { exp }
     end
   end
