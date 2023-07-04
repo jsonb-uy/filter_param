@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-RSpec.describe FilterParam::Expression do
+RSpec.describe FilterParam::Parser do
   def parse(expression)
-    described_class.new(expression).tree[:root]
+    described_class.new.parse(expression)
   end
 
   def parse_value(expression, type)
@@ -309,9 +309,10 @@ RSpec.describe FilterParam::Expression do
       end
     end
 
-    xit "ignores whitespace sequences" do
-      expect(parse(" ")).to eql("")
-      expect(parse("          ")).to eql("")
+    it "ignores blank expression" do
+      expect(parse(" ")).to be_nil
+      expect(parse("")).to be_nil
+      expect(parse("          ")).to be_nil
     end
   end
 end

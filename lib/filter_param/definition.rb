@@ -73,10 +73,10 @@ module FilterParam
     # @param [String] expression Filter expression.
     #
     def filter!(ar_relation, expression)
-      filter = Filter.new(self)
+      transpiler = Transpiler.new(self)
 
       ar_relation.where(
-        filter.to_sql(expression)
+        transpiler.transpile(expression)
       )
     end
 

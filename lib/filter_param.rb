@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "filter_param/expression"
+require "parslet"
+require_relative "filter_param/ast"
+require_relative "filter_param/ast_transformer"
+require_relative "filter_param/parser"
+require_relative "filter_param/transpiler"
 require_relative "filter_param/definition"
 require_relative "filter_param/version"
 
