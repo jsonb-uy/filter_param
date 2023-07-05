@@ -7,7 +7,7 @@ module FilterParam
       include AST
 
       rule(null: simple(:null)) { nil }
-      rule(string: simple(:val)) { val }
+      rule(string: simple(:val)) { val.to_s }
       rule(int: simple(:val)) { Integer(val) }
       rule(boolean: simple(:val)) { val == "true" }
       rule(decimal: simple(:val)) { BigDecimal(val) }
@@ -21,7 +21,7 @@ module FilterParam
         BinaryExpression.new(Identifier.new(f), op, val)
       end
       rule(f: simple(:f), op: simple(:op)) { UnaryExpression.new(Identifier.new(f), op) }
-      rule(group: simple(:exp)) { GroupExpression.new(exp) }
+      rule(group: simple(:exp)) { Group.new(exp) }
       rule(exp: simple(:exp)) { exp }
     end
   end

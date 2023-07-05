@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "parslet"
+require "active_record"
+require "active_support"
 require_relative "filter_param/filter/ast"
 require_relative "filter_param/filter/ast_transformer"
 require_relative "filter_param/filter/parser"
@@ -9,6 +11,8 @@ require_relative "filter_param/definition"
 require_relative "filter_param/version"
 
 module FilterParam
+  class UnsupportedFilterField < StandardError; end
+
   # Creates a new FilterParam definition that whitelists the columns that are allowed to
   # be filtered (i.e. used in SQL WHERE).
   #
