@@ -13,8 +13,10 @@ module FilterParam
         attr_reader :exp, :op
 
         def initialize(exp, operator)
+          super()
+
           @exp = exp
-          @op = operator
+          @op = operator.to_s
         end
       end
 
@@ -22,8 +24,10 @@ module FilterParam
         attr_reader :left, :op, :right
 
         def initialize(left, operator, right)
+          super()
+
           @left = left
-          @op = operator
+          @op = operator.to_s
           @right = right
         end
       end
@@ -32,6 +36,8 @@ module FilterParam
         attr_reader :exp
 
         def initialize(exp)
+          super()
+
           @exp = exp
         end
       end
@@ -40,11 +46,21 @@ module FilterParam
         attr_reader :name
 
         def initialize(name)
+          super()
+
           @name = name.to_s
         end
 
-        def to_s
-          name
+        alias to_s name
+      end
+
+      class Literal < Node
+        attr_reader :value
+
+        def initialize(value = nil)
+          super()
+
+          @value = value
         end
       end
     end

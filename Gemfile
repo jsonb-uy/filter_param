@@ -17,6 +17,6 @@ end
 eval_gemfile("gemfiles/rails-#{rails_version}.gemfile")
 
 git "https://github.com/rails/rails.git", branch: "#{rails_version}-stable" do
-  gem "activesupport"
   gem "activerecord"
+  gem "activesupport"
 end
