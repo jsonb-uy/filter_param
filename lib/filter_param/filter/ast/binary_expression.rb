@@ -10,6 +10,8 @@ module FilterParam
           @left = left
           @op = operator.to_s
           @right = right
+
+          @children = [left, right]
         end
       end
     end

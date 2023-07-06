@@ -9,6 +9,8 @@ module FilterParam
 
           @exp = exp
           @op = operator.to_s
+
+          @children = [exp]
         end
       end
     end

@@ -8,6 +8,8 @@ module FilterParam
           super()
 
           @exp = exp
+
+          @children = [exp]
         end
       end
     end

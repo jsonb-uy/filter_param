@@ -10,7 +10,7 @@ require_relative "filter_param/definition"
 require_relative "filter_param/version"
 
 module FilterParam
-  class UnsupportedFilterField < StandardError; end
+  class UnpermittedField < StandardError; end
 
   # Creates a new FilterParam definition that whitelists the columns that are allowed to
   # be filtered (i.e. used in SQL WHERE).
