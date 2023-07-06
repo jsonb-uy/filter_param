@@ -1,0 +1,17 @@
+module FilterParam
+  module Filter
+    module AST
+      class BinaryExpression < Node
+        attr_reader :left, :op, :right
+
+        def initialize(left, operator, right)
+          super()
+
+          @left = left
+          @op = operator.to_s
+          @right = right
+        end
+      end
+    end
+  end
+end

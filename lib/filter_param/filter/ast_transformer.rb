@@ -1,9 +1,15 @@
 require "bigdecimal"
 require "date"
+require_relative "ast/node"
+require_relative "ast/literal"
+require_relative "ast/identifier"
+require_relative "ast/group"
+require_relative "ast/binary_expression"
+require_relative "ast/unary_expression"
 
 module FilterParam
   module Filter
-    class ASTTransformer < Parslet::Transform
+    class AstTransformer < Parslet::Transform
       include AST
 
       rule(exp: simple(:exp))      { exp }

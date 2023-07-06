@@ -3,7 +3,6 @@
 require "parslet"
 require "active_record"
 require "active_support"
-require_relative "filter_param/filter/ast"
 require_relative "filter_param/filter/ast_transformer"
 require_relative "filter_param/filter/parser"
 require_relative "filter_param/filter/transpiler"
