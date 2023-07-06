@@ -29,7 +29,7 @@ module FilterParam
             value = "%#{right}"
             "#{left} like #{quote(value)}"
           when "co"
-            value ="%#{right}%"
+            value = "%#{right}%"
             "#{left} like #{quote(value)}"
           else
             "#{left} #{OPS_MAP[op]} #{quote(right)}"

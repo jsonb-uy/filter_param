@@ -15,12 +15,19 @@ module FilterParam
           "pr" => "IS NOT NULL"
         }.freeze
 
+        def initialize(definition)
+          @definition = definition
+        end
+
         def visit_group(group)
           "(#{evaluate(group.exp)})"
         end
 
         def visit_identifier(identifier)
-          return identifier.name
+          field_options = definition.field_options(identifier.name)
+          return identifier if field_options.nil?
+
+          field_options[:rename].presence || identifier
         end
 
         def visit_literal(literal)
@@ -32,6 +39,8 @@ module FilterParam
         end
 
         private
+
+        attr_reader :definition
 
         def quote(value)
           ActiveRecord::Base.connection.quote(value)

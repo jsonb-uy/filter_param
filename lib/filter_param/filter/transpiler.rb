@@ -33,7 +33,7 @@ module FilterParam
       end
 
       def backend
-        Backend::Postgresql.new
+        Backend::Postgresql.new(definition)
       end
     end
   end
