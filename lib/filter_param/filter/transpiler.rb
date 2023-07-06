@@ -7,11 +7,16 @@ module FilterParam
         @definition = definition
       end
 
-      def transpile(expression)
+      def transpile!(expression)
+        return nil if expression.blank?
+
         parse_tree = Parser.new.parse(expression)
         ast = AstTransformer.new.apply(parse_tree)
         validate! ast
         backend.evaluate ast
+      rescue Parslet::ParseFailed => e
+        puts "e.message ====> #{e.message}"
+        raise ParseError.new(e.message)
       end
 
       private

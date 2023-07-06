@@ -105,7 +105,7 @@ RSpec.describe FilterParam::Definition do
 
     context "with String :rename option value" do
       it "raises an error" do
-        expect { definition.fields(:first_name, :last_name, rename: "surname") }.to raise_error
+        expect { definition.fields(:first_name, :last_name, rename: "surname") }.to raise_error(ArgumentError)
       end
     end
 
