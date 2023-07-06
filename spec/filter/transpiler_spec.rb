@@ -5,10 +5,11 @@ RSpec.describe FilterParam::Filter::Transpiler do
 
   def new_transpiler(definition = nil)
     definition ||= FilterParam::Definition.new.fields(
-                    :first_name,
-                    :birth_date,
-                    :member_since,
-                    :balance)
+      :first_name,
+      :birth_date,
+      :member_since,
+      :balance
+    )
 
     described_class.new(definition)
   end
@@ -22,11 +23,86 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with unexpected token" do
+    context "with an expression with unexpected token" do
       it "raises an error" do
         expect do
           transpiler.transpile!("first_name eq 'John' 1")
-          transpiler.transpile!("first_name eq 'John'a")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq 1 'John'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq a 'John'")
+        end.to raise_error(FilterParam::ParseError)
+      end
+    end
+
+    context "with an expression with missing parenthesis" do
+      it "raises an error" do
+        expect do
+          transpiler.transpile!("first_name eq ('John'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq 'John')")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("((first_name eq 'John')")
+        end.to raise_error(FilterParam::ParseError)
+      end
+    end
+
+    context "with an expression with missing quote" do
+      it "raises an error" do
+        expect do
+          transpiler.transpile!("first_name eq 'John")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq \"John")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq John'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq John\"")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("first_name eq John")
+        end.to raise_error(FilterParam::ParseError)
+      end
+    end
+
+    context "with an expression with invalid identifier format" do
+      it "raises an error" do
+        expect do
+          transpiler.transpile!("1dentifer eq 'John'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("'first_name' eq 'John'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("----' eq 'John'")
+        end.to raise_error(FilterParam::ParseError)
+      end
+    end
+
+    context "with an expression with unrecognized operation" do
+      it "raises an error" do
+        expect do
+          transpiler.transpile!("1dentifer equals 'John'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("'first_name' = 'John'")
         end.to raise_error(FilterParam::ParseError)
       end
     end
