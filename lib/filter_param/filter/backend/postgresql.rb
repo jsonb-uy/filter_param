@@ -7,24 +7,33 @@ module FilterParam
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
           exp = evaluate(unary_exp.exp)
-          return "#{exp} #{op}" if op == "pr"
+          return "#{exp} #{OPS_MAP[op]}" if op == "pr"
 
-          "#{op} #{exp}"
+          "#{OPS_MAP[op]} #{exp}"
         end
 
         def visit_binary_expression(binary_exp)
           op = binary_exp.op
-          translated_op = op
           left = evaluate(binary_exp.left)
           right = evaluate(binary_exp.right)
 
-          "#{left} #{translated_op} #{right}" # if translated_op.present?
-
-          # case op
-          # when "eq_ci"
-          #   "lower(#{left}) = lower(#{right})"
-          # when "sw"
-          #   "#{left} like #{right}"
+          case op
+          when "and", "or"
+            "#{left} #{OPS_MAP[op]} #{right}"
+          when "eq_ci"
+            "lower(#{left}) = #{quote(right.downcase)}"
+          when "sw"
+            value << "#{right}%"
+            "#{left} like #{quote(value)}"
+          when "ew"
+            value << "%#{right}"
+            "#{left} like #{quote(value)}"
+          when "co"
+            value << "%#{right}%"
+            "#{left} like #{quote(value)}"
+          else
+            "#{left} #{OPS_MAP[op]} #{quote(right)}"
+          end
         end
       end
     end
