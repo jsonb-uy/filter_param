@@ -1,4 +1,6 @@
-require_relative "backend/postgresql"
+require_relative "backends/postgresql"
+require_relative "validators/field_permission_validator"
+require_relative "validators/field_value_type_validator"
 
 module FilterParam
   module Filter
@@ -10,33 +12,28 @@ module FilterParam
       def transpile!(expression)
         return nil if expression.blank?
 
-        parse_tree = Parser.new.parse(expression,
-                                      reporter: Parslet::ErrorReporter::Deepest.new)
+        parse_tree = Parser.new.parse(expression, reporter: Parslet::ErrorReporter::Deepest.new)
         ast = AstTransformer.new.apply(parse_tree)
-        validate! ast
-        backend.evaluate ast
+
+        field_validator.validate!(ast)
+                       .then { |ast| field_value_type_validator.validate!(ast) }
+                       .then { |ast| backend.evaluate(ast) }
       end
 
       private
 
       attr_reader :definition
 
-      def identifier_whitelisted?(identifier)
-        definition.fields_hash.key? identifier.name
+      def field_validator
+        Validators::FieldPermissionValidator.new(definition)
       end
 
-      def validate!(node)
-        if node.is_a?(AST::Identifier) && !identifier_whitelisted?(node)
-          raise UnpermittedField.new("Unpermitted filter field: '#{node.name}'")
-        end
-
-        node.children&.each do |child|
-          validate!(child)
-        end
+      def field_value_type_validator
+        Validators::FieldValueTypeValidator.new(definition)
       end
 
       def backend
-        Backend::Postgresql.new(definition)
+        Backends::Postgresql.new(definition)
       end
     end
   end

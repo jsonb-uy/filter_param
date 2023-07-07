@@ -80,9 +80,19 @@ module FilterParam
     def filter!(ar_relation, expression)
       transpiler = Filter::Transpiler.new(self)
 
-      ar_relation.where(
-        transpiler.transpile(expression)
-      )
+      # ar_relation.where(
+      #   transpiler.transpile!(expression)
+      # )
+
+      transpiler.transpile!(expression)
+    end
+
+    def field_type(field_name)
+      fields_hash.dig(field_name, :type)
+    end
+
+    def field_permitted?(field_name)
+      fields_hash.key? field_name
     end
 
     private

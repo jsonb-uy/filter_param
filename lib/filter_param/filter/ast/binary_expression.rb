@@ -8,7 +8,7 @@ module FilterParam
           super()
 
           @left = left
-          @op = operator.to_s
+          @op = operator.to_sym
           @right = right
 
           @children = [left, right]

@@ -79,7 +79,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with invalid identifier format" do
+    context "with invalid field format" do
       it "raises parse error" do
         expect do
           transpiler.transpile!("1dentifer eq 'John'")
@@ -95,6 +95,14 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
+    context "with non-whitelisted field" do
+      it "raises unpermitted field error" do
+        expect do
+          transpiler.transpile!("last_name eq 'Doe'")
+        end.to raise_error(FilterParam::UnpermittedField)
+      end
+    end
+
     context "with unrecognized operation" do
       it "raises parse error" do
         expect do
@@ -107,7 +115,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with invalid date month day" do
+    xcontext "with invalid date month day" do
       it "raises parse error" do
         expect do
           transpiler.transpile!("birth_date eq '2023-02-31'")

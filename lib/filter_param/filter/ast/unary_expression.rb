@@ -8,7 +8,7 @@ module FilterParam
           super()
 
           @exp = exp
-          @op = operator.to_s
+          @op = operator.to_sym
 
           @children = [exp]
         end

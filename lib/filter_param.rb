@@ -3,6 +3,8 @@
 require "parslet"
 require "active_record"
 require "active_support"
+require_relative "filter_param/filter/visitor"
+require_relative "filter_param/filter/validators/validator"
 require_relative "filter_param/filter/ast_transformer"
 require_relative "filter_param/filter/parser"
 require_relative "filter_param/filter/transpiler"
@@ -14,6 +16,7 @@ module FilterParam
   class UnknownType < BaseError; end
   class ExpressionError < BaseError; end
   class UnpermittedField < ExpressionError; end
+  class TypeMismatch < ExpressionError; end
   class ParseError < ExpressionError; end
 
   # Creates a new FilterParam definition that whitelists the columns that are allowed to

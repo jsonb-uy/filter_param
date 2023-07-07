@@ -2,12 +2,12 @@ require_relative "base"
 
 module FilterParam
   module Filter
-    module Backend
-      class Postgresql < Base
+    module Backends
+      class Postgresql < Backend
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
           exp = evaluate(unary_exp.exp)
-          return "#{exp} #{OPS_MAP[op]}" if op == "pr"
+          return "#{exp} #{OPS_MAP[op]}" if op == :pr
 
           "#{OPS_MAP[op]} #{exp}"
         end
@@ -18,17 +18,17 @@ module FilterParam
           right = evaluate(binary_exp.right)
 
           case op
-          when "and", "or"
+          when :and, :or
             "#{left} #{OPS_MAP[op]} #{right}"
-          when "eq_ci"
+          when :eq_ci
             "lower(#{left}) = #{quote(right.downcase)}"
-          when "sw"
+          when :sw
             value = "#{right}%"
             "#{left} like #{quote(value)}"
-          when "ew"
+          when :ew
             value = "%#{right}"
             "#{left} like #{quote(value)}"
-          when "co"
+          when :co
             value = "%#{right}%"
             "#{left} like #{quote(value)}"
           else

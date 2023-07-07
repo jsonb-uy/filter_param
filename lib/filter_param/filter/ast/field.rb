@@ -1,7 +1,7 @@
 module FilterParam
   module Filter
     module AST
-      class Identifier < Node
+      class Field < Node
         attr_reader :name
 
         def initialize(name)
