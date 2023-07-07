@@ -1,7 +1,7 @@
 module FilterParam
   module Filter
     module Validators
-      class Validator < Filter::Visitor
+      class Validator < Filter::AST::Visitor
         def validate!(node)
           evaluate(node)
         end
