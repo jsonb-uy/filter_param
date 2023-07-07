@@ -13,7 +13,7 @@ module FilterParam
         return nil if expression.blank?
 
         parse_tree = Parser.new.parse(expression, reporter: Parslet::ErrorReporter::Deepest.new)
-        ast = AstTransformer.new.apply(parse_tree, definition: definition)
+        ast = AST::Transformer.new.apply(parse_tree, definition: definition)
 
         field_validator.validate!(ast)
                        .then { |ast| field_value_type_validator.validate!(ast) }

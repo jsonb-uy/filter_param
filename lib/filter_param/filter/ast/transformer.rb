@@ -11,7 +11,7 @@ module FilterParam
   module Filter
     module AST
       class Transformer < Parslet::Transform
-        include AST
+        include Nodes
 
         rule(exp: simple(:exp)) { exp }
         rule(group: simple(:exp)) { Group.new(exp) }
