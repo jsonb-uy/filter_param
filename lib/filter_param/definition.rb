@@ -2,6 +2,8 @@ module FilterParam
   class Definition
     attr_reader :fields_hash
 
+    FIELD_TYPES = %i[string numeric boolean date datetime].freeze
+
     # Creates a new FilterParam definition that whitelists the columns that are allowed to
     # filtered (i.e. used in SQL WHERE condition).
     def initialize
@@ -25,6 +27,8 @@ module FilterParam
     #
     # @param [String, Symbol] name column name
     # @param [Hash] options column options:
+    #   * type [Symbol] expected field type:
+    #     :string (default), :numeric, :boolean, :date, :datetime
     #   * rename [String, Proc] rename field in the formatted output.
     #     This can be a Proc code block that receives the :name as argument and
     #     returns a transformed field name.
@@ -32,9 +36,10 @@ module FilterParam
     # @return [self] Definition instance
     def field(name, **options)
       name = name.to_s
-      return if name.strip.empty?
+      return if name.blank?
 
       fields_hash[name] = preprocess_field_options(name, options)
+      validate_field_options!(name, fields_hash[name])
 
       self
     end
@@ -83,11 +88,20 @@ module FilterParam
     private
 
     def preprocess_field_options(field, options)
+      options[:type] ||= :string
+      options[:type] = options[:type].to_sym
       rename = options[:rename]
       return options unless rename.is_a?(Proc)
 
       options[:rename] = options[:rename].call(field)
       options
+    end
+
+    def validate_field_options!(field, options)
+      type = options[:type]
+      return if FIELD_TYPES.include?(type)
+
+      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{FIELD_TYPES}.")
     end
   end
 end

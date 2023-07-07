@@ -94,10 +94,35 @@ module FilterParam
       rule(:exp_root) { exp | empty_exp }
       root(:exp_root)
 
+      def parse(expression, options = {})
+        super(expression, options)
+      rescue Parslet::ParseFailed => e
+        parse_cause = e.parse_failure_cause.children.last
+
+        raise parse_error(parse_cause)
+      end
+
       private
 
       def quoted(atom_or_seq)
         (single_quote >> atom_or_seq >> single_quote) | (double_quote >> atom_or_seq >> double_quote)
+      end
+
+      def parse_error(parse_cause)
+        parse_cause = parse_cause.to_s
+        invalid_expression = "Filter expression syntax error."
+
+        if parse_cause.start_with?("Expected one of")
+          parse_cause = invalid_expression
+        else
+          unexpected_token = "Unexpected token"
+
+          parse_cause.sub!("Don't know what to do with", unexpected_token)
+          parse_cause.sub!(/(Failed to match).*.(at line 1)/, "#{unexpected_token} at")
+          parse_cause.sub!(/(at line 1)/, "at")
+        end
+
+        ParseError.new(parse_cause)
       end
     end
   end

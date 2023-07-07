@@ -15,7 +15,7 @@ RSpec.describe FilterParam::Filter::Parser do
         invalid_column_names = [1, "a.1", "a a", ".a", "!", "a!", "'", "a.a.a"]
 
         invalid_column_names.each do |column|
-          expect { parse("#{column} eq 1") }.to raise_error(Parslet::ParseFailed)
+          expect { parse("#{column} eq 1") }.to raise_error(FilterParam::ParseError)
         end
       end
     end
@@ -35,9 +35,9 @@ RSpec.describe FilterParam::Filter::Parser do
 
     context "with an unrecognized filter operator" do
       it "raises an error" do
-        expect { parse("name equals 1") }.to raise_error(Parslet::ParseFailed)
-        expect { parse("name = 1") }.to raise_error(Parslet::ParseFailed)
-        expect { parse("name + 1") }.to raise_error(Parslet::ParseFailed)
+        expect { parse("name equals 1") }.to raise_error(FilterParam::ParseError)
+        expect { parse("name = 1") }.to raise_error(FilterParam::ParseError)
+        expect { parse("name + 1") }.to raise_error(FilterParam::ParseError)
       end
     end
 
@@ -274,10 +274,10 @@ RSpec.describe FilterParam::Filter::Parser do
       end
 
       it "requires parentheses to be pairs" do
-        expect { parse("id eq(42") }.to raise_error(Parslet::ParseFailed)
-        expect { parse("id eq ((42)") }.to raise_error(Parslet::ParseFailed)
-        expect { parse("id eq 42)") }.to raise_error(Parslet::ParseFailed)
-        expect { parse("id eq (42))") }.to raise_error(Parslet::ParseFailed)
+        expect { parse("id eq(42") }.to raise_error(FilterParam::ParseError)
+        expect { parse("id eq ((42)") }.to raise_error(FilterParam::ParseError)
+        expect { parse("id eq 42)") }.to raise_error(FilterParam::ParseError)
+        expect { parse("id eq (42))") }.to raise_error(FilterParam::ParseError)
       end
     end
 

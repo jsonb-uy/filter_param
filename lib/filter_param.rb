@@ -10,7 +10,9 @@ require_relative "filter_param/definition"
 require_relative "filter_param/version"
 
 module FilterParam
-  class ExpressionError < StandardError; end
+  class BaseError < StandardError; end
+  class UnknownType < BaseError; end
+  class ExpressionError < BaseError; end
   class UnpermittedField < ExpressionError; end
   class ParseError < ExpressionError; end
 

@@ -23,8 +23,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with an expression with unexpected token" do
-      it "raises an error" do
+    context "with unexpected token" do
+      it "raises parse error" do
         expect do
           transpiler.transpile!("first_name eq 'John' 1")
         end.to raise_error(FilterParam::ParseError)
@@ -39,8 +39,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with an expression with missing parenthesis" do
-      it "raises an error" do
+    context "with missing parenthesis" do
+      it "raises parse error" do
         expect do
           transpiler.transpile!("first_name eq ('John'")
         end.to raise_error(FilterParam::ParseError)
@@ -55,8 +55,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with an expression with missing quote" do
-      it "raises an error" do
+    context "with missing quote" do
+      it "raises parse error" do
         expect do
           transpiler.transpile!("first_name eq 'John")
         end.to raise_error(FilterParam::ParseError)
@@ -79,8 +79,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with an expression with invalid identifier format" do
-      it "raises an error" do
+    context "with invalid identifier format" do
+      it "raises parse error" do
         expect do
           transpiler.transpile!("1dentifer eq 'John'")
         end.to raise_error(FilterParam::ParseError)
@@ -95,8 +95,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    context "with an expression with unrecognized operation" do
-      it "raises an error" do
+    context "with unrecognized operation" do
+      it "raises parse error" do
         expect do
           transpiler.transpile!("1dentifer equals 'John'")
         end.to raise_error(FilterParam::ParseError)
@@ -105,6 +105,25 @@ RSpec.describe FilterParam::Filter::Transpiler do
           transpiler.transpile!("'first_name' = 'John'")
         end.to raise_error(FilterParam::ParseError)
       end
+    end
+
+    context "with invalid date month day" do
+      it "raises parse error" do
+        expect do
+          transpiler.transpile!("birth_date eq '2023-02-31'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("birth_date eq '2023-09-31'")
+        end.to raise_error(FilterParam::ParseError)
+
+        expect do
+          transpiler.transpile!("birth_date eq '2023-06-31'")
+        end.to raise_error(FilterParam::ParseError)
+      end
+    end
+
+    xcontext "with :eq operation" do
     end
   end
 end
