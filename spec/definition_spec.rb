@@ -99,7 +99,8 @@ RSpec.describe FilterParam::Definition do
     context "with valid :type option value" do
       it "sets the field type" do
         definition.field(:email, type: :string)
-                  .field(:age, type: :numeric)
+                  .field(:age, type: :int)
+                  .field(:weight, type: :decimal)
                   .field(:birth_date, type: :date)
                   .field(:created_at, type: :datetime)
                   .field(:active, type: :boolean)
@@ -107,9 +108,10 @@ RSpec.describe FilterParam::Definition do
         expect(definition.fields_hash).to eql(
           {
             "email" => { type: :string },
-            "age" => { type: :numeric },
+            "age" => { type: :int },
             "birth_date" => { type: :date },
             "created_at" => { type: :datetime },
+            "weight" => { type: :decimal },
             "active" => { type: :boolean }
           }
         )
@@ -164,10 +166,10 @@ RSpec.describe FilterParam::Definition do
   describe "#field_options" do
     it "returns the field's configured options" do
       definition.field(:email, rename: "eadd")
-      definition.field(:age, type: :numeric)
+      definition.field(:age, type: :int)
 
       expect(definition.field_options("email")).to eql(rename: "eadd", type: :string)
-      expect(definition.field_options("age")).to eql(type: :numeric)
+      expect(definition.field_options("age")).to eql(type: :int)
     end
   end
 end

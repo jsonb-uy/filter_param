@@ -12,24 +12,19 @@ module FilterParam
     class AstTransformer < Parslet::Transform
       include AST
 
-      rule(exp: simple(:exp))      { exp }
-      rule(group: simple(:exp))    { Group.new(exp) }
-      rule(null: simple(:null))    { Literal.new(nil, :null) }
-      rule(string: simple(:val))   { Literal.new(val.to_s, :string) }
-      rule(int: simple(:val))      { Literal.new(Integer(val), :numeric) }
-      rule(boolean: simple(:val))  { Literal.new(val == "true", :boolean) }
-      rule(decimal: simple(:val))  { Literal.new(BigDecimal(val), :numeric) }
-      rule(datetime: simple(:val)) { Literal.new(DateTime.iso8601(val), :datetime) }
-      rule(date: simple(:val))     { Literal.new(Date.iso8601(val), :date) }
+      rule(exp: simple(:exp)) { exp }
+      rule(group: simple(:exp)) { Group.new(exp) }
       rule(op: simple(:op), right: simple(:exp)) { UnaryExpression.new(exp, op) }
-      rule(f: simple(:f), op: simple(:op)) do
-        UnaryExpression.new(Field.new(f), op).validate!(definition)
-      end
+      rule(f: simple(:f), op: simple(:op)) { UnaryExpression.new(Field.new(f), op) }
       rule(left: simple(:left), op: simple(:op), right: simple(:right)) do
         BinaryExpression.new(left, op, right)
       end
       rule(f: simple(:f), op: simple(:op), val: simple(:val)) do
-        BinaryExpression.new(Field.new(f), op, val)
+        field = Field.new(f)
+        field_type = definition.field_type(field.name)
+        literal = Literal.new(val, field_type)
+
+        BinaryExpression.new(field, op, literal)
       end
     end
   end

@@ -5,8 +5,8 @@ RSpec.describe FilterParam::Filter::Parser do
     described_class.new.parse(expression)
   end
 
-  def parse_value(expression, type)
-    parse(expression)[:exp][:val][type].str
+  def parse_value(expression)
+    parse(expression)[:exp][:val].str
   end
 
   describe "#tree" do
@@ -45,70 +45,70 @@ RSpec.describe FilterParam::Filter::Parser do
       exp = parse("name eq 'john'")[:exp]
       expect(exp[:op].str).to eql("eq")
       expect(exp[:f].str).to eql("name")
-      expect(exp[:val][:string].str).to eql("john")
+      expect(exp[:val].str).to eql("john")
     end
 
     it "parses :eq_ci 'case-insensitive equal' filter operator" do
       exp = parse("name eq_ci 'JOhn'")[:exp]
       expect(exp[:op].str).to eql("eq_ci")
       expect(exp[:f].str).to eql("name")
-      expect(exp[:val][:string].str).to eql("JOhn")
+      expect(exp[:val].str).to eql("JOhn")
     end
 
     it "parses :neq 'not equal' filter operator" do
       exp = parse("name neq 'John'")[:exp]
       expect(exp[:op].str).to eql("neq")
       expect(exp[:f].str).to eql("name")
-      expect(exp[:val][:string].str).to eql("John")
+      expect(exp[:val].str).to eql("John")
     end
 
     it "parses :co 'contains' filter operator" do
       exp = parse("users.name co 'oh'")[:exp]
       expect(exp[:op].str).to eql("co")
       expect(exp[:f].str).to eql("users.name")
-      expect(exp[:val][:string].str).to eql("oh")
+      expect(exp[:val].str).to eql("oh")
     end
 
     it "parses :sw 'starts with' filter operator" do
       exp = parse("users.name sw 'Jo'")[:exp]
       expect(exp[:op].str).to eql("sw")
       expect(exp[:f].str).to eql("users.name")
-      expect(exp[:val][:string].str).to eql("Jo")
+      expect(exp[:val].str).to eql("Jo")
     end
 
     it "parses :ew 'ends with' filter operator" do
       exp = parse("users.name ew 'hn'")[:exp]
       expect(exp[:op].str).to eql("ew")
       expect(exp[:f].str).to eql("users.name")
-      expect(exp[:val][:string].str).to eql("hn")
+      expect(exp[:val].str).to eql("hn")
     end
 
     it "parses :gt 'greater than' filter operator" do
       exp = parse("width gt 3")[:exp]
       expect(exp[:op].str).to eql("gt")
       expect(exp[:f].str).to eql("width")
-      expect(exp[:val][:int].str).to eql("3")
+      expect(exp[:val].str).to eql("3")
     end
 
     it "parses :ge 'greater than or equal' filter operator" do
       exp = parse("width ge 300.10")[:exp]
       expect(exp[:op].str).to eql("ge")
       expect(exp[:f].str).to eql("width")
-      expect(exp[:val][:decimal].str).to eql("300.10")
+      expect(exp[:val].str).to eql("300.10")
     end
 
     it "parses :lt 'less than' filter operator" do
       exp = parse("weight lt 12059.239")[:exp]
       expect(exp[:op].str).to eql("lt")
       expect(exp[:f].str).to eql("weight")
-      expect(exp[:val][:decimal].str).to eql("12059.239")
+      expect(exp[:val].str).to eql("12059.239")
     end
 
     it "parses :le 'less than or equal' filter operator" do
       exp = parse("weight le 999")[:exp]
       expect(exp[:op].str).to eql("le")
       expect(exp[:f].str).to eql("weight")
-      expect(exp[:val][:int].str).to eql("999")
+      expect(exp[:val].str).to eql("999")
     end
 
     it "parses :pr 'present' filter operator" do
@@ -120,99 +120,99 @@ RSpec.describe FilterParam::Filter::Parser do
     end
 
     it "parses null filter value" do
-      expect(parse_value("name eq null", :null)).to eql("null")
+      expect(parse_value("name eq null")).to eql("null")
     end
 
     it "parses boolean filter value" do
-      expect(parse_value("name eq true", :boolean)).to eql("true")
-      expect(parse_value("name eq false", :boolean)).to eql("false")
+      expect(parse_value("name eq true")).to eql("true")
+      expect(parse_value("name eq false")).to eql("false")
     end
 
     it "parses positive integer filter value" do
-      expect(parse_value("age ge 1", :int)).to eql("1")
-      expect(parse_value("age ge 420", :int)).to eql("420")
-      expect(parse_value("age ge 100003", :int)).to eql("100003")
-      expect(parse_value("age ge 01", :int)).to eql("1")
-      expect(parse_value("age ge 00023", :int)).to eql("23")
-      expect(parse_value("age ge 000230", :int)).to eql("230")
-      expect(parse_value("age ge 02301", :int)).to eql("2301")
+      expect(parse_value("age ge 1")).to eql("1")
+      expect(parse_value("age ge 420")).to eql("420")
+      expect(parse_value("age ge 100003")).to eql("100003")
+      expect(parse_value("age ge 01")).to eql("1")
+      expect(parse_value("age ge 00023")).to eql("23")
+      expect(parse_value("age ge 000230")).to eql("230")
+      expect(parse_value("age ge 02301")).to eql("2301")
     end
 
     it "parses zero integer filter value" do
-      expect(parse_value("age ge 00000", :int)).to eql("0")
-      expect(parse_value("age ge 00", :int)).to eql("0")
-      expect(parse_value("age ge 0", :int)).to eql("0")
-      expect(parse_value("age ge -0", :int)).to eql("0")
-      expect(parse_value("age ge -000", :int)).to eql("0")
+      expect(parse_value("age ge 00000")).to eql("0")
+      expect(parse_value("age ge 00")).to eql("0")
+      expect(parse_value("age ge 0")).to eql("0")
+      expect(parse_value("age ge -0")).to eql("0")
+      expect(parse_value("age ge -000")).to eql("0")
     end
 
     it "parses negative integer filter value" do
-      expect(parse_value("age ge -1", :int)).to eql("-1")
-      expect(parse_value("age ge -420", :int)).to eql("-420")
-      expect(parse_value("age ge -100003", :int)).to eql("-100003")
-      expect(parse_value("age ge -01", :int)).to eql("-1")
-      expect(parse_value("age ge -00023", :int)).to eql("-23")
-      expect(parse_value("age ge -000230", :int)).to eql("-230")
-      expect(parse_value("age ge -02301", :int)).to eql("-2301")
+      expect(parse_value("age ge -1")).to eql("-1")
+      expect(parse_value("age ge -420")).to eql("-420")
+      expect(parse_value("age ge -100003")).to eql("-100003")
+      expect(parse_value("age ge -01")).to eql("-1")
+      expect(parse_value("age ge -00023")).to eql("-23")
+      expect(parse_value("age ge -000230")).to eql("-230")
+      expect(parse_value("age ge -02301")).to eql("-2301")
     end
 
     it "parses positive decimal filter value" do
-      expect(parse_value("age ge 1.0", :decimal)).to eql("1.0")
-      expect(parse_value("age ge 420.101", :decimal)).to eql("420.101")
-      expect(parse_value("age ge 58456.100003", :decimal)).to eql("58456.100003")
-      expect(parse_value("age ge 09.01", :decimal)).to eql("9.01")
-      expect(parse_value("age ge 00900.00023", :decimal)).to eql("900.00023")
-      expect(parse_value("age ge 73.02301", :decimal)).to eql("73.02301")
-      expect(parse_value("age ge 0.0958", :decimal)).to eql("0.0958")
+      expect(parse_value("age ge 1.0")).to eql("1.0")
+      expect(parse_value("age ge 420.101")).to eql("420.101")
+      expect(parse_value("age ge 58456.100003")).to eql("58456.100003")
+      expect(parse_value("age ge 09.01")).to eql("9.01")
+      expect(parse_value("age ge 00900.00023")).to eql("900.00023")
+      expect(parse_value("age ge 73.02301")).to eql("73.02301")
+      expect(parse_value("age ge 0.0958")).to eql("0.0958")
     end
 
     it "parses negative decimal filter value" do
-      expect(parse_value("age ge -1.0", :decimal)).to eql("-1.0")
-      expect(parse_value("age ge -420.101", :decimal)).to eql("-420.101")
-      expect(parse_value("age ge -58456.100003", :decimal)).to eql("-58456.100003")
-      expect(parse_value("age ge -09.01", :decimal)).to eql("-9.01")
-      expect(parse_value("age ge -00900.00023", :decimal)).to eql("-900.00023")
-      expect(parse_value("age ge -73.02301", :decimal)).to eql("-73.02301")
-      expect(parse_value("age ge -0.0958", :decimal)).to eql("-0.0958")
+      expect(parse_value("age ge -1.0")).to eql("-1.0")
+      expect(parse_value("age ge -420.101")).to eql("-420.101")
+      expect(parse_value("age ge -58456.100003")).to eql("-58456.100003")
+      expect(parse_value("age ge -09.01")).to eql("-9.01")
+      expect(parse_value("age ge -00900.00023")).to eql("-900.00023")
+      expect(parse_value("age ge -73.02301")).to eql("-73.02301")
+      expect(parse_value("age ge -0.0958")).to eql("-0.0958")
     end
 
     it "parses zero decimal filter value" do
-      expect(parse_value("age ge 00.000", :decimal)).to eql("0.000")
-      expect(parse_value("age ge 0.00", :decimal)).to eql("0.00")
-      expect(parse_value("age ge 0.0", :decimal)).to eql("0.0")
-      expect(parse_value("age ge -0.0", :decimal)).to eql("-0.0")
-      expect(parse_value("age ge -0.00", :decimal)).to eql("-0.00")
+      expect(parse_value("age ge 00.000")).to eql("0.000")
+      expect(parse_value("age ge 0.00")).to eql("0.00")
+      expect(parse_value("age ge 0.0")).to eql("0.0")
+      expect(parse_value("age ge -0.0")).to eql("-0.0")
+      expect(parse_value("age ge -0.00")).to eql("-0.00")
     end
 
     it "parses string filter value" do
-      expect(parse_value("name eq 'john'", :string)).to eql("john")
-      expect(parse_value("name eq \"john\"", :string)).to eql("john")
-      expect(parse_value('name eq \'john\'', :string)).to eql("john")
-      expect(parse_value('name eq "john"', :string)).to eql("john")
+      expect(parse_value("name eq 'john'")).to eql("john")
+      expect(parse_value("name eq \"john\"")).to eql("john")
+      expect(parse_value('name eq \'john\'')).to eql("john")
+      expect(parse_value('name eq "john"')).to eql("john")
     end
 
     it "parses date filter value" do
-      expect(parse_value("birthdate eq \"2023-04-23\"", :date)).to eql("2023-04-23")
-      expect(parse_value("birthdate eq '2023-04-23'", :date)).to eql("2023-04-23")
-      expect(parse_value("birthdate eq \"2023-01-01\"", :date)).to eql("2023-01-01")
-      expect(parse_value("birthdate eq '2023-12-31'", :date)).to eql("2023-12-31")
+      expect(parse_value("birthdate eq \"2023-04-23\"")).to eql("2023-04-23")
+      expect(parse_value("birthdate eq '2023-04-23'")).to eql("2023-04-23")
+      expect(parse_value("birthdate eq \"2023-01-01\"")).to eql("2023-01-01")
+      expect(parse_value("birthdate eq '2023-12-31'")).to eql("2023-12-31")
     end
 
     it "parses datetime filter value" do
-      expect(parse_value("expiry le \"2017-06-04T10:15:30Z\"", :datetime)).to eql("2017-06-04T10:15:30Z")
-      expect(parse_value("expiry ge \"2017-06-04T10:15:30.999Z\"", :datetime)).to eql("2017-06-04T10:15:30.999Z")
-      expect(parse_value("expiry le '2017-06-04T10:15:30Z'", :datetime)).to eql("2017-06-04T10:15:30Z")
-      expect(parse_value("expiry ge '2017-06-04T10:15:30.999Z'", :datetime)).to eql("2017-06-04T10:15:30.999Z")
-      expect(parse_value("expiry le \"2017-06-04T10:15:30+09:00\"", :datetime)).to eql("2017-06-04T10:15:30+09:00")
-      expect(parse_value("expiry ge \"2017-06-04T10:15:30.999-08:30\"", :datetime)).to eql("2017-06-04T10:15:30.999-08:30")
-      expect(parse_value("expiry le '2017-06-04T10:15:30+00:30'", :datetime)).to eql("2017-06-04T10:15:30+00:30")
-      expect(parse_value("expiry le '2017-06-04T10:15:30+00:00'", :datetime)).to eql("2017-06-04T10:15:30+00:00")
-      expect(parse_value("expiry ge '2017-06-04T10:15:30.999-07:00'", :datetime)).to eql("2017-06-04T10:15:30.999-07:00")
-      expect(parse_value("expiry le \"2017-06-04T10:15:30+0900\"", :datetime)).to eql("2017-06-04T10:15:30+0900")
-      expect(parse_value("expiry ge \"2017-06-04T10:15:30.999-0830\"", :datetime)).to eql("2017-06-04T10:15:30.999-0830")
-      expect(parse_value("expiry le '2017-06-04T10:15:30+0030'", :datetime)).to eql("2017-06-04T10:15:30+0030")
-      expect(parse_value("expiry le '2017-06-04T10:15:30+0000'", :datetime)).to eql("2017-06-04T10:15:30+0000")
-      expect(parse_value("expiry ge '2017-06-04T10:15:30.999-0700'", :datetime)).to eql("2017-06-04T10:15:30.999-0700")
+      expect(parse_value("expiry le \"2017-06-04T10:15:30Z\"")).to eql("2017-06-04T10:15:30Z")
+      expect(parse_value("expiry ge \"2017-06-04T10:15:30.999Z\"")).to eql("2017-06-04T10:15:30.999Z")
+      expect(parse_value("expiry le '2017-06-04T10:15:30Z'")).to eql("2017-06-04T10:15:30Z")
+      expect(parse_value("expiry ge '2017-06-04T10:15:30.999Z'")).to eql("2017-06-04T10:15:30.999Z")
+      expect(parse_value("expiry le \"2017-06-04T10:15:30+09:00\"")).to eql("2017-06-04T10:15:30+09:00")
+      expect(parse_value("expiry ge \"2017-06-04T10:15:30.999-08:30\"")).to eql("2017-06-04T10:15:30.999-08:30")
+      expect(parse_value("expiry le '2017-06-04T10:15:30+00:30'")).to eql("2017-06-04T10:15:30+00:30")
+      expect(parse_value("expiry le '2017-06-04T10:15:30+00:00'")).to eql("2017-06-04T10:15:30+00:00")
+      expect(parse_value("expiry ge '2017-06-04T10:15:30.999-07:00'")).to eql("2017-06-04T10:15:30.999-07:00")
+      expect(parse_value("expiry le \"2017-06-04T10:15:30+0900\"")).to eql("2017-06-04T10:15:30+0900")
+      expect(parse_value("expiry ge \"2017-06-04T10:15:30.999-0830\"")).to eql("2017-06-04T10:15:30.999-0830")
+      expect(parse_value("expiry le '2017-06-04T10:15:30+0030'")).to eql("2017-06-04T10:15:30+0030")
+      expect(parse_value("expiry le '2017-06-04T10:15:30+0000'")).to eql("2017-06-04T10:15:30+0000")
+      expect(parse_value("expiry ge '2017-06-04T10:15:30.999-0700'")).to eql("2017-06-04T10:15:30.999-0700")
     end
 
     it "parses :or logical operator" do
@@ -223,10 +223,10 @@ RSpec.describe FilterParam::Filter::Parser do
       expect(exp[:op].str).to eql("or")
       expect(left[:f].str).to eql("name")
       expect(left[:op].str).to eql("eq")
-      expect(left[:val][:string].str).to eql("john")
+      expect(left[:val].str).to eql("john")
       expect(right[:f].str).to eql("surname")
       expect(right[:op].str).to eql("eq")
-      expect(right[:val][:string].str).to eql("doe")
+      expect(right[:val].str).to eql("doe")
     end
 
     it "parses :and logical operator" do
@@ -237,10 +237,10 @@ RSpec.describe FilterParam::Filter::Parser do
       expect(exp[:op].str).to eql("and")
       expect(left[:f].str).to eql("name")
       expect(left[:op].str).to eql("eq")
-      expect(left[:val][:string].str).to eql("jane")
+      expect(left[:val].str).to eql("jane")
       expect(right[:f].str).to eql("surname")
       expect(right[:op].str).to eql("neq")
-      expect(right[:val][:string].str).to eql("doe")
+      expect(right[:val].str).to eql("doe")
     end
 
     it "parses :not logical operator" do
@@ -253,24 +253,24 @@ RSpec.describe FilterParam::Filter::Parser do
       expect(left_neg_exp[:op].str).to eql("not")
       expect(left_neg_exp[:right][:exp][:f].str).to eql("name")
       expect(left_neg_exp[:right][:exp][:op].str).to eql("eq")
-      expect(left_neg_exp[:right][:exp][:val][:string].str).to eql("jane")
+      expect(left_neg_exp[:right][:exp][:val].str).to eql("jane")
 
       expect(right_neg_exp[:op].str).to eql("not")
       expect(right_neg_exp[:right][:group][:exp][:op].str).to eql("and")
       expect(right_neg_exp[:right][:group][:exp][:left][:exp][:op].str).to eql("eq")
       expect(right_neg_exp[:right][:group][:exp][:left][:exp][:f].str).to eql("surname")
-      expect(right_neg_exp[:right][:group][:exp][:left][:exp][:val][:string].str).to eql("doe")
+      expect(right_neg_exp[:right][:group][:exp][:left][:exp][:val].str).to eql("doe")
       expect(right_neg_exp[:right][:group][:exp][:right][:exp][:op].str).to eql("eq")
       expect(right_neg_exp[:right][:group][:exp][:right][:exp][:f].str).to eql("name")
-      expect(right_neg_exp[:right][:group][:exp][:right][:exp][:val][:string].str).to eql("john")
+      expect(right_neg_exp[:right][:group][:exp][:right][:exp][:val].str).to eql("john")
     end
 
     context "value parenthesization" do
       it "correctly parses different formats" do
-        expect(parse("id eq(42)")[:exp][:val][:int].str).to eql("42")
-        expect(parse("id eq (42)")[:exp][:val][:int].str).to eql("42")
-        expect(parse("id eq ((42))")[:exp][:val][:int].str).to eql("42")
-        expect(parse("id eq ( (   ( 42)) )")[:exp][:val][:int].str).to eql("42")
+        expect(parse("id eq(42)")[:exp][:val].str).to eql("42")
+        expect(parse("id eq (42)")[:exp][:val].str).to eql("42")
+        expect(parse("id eq ((42))")[:exp][:val].str).to eql("42")
+        expect(parse("id eq ( (   ( 42)) )")[:exp][:val].str).to eql("42")
       end
 
       it "requires parentheses to be pairs" do

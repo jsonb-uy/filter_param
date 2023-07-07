@@ -20,32 +20,32 @@ module FilterParam
       rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
 
       # Literals / types
-      rule(:null) { str("null").as(:null) }
-      rule(:boolean) { (str("true") | str("false")).as(:boolean) }
+      rule(:null) { str("null").as(:val) }
+      rule(:boolean) { (str("true") | str("false")).as(:val) }
 
       rule(:integer) do
         (
           (hyphen.maybe >> zero_nonsig >> sig_number) |
           (hyphen.maybe.ignore >> zero >> zero_nonsig)
-        ).as(:int)
+        ).as(:val)
       end
 
       rule(:decimal) do
         (
           (hyphen.maybe >> zero_nonsig >> sig_number >> dot >> digit.repeat(1)) |
           (hyphen.maybe >> zero >> zero_nonsig >> dot >> digit.repeat(1))
-        ).as(:decimal)
+        ).as(:val)
       end
 
       rule(:string) do
-        (single_quote >> (escape_seq | match("[^\']")).repeat.as(:string) >> single_quote) |
-          (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:string) >> double_quote)
+        (single_quote >> (escape_seq | match("[^\']")).repeat.as(:val) >> single_quote) |
+          (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:val) >> double_quote)
       end
       rule(:date_yyyy) { digit.repeat(4) }
       rule(:date_mm) { (zero >> non_zero_digit) | (str("1") >> match("[0-2]")) }
       rule(:date_md) { (zero >> non_zero_digit) | (match("[1-2]") >> digit) | (str("3") >> match("[0-1]")) }
       rule(:date_iso8601) { date_yyyy >> hyphen >> date_mm >> hyphen >> date_md }
-      rule(:date) { quoted date_iso8601.as(:date) }
+      rule(:date) { quoted date_iso8601.as(:val) }
       rule(:time_hh_mi) do
         (((zero | str("1")) >> digit) | (str("2") >> match("[0-3]"))) >>
           str(":").maybe >> ((zero >> digit) | (match("[1-5]") >> digit))
@@ -54,7 +54,7 @@ module FilterParam
       rule(:time_hh_mi_ss_sss) { time_hh_mi_ss >> dot >> digit.repeat(3, 3) }
       rule(:time_tz) { str("Z") | (match("[\+\-]") >> time_hh_mi) }
       rule(:datetime_iso8601) { date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz }
-      rule(:datetime) { quoted datetime_iso8601.as(:datetime) }
+      rule(:datetime) { quoted datetime_iso8601.as(:val) }
 
       # Operations
       rule(:op_filter_binary) do
@@ -66,7 +66,7 @@ module FilterParam
       rule(:op_logic_unary) { str("not").as(:op) }
 
       # Expressions
-      rule(:literal) { (null | boolean | decimal | integer | datetime | date | string).as(:val) }
+      rule(:literal) { (null | boolean | decimal | integer | datetime | date | string) }
       rule(:literal_paren) { lparen >> space? >> (literal | literal_paren) >> space? >> rparen }
       rule(:value) { literal_paren | (space >> (literal | literal_paren)) }
       rule(:field_exp) { (field >> space >> (op_filter_unary | (op_filter_binary >> value))).as(:exp) }
@@ -99,7 +99,7 @@ module FilterParam
       rescue Parslet::ParseFailed => e
         parse_cause = e.parse_failure_cause.children.last
 
-        raise parse_error(parse_cause)
+        raise_parse_error!(parse_cause)
       end
 
       private
@@ -108,7 +108,7 @@ module FilterParam
         (single_quote >> atom_or_seq >> single_quote) | (double_quote >> atom_or_seq >> double_quote)
       end
 
-      def parse_error(parse_cause)
+      def raise_parse_error!(parse_cause)
         parse_cause = parse_cause.to_s
         invalid_expression = "Filter expression syntax error."
 
@@ -122,7 +122,7 @@ module FilterParam
           parse_cause.sub!(/(at line 1)/, "at")
         end
 
-        ParseError.new(parse_cause)
+        raise ParseError.new(parse_cause)
       end
     end
   end

@@ -2,7 +2,7 @@ module FilterParam
   class Definition
     attr_reader :fields_hash
 
-    FIELD_TYPES = %i[string numeric boolean date datetime].freeze
+    FIELD_TYPES = %i[string int decimal boolean date datetime].freeze
 
     # Creates a new FilterParam definition that whitelists the columns that are allowed to
     # filtered (i.e. used in SQL WHERE condition).
@@ -28,7 +28,7 @@ module FilterParam
     # @param [String, Symbol] name column name
     # @param [Hash] options column options:
     #   * type [Symbol] expected field type:
-    #     :string (default), :numeric, :boolean, :date, :datetime
+    #     :string (default), :int, :decimal :boolean, :date, :datetime
     #   * rename [String, Proc] rename field in the formatted output.
     #     This can be a Proc code block that receives the :name as argument and
     #     returns a transformed field name.
