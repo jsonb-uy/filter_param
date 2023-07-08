@@ -3,17 +3,14 @@ module FilterParam
     module AST
       module Nodes
         class Literal < Node
-          attr_reader :value, :data_type
+          attr_reader :value
 
-          def initialize(value = nil, data_type = :string)
-            super()
-
+          def initialize(value)
             @value = value
-            @data_type = data_type
           end
 
-          def to_s
-            value.to_s
+          def self.type_for(type_symbol)
+            "#{type_symbol.to_s.camelize}Literal".safe_constantize
           end
         end
       end
