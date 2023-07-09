@@ -6,11 +6,7 @@ module FilterParam
           attr_reader :value
 
           def initialize(value)
-            @value = value
-          end
-
-          def self.type_for(type_symbol)
-            "#{type_symbol.to_s.camelize}Literal".safe_constantize
+            @value = value.to_s
           end
         end
       end

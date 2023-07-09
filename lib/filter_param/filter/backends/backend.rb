@@ -16,7 +16,7 @@ module FilterParam
         }.freeze
 
         def visit_group(group)
-          "(#{evaluate(group.exp)})"
+          "(#{visit_node(group.exp)})"
         end
 
         def visit_field(field)

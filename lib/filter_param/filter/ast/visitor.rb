@@ -7,7 +7,7 @@ module FilterParam
         end
 
         def visit_group(group)
-          evaluate(group.exp)
+          visit_node(group.exp)
         end
 
         def visit_field(field)
@@ -19,19 +19,19 @@ module FilterParam
         end
 
         def visit_binary_expression(binary_exp)
-          evaluate(binary_exp.left)
-          evaluate(binary_exp.right)
+          visit_node(binary_exp.left)
+          visit_node(binary_exp.right)
 
           binary_exp
         end
 
         def visit_unary_expression(unary_exp)
-          evaluate(unary_exp.exp)
+          visit_node(unary_exp.exp)
 
           unary_exp
         end
 
-        def evaluate(node)
+        def visit_node(node)
           node.accept(self)
         end
 

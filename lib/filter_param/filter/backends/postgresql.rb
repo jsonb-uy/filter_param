@@ -6,7 +6,7 @@ module FilterParam
       class Postgresql < Backend
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
-          exp = evaluate(unary_exp.exp)
+          exp = visit_node(unary_exp.exp)
           return "#{exp} #{OPS_MAP[op]}" if op == :pr
 
           "#{OPS_MAP[op]} #{exp}"
@@ -14,8 +14,8 @@ module FilterParam
 
         def visit_binary_expression(binary_exp)
           op = binary_exp.op
-          left = evaluate(binary_exp.left)
-          right = evaluate(binary_exp.right)
+          left = visit_node(binary_exp.left)
+          right = visit_node(binary_exp.right)
 
           case op
           when :and, :or
