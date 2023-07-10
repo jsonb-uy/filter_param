@@ -1,9 +1,9 @@
-require_relative "backend"
+require_relative "base"
 
 module FilterParam
   module Filter
-    module Backends
-      class Postgresql < Backend
+    module Backend
+      class Postgresql < Base
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
           exp = visit_node(unary_exp.exp)

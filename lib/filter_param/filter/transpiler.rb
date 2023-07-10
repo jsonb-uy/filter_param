@@ -1,6 +1,6 @@
-require_relative "backends/postgresql"
-require_relative "validators/field_permission_validator"
-require_relative "validators/field_value_type_validator"
+require_relative "backend/postgresql"
+require_relative "permission_checker"
+require_relative "type_checker"
 
 module FilterParam
   module Filter
@@ -15,25 +15,25 @@ module FilterParam
         parse_tree = Parser.new.parse(expression, reporter: Parslet::ErrorReporter::Deepest.new)
         ast = AST::Transformer.new.apply(parse_tree, definition: definition)
 
-        field_validator.validate!(ast)
-                       .then { |ast| field_value_type_validator.validate!(ast) }
-                       .then { |ast| backend.evaluate(ast) }
+        permission_checker.visit_node(ast)
+                          .then { |ast| type_checker.visit_node(ast) }
+                          .then { |ast| backend.visit_node(ast) }
       end
 
       private
 
       attr_reader :definition
 
-      def field_validator
-        Validators::FieldPermissionValidator.new(definition)
+      def permission_checker
+        PermissionChecker.new(definition)
       end
 
-      def field_value_type_validator
-        Validators::FieldValueTypeValidator.new(definition)
+      def type_checker
+        TypeChecker.new(definition)
       end
 
       def backend
-        Backends::Postgresql.new(definition)
+        Backend::Postgresql.new(definition)
       end
     end
   end

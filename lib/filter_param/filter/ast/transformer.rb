@@ -23,7 +23,7 @@ module FilterParam
         rule(f: simple(:f), op: simple(:op), val: simple(:val)) do
           field = Field.new(f)
           field_type = definition.field_type(field.name)
-          literal = Literal.type_for(field_type).new(val)
+          literal = Literal.new(val, field_type)
 
           BinaryExpression.new(field, op, literal)
         end

@@ -1,7 +1,7 @@
 module FilterParam
   module Filter
-    module Backends
-      class Backend < Filter::AST::Visitor
+    module Backend
+      class Base < Filter::AST::Visitor
         OPS_MAP = {
           and: "AND",
           or: "OR",
