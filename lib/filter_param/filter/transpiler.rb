@@ -1,6 +1,5 @@
 require_relative "backend/postgresql"
 require_relative "permission_checker"
-require_relative "type_checker"
 
 module FilterParam
   module Filter
@@ -16,7 +15,6 @@ module FilterParam
         ast = AST::Transformer.new.apply(parse_tree, definition: definition)
 
         permission_checker.visit_node(ast)
-                          .then { |ast| type_checker.visit_node(ast) }
                           .then { |ast| backend.visit_node(ast) }
       end
 
@@ -26,10 +24,6 @@ module FilterParam
 
       def permission_checker
         PermissionChecker.new(definition)
-      end
-
-      def type_checker
-        TypeChecker.new(definition)
       end
 
       def backend
