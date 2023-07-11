@@ -1,5 +1,4 @@
 require_relative "backend/postgresql"
-require_relative "permission_checker"
 
 module FilterParam
   module Filter
@@ -23,7 +22,7 @@ module FilterParam
       attr_reader :definition
 
       def permission_checker
-        PermissionChecker.new(definition)
+        AST::FieldPermissionChecker.new(definition)
       end
 
       def backend

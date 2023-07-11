@@ -1,10 +1,3 @@
-require_relative "nodes/node"
-require_relative "nodes/literal"
-require_relative "nodes/field"
-require_relative "nodes/group"
-require_relative "nodes/binary_expression"
-require_relative "nodes/unary_expression"
-
 module FilterParam
   module Filter
     module AST
