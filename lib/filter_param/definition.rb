@@ -2,8 +2,6 @@ module FilterParam
   class Definition
     attr_reader :fields_hash
 
-    FIELD_TYPES = %i[string int decimal boolean date datetime].freeze
-
     # Creates a new FilterParam definition that whitelists the columns that are allowed to
     # filtered (i.e. used in SQL WHERE condition).
     def initialize
@@ -109,9 +107,9 @@ module FilterParam
 
     def validate_field_options!(field, options)
       type = options[:type]
-      return if FIELD_TYPES.include?(type)
+      return if Filter::AST::Nodes::Literal::TYPES.include?(type)
 
-      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{FIELD_TYPES}.")
+      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{Filter::AST::Nodes::Literal::TYPES}.")
     end
   end
 end

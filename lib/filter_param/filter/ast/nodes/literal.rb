@@ -1,18 +1,55 @@
+require "bigdecimal"
+require "date"
 module FilterParam
   module Filter
     module AST
       module Nodes
         class Literal < Node
-          attr_accessor :type
-          attr_reader :value
+          TYPES = %i[string int decimal boolean date datetime].freeze
+
+          attr_reader :type, :value
 
           def initialize(value, type)
             @type = type
-            self.value = value
+            @value = value.to_s
+
+            coerce_value!
           end
 
-          def value=(value)
-            @value = value.to_s
+          private
+
+          def coerce_method
+            @coerce_method ||= "coerce_to_#{type}!".to_sym
+          end
+
+          def coerce_value!
+            return unless respond_to?(coerce_method, true)
+
+            send(coerce_method)
+          end
+
+          def coerce_to_boolean!
+            @value = value == "true"
+          end
+
+          def coerce_to_int!
+            @value = Integer(value)
+          end
+
+          def coerce_to_decimal!
+            @value = BigDecimal(value)
+          end
+
+          def coerce_to_date!
+            @value = Date.iso8601(value)
+          rescue Date::Error
+            raise FilterParam::ParseError.new("Invalid Date: #{value}")
+          end
+
+          def coerce_to_datetime!
+            @value = DateTime.iso8601(value)
+          rescue Date::Error
+            raise FilterParam::ParseError.new("Invalid Datetime: #{value}")
           end
         end
       end

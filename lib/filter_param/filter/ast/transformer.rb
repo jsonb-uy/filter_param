@@ -1,5 +1,3 @@
-require "bigdecimal"
-require "date"
 require_relative "nodes/node"
 require_relative "nodes/literal"
 require_relative "nodes/field"

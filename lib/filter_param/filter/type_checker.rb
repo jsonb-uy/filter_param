@@ -1,21 +1,27 @@
 module FilterParam
   module Filter
     class TypeChecker < AST::Visitor
-      TYPECHECKED_OPS = %i[eq neq eq_ci lt le gt ge sw ew co].freeze
+      COMPARISON_OPS = %i[eq neq eq_ci lt le gt ge sw ew co].freeze
 
       def visit_binary_expression(binary_exp)
-        validate_type!(binary_exp.left, binary_exp.right) if typecheck?(binary_exp.op)
-
         super
+
+        type_check!(binary_exp)
       end
 
       private
 
-      def validate_type!(field, value)
+      def type_check!(comparison)
+        op = comparison.op
+        return comparison unless COMPARISON_OPS.include?(op)
+
+        field = comparison.left
+        value = comparison.right
+
         expected_type = definition.field_type(field.name)
         actual_type = value.type
 
-        return if expected_type == actual_type || actual_type == :null
+        return comparison if expected_type == actual_type || actual_type == :null
 
         expected_phrase = case expected_type
                           when :date
@@ -29,10 +35,6 @@ module FilterParam
         error_message = "#{field} operand must be #{expected_phrase} (actual: '#{value}' [#{actual_type}])."
 
         raise TypeMismatch.new(error_message)
-      end
-
-      def typecheck?(operator)
-        TYPECHECKED_OPS.include?(operator)
       end
     end
   end

@@ -4,12 +4,12 @@ RSpec.describe FilterParam::Filter::Transpiler do
   subject(:transpiler) { new_transpiler }
 
   def new_transpiler(definition = nil)
-    definition ||= FilterParam::Definition.new.fields(
-      :first_name,
-      :birth_date,
-      :member_since,
-      :balance
-    )
+    definition ||= FilterParam::Definition.new
+                                          .field(:first_name)
+                                          .field(:birth_date, type: :date)
+                                          .field(:member_since, type: :datetime)
+                                          .field(:balance, type: :decimal)
+                                          .field(:age, type: :int)
 
     described_class.new(definition)
   end
@@ -115,19 +115,79 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    xcontext "with invalid date month day" do
+    context "with invalid iso8601 date " do
       it "raises parse error" do
         expect do
           transpiler.transpile!("birth_date eq '2023-02-31'")
-        end.to raise_error(FilterParam::ParseError)
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-09-31'")
-        end.to raise_error(FilterParam::ParseError)
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-06-31'")
-        end.to raise_error(FilterParam::ParseError)
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+
+        expect do
+          transpiler.transpile!("birth_date eq '06-31-2023'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+
+        expect do
+          transpiler.transpile!("birth_date eq '2023-00-00'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+      end
+    end
+
+    context "with invalid iso8601 date" do
+      it "raises parse error" do
+        expect do
+          transpiler.transpile!("birth_date eq '2023-02-31'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+
+        expect do
+          transpiler.transpile!("birth_date eq '2023-09-31'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+
+        expect do
+          transpiler.transpile!("birth_date eq '2023-06-31'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+
+        expect do
+          transpiler.transpile!("birth_date eq '06-31-2023'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+
+        expect do
+          transpiler.transpile!("birth_date eq '2023-00-00'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+      end
+    end
+
+    context "with invalid iso8601 datetime" do
+      it "raises parse error" do
+        expect do
+          transpiler.transpile!("member_since eq '2023-02-31T08:30:01.999Z'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+
+        expect do
+          transpiler.transpile!("member_since eq '2023-13-15T15:30:01.999'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+
+        expect do
+          transpiler.transpile!("member_since eq '2023-02-15T25:30:01.999'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+
+        expect do
+          transpiler.transpile!("member_since eq '2023-02-15T23:60:01.999'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+
+        expect do
+          transpiler.transpile!("member_since eq '2023-00-10'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+
+        expect do
+          transpiler.transpile!("member_since eq '2023-11-00'")
+        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
       end
     end
 
