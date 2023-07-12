@@ -120,7 +120,7 @@ RSpec.describe FilterParam::Filter::Parser do
     end
 
     it "parses null filter value" do
-      expect(parse_value("name eq null")).to eql("null")
+      expect(parse("name eq null")[:exp][:val][:null].str).to eql("null")
     end
 
     it "parses boolean filter value" do

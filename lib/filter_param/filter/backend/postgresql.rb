@@ -4,12 +4,36 @@ module FilterParam
   module Filter
     module Backend
       class Postgresql < Base
+        OPS_MAP = {
+          and: ->(left, right) { "#{left} AND #{right}" },
+          or: ->(left, right) { "#{left} OR #{right}" },
+          not: ->(exp) { "NOT #{exp}" },
+          eq: Proc.new do |field, value|
+                if value.nil?
+                  "#{field} IS NULL"
+                else
+                  "#{field} = #{value}"
+                end
+              end,
+          neq: Proc.new do |field, value|
+                if value.nil?
+                  "#{field} IS NOT NULL"
+                else
+                  "#{field} != #{value}"
+                end
+              end,
+          le: ->(field, value) { "#{field} <= #{value}" },
+          lt: ->(field, value) { "#{field} < #{value}" },
+          ge: ->(field, value) { "#{field} >= #{value}" },
+          gt: ->(field, value) { "#{field} > #{value}" },
+          pr: ->(field) { "#{field} IS NOT NULL" }
+        }.freeze
+
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
-          exp = visit_node(unary_exp.exp)
-          return "#{exp} #{OPS_MAP[op]}" if op == :pr
+          node = visit_node(unary_exp.exp)
 
-          "#{OPS_MAP[op]} #{exp}"
+          OPS_MAP[op].call(node)
         end
 
         def visit_binary_expression(binary_exp)
@@ -17,23 +41,7 @@ module FilterParam
           left = visit_node(binary_exp.left)
           right = visit_node(binary_exp.right)
 
-          case op
-          when :and, :or
-            "#{left} #{OPS_MAP[op]} #{right}"
-          when :eq_ci
-            "lower(#{left}) = #{quote(right.downcase)}"
-          when :sw
-            value = "#{right}%"
-            "#{left} like #{quote(value)}"
-          when :ew
-            value = "%#{right}"
-            "#{left} like #{quote(value)}"
-          when :co
-            value = "%#{right}%"
-            "#{left} like #{quote(value)}"
-          else
-            "#{left} #{OPS_MAP[op]} #{quote(right)}"
-          end
+          OPS_MAP[op].call(left, right)
         end
       end
     end

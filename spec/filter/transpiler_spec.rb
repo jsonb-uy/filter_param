@@ -5,6 +5,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
 
   def new_transpiler(definition = nil)
     definition ||= FilterParam::Definition.new
+                                          .field(:name, rename: :first_name)
                                           .field(:first_name)
                                           .field(:birth_date, type: :date)
                                           .field(:member_since, type: :datetime)
@@ -191,7 +192,28 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
-    xcontext "with :eq operation" do
+    context "with :eq operation" do
+      it "transpiles to SQL correctly" do
+        expect(transpiler.transpile!("name eq null")).to eql("first_name IS NULL")
+        expect(transpiler.transpile!("name eq 'John'")).to eql("first_name = 'John'")
+        expect(transpiler.transpile!("age eq 100")).to eql("age = 100")
+        expect(transpiler.transpile!("balance eq 9182841.1923")).to eql("balance = 9182841.1923")
+        expect(transpiler.transpile!("birth_date eq '2023-04-01'")).to eql("birth_date = '2023-04-01'")
+        expect(transpiler.transpile!("member_since eq '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since = '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("member_since eq '2023-04-01T22:30:05.019+08:00'")).to eql("member_since = '2023-04-01 14:30:05.019000'")
+      end
+    end
+
+    context "with :neq operation" do
+      it "transpiles to SQL correctly" do
+        expect(transpiler.transpile!("name neq null")).to eql("first_name IS NOT NULL")
+        expect(transpiler.transpile!("name neq 'John'")).to eql("first_name != 'John'")
+        expect(transpiler.transpile!("age neq 100")).to eql("age != 100")
+        expect(transpiler.transpile!("balance neq 9182841.1923")).to eql("balance != 9182841.1923")
+        expect(transpiler.transpile!("birth_date neq '2023-04-01'")).to eql("birth_date != '2023-04-01'")
+        expect(transpiler.transpile!("member_since neq '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since != '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("member_since neq '2023-04-01T22:30:05.019+08:00'")).to eql("member_since != '2023-04-01 14:30:05.019000'")
+      end
     end
   end
 end

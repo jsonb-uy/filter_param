@@ -2,19 +2,6 @@ module FilterParam
   module Filter
     module Backend
       class Base < Filter::AST::Visitor
-        OPS_MAP = {
-          and: "AND",
-          or: "OR",
-          not: "NOT",
-          eq: "=",
-          neq: "!=",
-          le: "<=",
-          lt: "<",
-          ge: ">=",
-          gt: ">",
-          pr: "IS NOT NULL"
-        }.freeze
-
         def visit_group(group)
           "(#{visit_node(group.exp)})"
         end
@@ -27,7 +14,11 @@ module FilterParam
         end
 
         def visit_literal(literal)
-          literal.value
+          quote literal.value
+        end
+
+        def visit_null(null)
+          nil
         end
 
         private

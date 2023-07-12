@@ -20,7 +20,7 @@ module FilterParam
       rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
 
       # Literals / types
-      rule(:null) { str("null").as(:val) }
+      rule(:null) { (str("null").as(:null)).as(:val) }
       rule(:boolean) { (str("true") | str("false")).as(:val) }
 
       rule(:integer) do
