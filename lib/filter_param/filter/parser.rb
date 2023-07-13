@@ -112,7 +112,7 @@ module FilterParam
         parse_cause = parse_cause.to_s
         invalid_expression = "Filter expression syntax error."
 
-        if parse_cause.start_with?("Expected one of")
+        if parse_cause.start_with?("Expected ")
           parse_cause = invalid_expression
         else
           unexpected_token = "Unexpected token"
