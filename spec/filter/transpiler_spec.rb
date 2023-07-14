@@ -215,5 +215,17 @@ RSpec.describe FilterParam::Filter::Transpiler do
         expect(transpiler.transpile!("member_since neq '2023-04-01T22:30:05.019+08:00'")).to eql("member_since != '2023-04-01 14:30:05.019000'")
       end
     end
+
+    context "with :lt operation" do
+      it "transpiles to SQL correctly" do
+        expect { transpiler.transpile!("name lt null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect(transpiler.transpile!("name lt 'John'")).to eql("first_name < 'John'")
+        expect(transpiler.transpile!("age lt 100")).to eql("age < 100")
+        expect(transpiler.transpile!("balance lt 9182841.1923")).to eql("balance < 9182841.1923")
+        expect(transpiler.transpile!("birth_date lt '2023-04-01'")).to eql("birth_date < '2023-04-01'")
+        expect(transpiler.transpile!("member_since lt '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since < '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("member_since lt '2023-04-01T22:30:05.019+08:00'")).to eql("member_since < '2023-04-01 14:30:05.019000'")
+      end
+    end
   end
 end

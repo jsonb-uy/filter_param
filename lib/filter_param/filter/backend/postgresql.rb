@@ -5,28 +5,28 @@ module FilterParam
     module Backend
       class Postgresql < Base
         OPS_MAP = {
-          and: ->(left, right) { "#{left} AND #{right}" },
-          or: ->(left, right) { "#{left} OR #{right}" },
-          not: ->(exp) { "NOT #{exp}" },
-          eq: Proc.new do |field, value|
+          and: proc { |left, right| "#{left} AND #{right}" },
+          or: proc { |left, right| "#{left} OR #{right}" },
+          not: proc { |exp| "NOT #{exp}" },
+          eq: proc do |field, value|
                 if value.nil?
                   "#{field} IS NULL"
                 else
                   "#{field} = #{value}"
                 end
               end,
-          neq: Proc.new do |field, value|
-                if value.nil?
-                  "#{field} IS NOT NULL"
-                else
-                  "#{field} != #{value}"
-                end
-              end,
-          le: ->(field, value) { "#{field} <= #{value}" },
-          lt: ->(field, value) { "#{field} < #{value}" },
-          ge: ->(field, value) { "#{field} >= #{value}" },
-          gt: ->(field, value) { "#{field} > #{value}" },
-          pr: ->(field) { "#{field} IS NOT NULL" }
+          neq: proc do |field, value|
+                 if value.nil?
+                   "#{field} IS NOT NULL"
+                 else
+                   "#{field} != #{value}"
+                 end
+               end,
+          le: proc { |field, value| "#{field} <= #{value}" },
+          lt: proc { |field, value| "#{field} < #{value}" },
+          ge: proc { |field, value| "#{field} >= #{value}" },
+          gt: proc { |field, value| "#{field} > #{value}" },
+          pr: proc { |field| "#{field} IS NOT NULL" }
         }.freeze
 
         def visit_unary_expression(unary_exp)

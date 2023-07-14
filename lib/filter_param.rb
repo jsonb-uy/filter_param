@@ -12,6 +12,7 @@ require_relative "filter_param/filter/ast/nodes/binary_expression"
 require_relative "filter_param/filter/ast/nodes/unary_expression"
 require_relative "filter_param/filter/ast/visitor"
 require_relative "filter_param/filter/ast/field_permission_checker"
+require_relative "filter_param/filter/ast/field_null_value_checker"
 require_relative "filter_param/filter/ast/transformer"
 require_relative "filter_param/filter/parser"
 require_relative "filter_param/filter/transpiler"
@@ -23,6 +24,7 @@ module FilterParam
   class UnknownType < BaseError; end
   class ExpressionError < BaseError; end
   class UnpermittedField < ExpressionError; end
+  class InvalidFilterValue < ExpressionError; end
   class TypeMismatch < ExpressionError; end
   class ParseError < ExpressionError; end
 
