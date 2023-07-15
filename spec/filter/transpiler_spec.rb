@@ -227,5 +227,41 @@ RSpec.describe FilterParam::Filter::Transpiler do
         expect(transpiler.transpile!("member_since lt '2023-04-01T22:30:05.019+08:00'")).to eql("member_since < '2023-04-01 14:30:05.019000'")
       end
     end
+
+    context "with :le operation" do
+      it "transpiles to SQL correctly" do
+        expect { transpiler.transpile!("name le null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect(transpiler.transpile!("name le 'John'")).to eql("first_name <= 'John'")
+        expect(transpiler.transpile!("age le 100")).to eql("age <= 100")
+        expect(transpiler.transpile!("balance le 9182841.1923")).to eql("balance <= 9182841.1923")
+        expect(transpiler.transpile!("birth_date le '2023-04-01'")).to eql("birth_date <= '2023-04-01'")
+        expect(transpiler.transpile!("member_since le '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since <= '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("member_since le '2023-04-01T22:30:05.019+08:00'")).to eql("member_since <= '2023-04-01 14:30:05.019000'")
+      end
+    end
+
+    context "with :gt operation" do
+      it "transpiles to SQL correctly" do
+        expect { transpiler.transpile!("name gt null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect(transpiler.transpile!("name gt 'John'")).to eql("first_name > 'John'")
+        expect(transpiler.transpile!("age gt 100")).to eql("age > 100")
+        expect(transpiler.transpile!("balance gt 9182841.1923")).to eql("balance > 9182841.1923")
+        expect(transpiler.transpile!("birth_date gt '2023-04-01'")).to eql("birth_date > '2023-04-01'")
+        expect(transpiler.transpile!("member_since gt '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since > '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("member_since gt '2023-04-01T22:30:05.019+08:00'")).to eql("member_since > '2023-04-01 14:30:05.019000'")
+      end
+    end
+
+    context "with :ge operation" do
+      it "transpiles to SQL correctly" do
+        expect { transpiler.transpile!("name ge null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect(transpiler.transpile!("name ge 'John'")).to eql("first_name >= 'John'")
+        expect(transpiler.transpile!("age ge 100")).to eql("age >= 100")
+        expect(transpiler.transpile!("balance ge 9182841.1923")).to eql("balance >= 9182841.1923")
+        expect(transpiler.transpile!("birth_date ge '2023-04-01'")).to eql("birth_date >= '2023-04-01'")
+        expect(transpiler.transpile!("member_since ge '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since >= '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("member_since ge '2023-04-01T22:30:05.019+08:00'")).to eql("member_since >= '2023-04-01 14:30:05.019000'")
+      end
+    end
   end
 end
