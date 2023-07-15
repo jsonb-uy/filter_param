@@ -1,9 +1,9 @@
 class User < ActiveRecord::Base
   def self.create_test_data
     User.delete_all
-    User.create(email: "john.doe@email.com", first_name: "John", last_name: "Doe")
-    User.create(email: "jane.doe@email.com", first_name: "Jane", last_name: "Doe")
-    User.create(email: "jane.c.smith@email.com", first_name: "Jane", last_name: "Smith")
+    User.create(email: "john.doe@email.com", first_name: "John", last_name: "Doe", active: true)
+    User.create(email: "jane.doe@email.com", first_name: "Jane", last_name: "Doe", active: false)
+    User.create(email: "jane.c.smith@email.com", first_name: "Jane", last_name: "Smith", active: true)
     User.create(email: "rory.gallagher@email.com", first_name: "Rory", last_name: "Gallagher")
     User.create(email: "johnny.apple@email.com", first_name: "Johnny", last_name: "Apple")
     User.create(email: "paul@domain.com", first_name: "Paul", last_name: nil)

@@ -11,6 +11,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
                                           .field(:member_since, type: :datetime)
                                           .field(:balance, type: :decimal)
                                           .field(:age, type: :int)
+                                          .field(:active, type: :boolean)
 
     described_class.new(definition)
   end
@@ -195,6 +196,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
     context "with :eq operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name eq null")).to eql("first_name IS NULL")
+        expect(transpiler.transpile!("active eq true")).to eql("active = 1")
+        expect(transpiler.transpile!("active eq false")).to eql("active = 0")
         expect(transpiler.transpile!("name eq 'John'")).to eql("first_name = 'John'")
         expect(transpiler.transpile!("age eq 100")).to eql("age = 100")
         expect(transpiler.transpile!("balance eq 9182841.1923")).to eql("balance = 9182841.1923")
@@ -207,6 +210,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
     context "with :neq operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name neq null")).to eql("first_name IS NOT NULL")
+        expect(transpiler.transpile!("active neq true")).to eql("active != 1")
+        expect(transpiler.transpile!("active neq false")).to eql("active != 0")
         expect(transpiler.transpile!("name neq 'John'")).to eql("first_name != 'John'")
         expect(transpiler.transpile!("age neq 100")).to eql("age != 100")
         expect(transpiler.transpile!("balance neq 9182841.1923")).to eql("balance != 9182841.1923")
@@ -219,6 +224,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
     context "with :lt operation" do
       it "transpiles to SQL correctly" do
         expect { transpiler.transpile!("name lt null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active lt true") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active lt false") }.to raise_error(FilterParam::InvalidFilterValue)
         expect(transpiler.transpile!("name lt 'John'")).to eql("first_name < 'John'")
         expect(transpiler.transpile!("age lt 100")).to eql("age < 100")
         expect(transpiler.transpile!("balance lt 9182841.1923")).to eql("balance < 9182841.1923")
@@ -231,6 +238,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
     context "with :le operation" do
       it "transpiles to SQL correctly" do
         expect { transpiler.transpile!("name le null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active le true") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active le false") }.to raise_error(FilterParam::InvalidFilterValue)
         expect(transpiler.transpile!("name le 'John'")).to eql("first_name <= 'John'")
         expect(transpiler.transpile!("age le 100")).to eql("age <= 100")
         expect(transpiler.transpile!("balance le 9182841.1923")).to eql("balance <= 9182841.1923")
@@ -243,6 +252,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
     context "with :gt operation" do
       it "transpiles to SQL correctly" do
         expect { transpiler.transpile!("name gt null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active gt true") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active gt false") }.to raise_error(FilterParam::InvalidFilterValue)
         expect(transpiler.transpile!("name gt 'John'")).to eql("first_name > 'John'")
         expect(transpiler.transpile!("age gt 100")).to eql("age > 100")
         expect(transpiler.transpile!("balance gt 9182841.1923")).to eql("balance > 9182841.1923")
@@ -255,6 +266,8 @@ RSpec.describe FilterParam::Filter::Transpiler do
     context "with :ge operation" do
       it "transpiles to SQL correctly" do
         expect { transpiler.transpile!("name ge null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active ge true") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active ge false") }.to raise_error(FilterParam::InvalidFilterValue)
         expect(transpiler.transpile!("name ge 'John'")).to eql("first_name >= 'John'")
         expect(transpiler.transpile!("age ge 100")).to eql("age >= 100")
         expect(transpiler.transpile!("balance ge 9182841.1923")).to eql("balance >= 9182841.1923")
