@@ -17,7 +17,7 @@ module FilterParam
           field_type = definition.field_type(field.name)
           literal = val.is_a?(Literal) ? val : Literal.new(val, field_type)
 
-          BinaryExpression.new(field, op, literal)
+          BinaryExpression.for(op).new(field, op, literal)
         end
       end
     end
