@@ -10,9 +10,10 @@ module FilterParam
       def transpile!(expression)
         return nil if expression.blank?
 
-        expression_to_ast!(expression).then { |ast| check_field_permissions!(ast) }
-                                      .then { |ast| check_null_fields!(ast) }
-                                      .then { |ast| transpile_to_sql!(ast) }
+        expression_to_ast!(expression)
+          .then { |ast| check_field_permissions!(ast) }
+          .then { |ast| check_filter_values!(ast) }
+          .then { |ast| transpile_to_sql!(ast) }
       end
 
       private
@@ -29,8 +30,8 @@ module FilterParam
         AST::FieldPermissionChecker.new(definition).visit_node(ast)
       end
 
-      def check_null_fields!(ast)
-        AST::FieldNullValueChecker.new(definition).visit_node(ast)
+      def check_filter_values!(ast)
+        AST::FieldValueNullabilityChecker.new(definition).visit_node(ast)
       end
 
       def transpile_to_sql!(ast)

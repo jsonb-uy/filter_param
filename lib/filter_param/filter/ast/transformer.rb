@@ -7,17 +7,17 @@ module FilterParam
         rule(null: simple(:null)) { Null.instance }
         rule(exp: simple(:exp)) { exp }
         rule(group: simple(:exp)) { Group.new(exp) }
-        rule(op: simple(:op), right: simple(:exp)) { UnaryExpression.new(exp, op) }
-        rule(f: simple(:f), op: simple(:op)) { UnaryExpression.new(Field.new(f), op) }
+        rule(op: simple(:op), right: simple(:exp)) { Expressions::Unary.new(exp, op) }
+        rule(f: simple(:f), op: simple(:op)) { Expressions::Unary.new(Field.new(f), op) }
         rule(left: simple(:left), op: simple(:op), right: simple(:right)) do
-          BinaryExpression.new(left, op, right)
+          Expressions::Binary.new(left, op, right)
         end
         rule(f: simple(:f), op: simple(:op), val: simple(:val)) do
           field = Field.new(f)
           field_type = definition.field_type(field.name)
           literal = val.is_a?(Literal) ? val : Literal.new(val, field_type)
 
-          BinaryExpression.for(op).new(field, op, literal)
+          Expressions::Binary.for(op).new(field, op, literal)
         end
       end
     end
