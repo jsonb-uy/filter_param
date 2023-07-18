@@ -4,7 +4,7 @@ module FilterParam
       class Transformer < Parslet::Transform
         include Nodes
 
-        rule(null: simple(:null)) { Null.instance }
+        rule(null: simple(:null)) { Literal.new(:null) }
         rule(exp: simple(:exp)) { exp }
         rule(group: simple(:exp)) { Group.new(exp) }
         rule(op: simple(:op), right: simple(:exp)) { Expressions::Unary.new(exp, op) }
@@ -15,7 +15,7 @@ module FilterParam
         rule(f: simple(:f), op: simple(:op), val: simple(:val)) do
           field = Field.new(f)
           field_type = definition.field_type(field.name)
-          literal = val.is_a?(Literal) ? val : Literal.new(val, field_type)
+          literal = val.is_a?(Literal) ? val : Literal.new(field_type, val)
 
           Expressions::Binary.for(op).new(field, op, literal)
         end

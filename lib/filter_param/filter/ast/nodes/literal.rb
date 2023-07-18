@@ -5,13 +5,13 @@ module FilterParam
     module AST
       module Nodes
         class Literal < Node
-          TYPES = %i[string int decimal boolean date datetime].freeze
+          TYPES = %i[null string int decimal boolean date datetime].freeze
 
           attr_reader :type, :value
 
-          def initialize(value, type)
+          def initialize(type, value = nil)
             @type = type
-            @value = value.to_s
+            @value = value.to_s unless value.nil?
 
             coerce_value!
           end

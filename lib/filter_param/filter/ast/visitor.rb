@@ -18,10 +18,6 @@ module FilterParam
           literal
         end
 
-        def visit_null(null)
-          null
-        end
-
         def visit_binary_expression(binary_exp)
           visit_node(binary_exp.left)
           visit_node(binary_exp.right)
