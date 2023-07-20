@@ -12,7 +12,7 @@ module FilterParam
 
         expression_to_ast!(expression)
           .then { |ast| check_field_permissions!(ast) }
-          .then { |ast| check_filter_values!(ast) }
+          .then { |ast| check_filter_value_types!(ast) }
           .then { |ast| transpile_to_sql!(ast) }
       end
 
@@ -30,8 +30,8 @@ module FilterParam
         AST::FieldPermissionChecker.new(definition).visit_node(ast)
       end
 
-      def check_filter_values!(ast)
-        AST::FieldValueNullabilityChecker.new(definition).visit_node(ast)
+      def check_filter_value_types!(ast)
+        AST::FilterValueTypeChecker.new(definition).visit_node(ast)
       end
 
       def transpile_to_sql!(ast)
