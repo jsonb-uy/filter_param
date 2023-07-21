@@ -4,39 +4,11 @@ module FilterParam
   module Filter
     module Backend
       class Postgresql < Base
-        OPERATORS = {
-          and: proc { |left, right| "#{left} AND #{right}" },
-          or: proc { |left, right| "#{left} OR #{right}" },
-          not: proc { |exp| "NOT #{exp}" },
-          eq: proc do |field, value|
-                if value.nil?
-                  "#{field} IS NULL"
-                else
-                  "#{field} = #{value}"
-                end
-              end,
-          eq_ci: proc do |field, value|
-                   "lower(#{field}) = #{value.downcase}"
-                 end,
-          neq: proc do |field, value|
-                 if value.nil?
-                   "#{field} IS NOT NULL"
-                 else
-                   "#{field} != #{value}"
-                 end
-               end,
-          le: proc { |field, value| "#{field} <= #{value}" },
-          lt: proc { |field, value| "#{field} < #{value}" },
-          ge: proc { |field, value| "#{field} >= #{value}" },
-          gt: proc { |field, value| "#{field} > #{value}" },
-          pr: proc { |field| "#{field} IS NOT NULL" }
-        }.freeze
-
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
           node = visit_node(unary_exp.exp)
-
-          OPERATORS[op].call(node)
+          
+          send("evaluate_#{op}", node)
         end
 
         def visit_binary_expression(binary_exp)
@@ -44,7 +16,73 @@ module FilterParam
           left = visit_node(binary_exp.left)
           right = visit_node(binary_exp.right)
 
-          OPERATORS[op].call(left, right)
+          send("evaluate_#{op}", left, right.value)
+        end
+
+        def evaluate_not(expression)
+          "NOT #{expression}"
+        end
+
+        def evaluate_pr(field)
+          "#{field} IS NOT NULL"
+        end
+
+        def evaluate_and(left, right)
+          "#{left} AND #{right}"
+        end
+
+        def evaluate_or(left, right)
+          "#{left} OR #{right}"
+        end
+
+        def evaluate_eq(field, value)
+          return "#{field} IS NULL" if value.nil?
+
+          "#{field} = #{quote(value)}"
+        end
+
+        def evaluate_eq_ci(field, value)
+          "lower(#{field}) = #{quote(value.downcase)}"
+        end
+
+        def evaluate_neq(field, value)
+          return "#{field} IS NOT NULL" if value.nil?
+
+          "#{field} != #{quote(value)}"
+        end
+
+        def evaluate_lt(field, value)
+          "#{field} < #{quote(value)}"
+        end
+
+        def evaluate_le(field, value)
+          "#{field} <= #{quote(value)}"
+        end
+
+        def evaluate_gt(field, value)
+          "#{field} > #{quote(value)}"
+        end
+
+        def evaluate_ge(field, value)
+          "#{field} >= #{quote(value)}"
+        end
+
+        def evaluate_sw(field, value)
+          pattern = "#{value}%"
+
+          "#{field} LIKE #{quote(pattern)}"
+        end
+
+        def evaluate_ew(field, value)
+          pattern = "%#{value}"
+
+          "#{field} LIKE #{quote(pattern)}"
+        end
+
+        def evaluate_co(field, value)
+          pattern = "%#{value}%"
+
+          "#{field} LIKE #{quote(pattern)}"
         end
       end
     end

@@ -13,12 +13,6 @@ module FilterParam
           field_options[:rename].presence || field.name
         end
 
-        def visit_literal(literal)
-          return if literal.value.nil?
-
-          quote literal.value
-        end
-
         private
 
         def quote(value)
