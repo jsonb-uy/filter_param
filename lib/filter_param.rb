@@ -3,6 +3,7 @@
 require "parslet"
 require "active_record"
 require "active_support"
+require "active_support/core_ext/object/inclusion"
 require_relative "filter_param/filter/ast/nodes/node"
 require_relative "filter_param/filter/ast/nodes/literal"
 require_relative "filter_param/filter/ast/nodes/field"

@@ -16,7 +16,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
     described_class.new(definition)
   end
 
-  describe "#transpile" do
+  describe "#transpile!" do
     context "with blank expression" do
       it "returns nil" do
         expect(transpiler.transpile!("     ")).to be_nil
@@ -121,23 +121,23 @@ RSpec.describe FilterParam::Filter::Transpiler do
       it "raises parse error" do
         expect do
           transpiler.transpile!("birth_date eq '2023-02-31'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-09-31'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-06-31'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '06-31-2023'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-00-00'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
       end
     end
 
@@ -145,23 +145,23 @@ RSpec.describe FilterParam::Filter::Transpiler do
       it "raises parse error" do
         expect do
           transpiler.transpile!("birth_date eq '2023-02-31'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-09-31'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-06-31'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '06-31-2023'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-00-00'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Date/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Date/)
       end
     end
 
@@ -169,27 +169,27 @@ RSpec.describe FilterParam::Filter::Transpiler do
       it "raises parse error" do
         expect do
           transpiler.transpile!("member_since eq '2023-02-31T08:30:01.999Z'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-13-15T15:30:01.999'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-02-15T25:30:01.999'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-02-15T23:60:01.999'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-00-10'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-11-00'")
-        end.to raise_error(FilterParam::ParseError, /Invalid Datetime/)
+        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Datetime/)
       end
     end
 
@@ -204,6 +204,20 @@ RSpec.describe FilterParam::Filter::Transpiler do
         expect(transpiler.transpile!("birth_date eq '2023-04-01'")).to eql("birth_date = '2023-04-01'")
         expect(transpiler.transpile!("member_since eq '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since = '2023-04-01 14:30:05.019254'")
         expect(transpiler.transpile!("member_since eq '2023-04-01T22:30:05.019+08:00'")).to eql("member_since = '2023-04-01 14:30:05.019000'")
+      end
+    end
+
+    context "with :eq_ci operation" do
+      it "transpiles to SQL correctly" do
+        expect { transpiler.transpile!("name eq_ci null") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active eq_ci true") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active eq_ci false") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect(transpiler.transpile!("name eq_ci 'John'")).to eql("lower(first_name) = 'john'")
+        expect { transpiler.transpile!("age eq_ci 100") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("balance eq_ci 9182841.1923") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("birth_date eq_ci '2023-04-01'") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("member_since eq_ci '2023-04-01T22:30:05.019254+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("member_since eq_ci '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
       end
     end
 

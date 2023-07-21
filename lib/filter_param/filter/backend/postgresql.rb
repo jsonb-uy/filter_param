@@ -4,7 +4,7 @@ module FilterParam
   module Filter
     module Backend
       class Postgresql < Base
-        OPS_MAP = {
+        OPERATORS = {
           and: proc { |left, right| "#{left} AND #{right}" },
           or: proc { |left, right| "#{left} OR #{right}" },
           not: proc { |exp| "NOT #{exp}" },
@@ -15,6 +15,9 @@ module FilterParam
                   "#{field} = #{value}"
                 end
               end,
+          eq_ci: proc do |field, value|
+                   "lower(#{field}) = #{value.downcase}"
+                 end,
           neq: proc do |field, value|
                  if value.nil?
                    "#{field} IS NOT NULL"
@@ -33,7 +36,7 @@ module FilterParam
           op = unary_exp.op
           node = visit_node(unary_exp.exp)
 
-          OPS_MAP[op].call(node)
+          OPERATORS[op].call(node)
         end
 
         def visit_binary_expression(binary_exp)
@@ -41,7 +44,7 @@ module FilterParam
           left = visit_node(binary_exp.left)
           right = visit_node(binary_exp.right)
 
-          OPS_MAP[op].call(left, right)
+          OPERATORS[op].call(left, right)
         end
       end
     end

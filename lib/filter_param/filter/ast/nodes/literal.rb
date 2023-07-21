@@ -16,6 +16,17 @@ module FilterParam
             coerce_value!
           end
 
+          def type_category
+            case type
+            when :date, :datetime
+              :temporal
+            when :int, :decimal
+              :numeric
+            else
+              type
+            end
+          end
+
           private
 
           def coerce_method
@@ -43,13 +54,13 @@ module FilterParam
           def coerce_to_date!
             @value = Date.iso8601(value)
           rescue Date::Error
-            raise FilterParam::ParseError.new("Invalid Date: #{value}")
+            raise FilterParam::InvalidFilterValue.new("Invalid Date: #{value}")
           end
 
           def coerce_to_datetime!
             @value = DateTime.iso8601(value)
           rescue Date::Error
-            raise FilterParam::ParseError.new("Invalid Datetime: #{value}")
+            raise FilterParam::InvalidFilterValue.new("Invalid Datetime: #{value}")
           end
         end
       end
