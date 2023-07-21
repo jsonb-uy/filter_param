@@ -337,5 +337,14 @@ RSpec.describe FilterParam::Filter::Transpiler do
         expect { transpiler.transpile!("member_since co '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
       end
     end
+
+    context "with :and operation" do
+      it "transpiles to SQL correctly" do
+        expect(transpiler.transpile!("age lt 50 and name eq 'John'")).to eql("age < 50 AND first_name = 'John'")
+        expect(transpiler.transpile!("age lt 50 and (name eq 'John')")).to eql("age < 50 AND (first_name = 'John')")
+        expect(transpiler.transpile!("(age lt 50) and name eq 'John'")).to eql("(age < 50) AND first_name = 'John'")
+        expect(transpiler.transpile!("(age lt 50 and name eq 'John')")).to eql("(age < 50 AND first_name = 'John')")
+      end
+    end
   end
 end

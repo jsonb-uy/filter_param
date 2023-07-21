@@ -8,6 +8,8 @@ module FilterParam
 
         def visit_group(group)
           visit_node(group.exp)
+
+          group
         end
 
         def visit_field(field)
