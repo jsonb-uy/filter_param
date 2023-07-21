@@ -193,6 +193,21 @@ RSpec.describe FilterParam::Filter::Transpiler do
       end
     end
 
+    context "with :not operation" do
+      it "transpiles to SQL correctly" do
+        expect(transpiler.transpile!("not name eq null")).to eql("NOT first_name IS NULL")
+        expect(transpiler.transpile!("not active eq true")).to eql("NOT active = 1")
+        expect(transpiler.transpile!("not active eq false")).to eql("NOT active = 0")
+        expect(transpiler.transpile!("not name eq 'John'")).to eql("NOT first_name = 'John'")
+        expect(transpiler.transpile!("not age eq 100")).to eql("NOT age = 100")
+        expect(transpiler.transpile!("not(age eq 100)")).to eql("NOT (age = 100)")
+        expect(transpiler.transpile!("not balance eq 9182841.1923")).to eql("NOT balance = 9182841.1923")
+        expect(transpiler.transpile!("not birth_date eq '2023-04-01'")).to eql("NOT birth_date = '2023-04-01'")
+        expect(transpiler.transpile!("not member_since eq '2023-04-01T22:30:05.019254+08:00'")).to eql("NOT member_since = '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("not member_since eq '2023-04-01T22:30:05.019+08:00'")).to eql("NOT member_since = '2023-04-01 14:30:05.019000'")
+      end
+    end
+
     context "with :eq operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name eq null")).to eql("first_name IS NULL")
@@ -344,6 +359,15 @@ RSpec.describe FilterParam::Filter::Transpiler do
         expect(transpiler.transpile!("age lt 50 and (name eq 'John')")).to eql("age < 50 AND (first_name = 'John')")
         expect(transpiler.transpile!("(age lt 50) and name eq 'John'")).to eql("(age < 50) AND first_name = 'John'")
         expect(transpiler.transpile!("(age lt 50 and name eq 'John')")).to eql("(age < 50 AND first_name = 'John')")
+      end
+    end
+
+    context "with :or operation" do
+      it "transpiles to SQL correctly" do
+        expect(transpiler.transpile!("age lt 50 or name eq 'John'")).to eql("age < 50 OR first_name = 'John'")
+        expect(transpiler.transpile!("age lt 50 or (name eq 'John')")).to eql("age < 50 OR (first_name = 'John')")
+        expect(transpiler.transpile!("(age lt 50) or name eq 'John'")).to eql("(age < 50) OR first_name = 'John'")
+        expect(transpiler.transpile!("(age lt 50 or name eq 'John')")).to eql("(age < 50 OR first_name = 'John')")
       end
     end
   end
