@@ -12,12 +12,6 @@ module FilterParam
             @left = left
             @right = right
           end
-
-          # private
-
-          # def raise_invalid_value!
-          #   raise FilterParam::InvalidFilterValue.new("Filter value for `#{left.name}` cannot be a #{right.type}.")
-          # end
         end
       end
     end

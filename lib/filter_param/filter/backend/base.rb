@@ -14,11 +14,9 @@ module FilterParam
         end
 
         def visit_literal(literal)
-          quote literal.value
-        end
+          return if literal.value.nil?
 
-        def visit_null(null)
-          nil
+          quote literal.value
         end
 
         private

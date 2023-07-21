@@ -11,7 +11,7 @@ module FilterParam
 
           def initialize(type, value = nil)
             @type = type
-            @value = value.to_s unless value.nil?
+            @value = value.to_s unless type == :null
 
             coerce_value!
           end
