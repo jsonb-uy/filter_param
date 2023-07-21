@@ -18,11 +18,18 @@ module FilterParam
           literal
         end
 
-        def visit_binary_expression(binary_exp)
-          visit_node(binary_exp.left)
-          visit_node(binary_exp.right)
+        def visit_comparison(comparison)
+          visit_node(comparison.field)
+          visit_node(comparison.literal)
 
-          binary_exp
+          comparison
+        end
+
+        def visit_logical_expression(expression)
+          visit_node(expression.left)
+          visit_node(expression.right)
+
+          expression
         end
 
         def visit_unary_expression(unary_exp)

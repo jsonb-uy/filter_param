@@ -3,12 +3,6 @@ module FilterParam
     module AST
       module Nodes
         class Node
-          attr_reader :children
-
-          def initialize
-            @children = nil
-          end
-
           def accept(visitor)
             visit_method = "visit_#{self.class.name.demodulize.underscore}"
 

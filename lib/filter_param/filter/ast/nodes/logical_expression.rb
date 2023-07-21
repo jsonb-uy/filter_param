@@ -2,7 +2,7 @@ module FilterParam
   module Filter
     module AST
       module Nodes
-        class BinaryExpression < Node
+        class LogicalExpression < Node
           attr_reader :left, :op, :right
 
           def initialize(operator, left, right)
