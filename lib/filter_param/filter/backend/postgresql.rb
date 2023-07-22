@@ -8,7 +8,7 @@ module FilterParam
           op = unary_exp.op
           node = visit_node(unary_exp.exp)
 
-          send("evaluate_#{op}", node)
+          evaluate(op, node)
         end
 
         def visit_comparison(comparison)
@@ -16,7 +16,7 @@ module FilterParam
           field = visit_node(comparison.field)
           literal = visit_node(comparison.literal)
 
-          send("evaluate_#{op}", field, literal)
+          evaluate(op, field, literal)
         end
 
         def visit_logical_expression(expression)
@@ -24,10 +24,14 @@ module FilterParam
           left = visit_node(expression.left)
           right = visit_node(expression.right)
 
-          send("evaluate_#{op}", left, right)
+          evaluate(op, left, right)
         end
 
         private
+
+        def evaluate(operator, *operands)
+          send("evaluate_#{operator}", *operands)
+        end
 
         def evaluate_not(expression)
           "NOT #{expression}"
