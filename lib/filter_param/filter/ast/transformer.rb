@@ -14,7 +14,7 @@ module FilterParam
         end
         rule(f: simple(:f), op: simple(:op), val: simple(:val)) do
           field = Field.new(f)
-          field_type = definition.field_type(field.name) || :string
+          field_type = definition.field_type(field.name)
           literal = val.is_a?(Literal) ? val : Literal.new(field_type, val)
 
           Comparison.new(op, field, literal)

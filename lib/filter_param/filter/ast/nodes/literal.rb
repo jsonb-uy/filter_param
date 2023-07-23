@@ -10,7 +10,7 @@ module FilterParam
           attr_reader :type, :value
 
           def initialize(type, value = nil)
-            @type = type
+            @type = type || :string
             @value = value.to_s unless type == :null
 
             coerce_value!

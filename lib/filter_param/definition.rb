@@ -78,11 +78,9 @@ module FilterParam
     def filter!(ar_relation, expression)
       transpiler = Filter::Transpiler.new(self)
 
-      # ar_relation.where(
-      #   transpiler.transpile!(expression)
-      # )
-
-      transpiler.transpile!(expression)
+      ar_relation.where(
+        transpiler.transpile!(expression)
+      )
     end
 
     def field_type(field_name)
@@ -105,11 +103,15 @@ module FilterParam
       options
     end
 
+    def known_field_types
+      @known_field_types ||= Filter::AST::Nodes::Literal::TYPES.reject { |t| t == :null }
+    end
+
     def validate_field_options!(field, options)
       type = options[:type]
-      return if Filter::AST::Nodes::Literal::TYPES.include?(type)
+      return if type.in?(known_field_types)
 
-      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{Filter::AST::Nodes::Literal::TYPES}.")
+      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{known_field_types}.")
     end
   end
 end
