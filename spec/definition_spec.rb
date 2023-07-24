@@ -201,7 +201,7 @@ RSpec.describe FilterParam::Definition do
       definition = described_class.new
       definition.field(:first_name)
       definition.field(:email, type: :string)
-      definition.field(:age, type: :integer)
+      definition.field(:score, type: :integer)
       definition.field(:balance, type: :decimal)
       definition.field(:active, type: :boolean)
       definition.field(:birth_date, type: :date)
@@ -212,19 +212,32 @@ RSpec.describe FilterParam::Definition do
       definition.filter!(User.all, expression).pluck(:email)
     end
 
-    context "when field is string" do
-      context "with :eq operation" do
-        it "correctly filters the records" do
-          expect(user_emails("email eq 'johnny.apple@email.com'")).to eql(%w[johnny.apple@email.com])
-          expect(user_emails("first_name eq 'Jane'")).to eql(%w[jane.doe@email.com jane.c.smith@email.com])
-        end
+    context "with :eq operation" do
+      it "supports filtering by :string field" do
+        expect(user_emails("email eq 'johnny.apple@email.com'")).to eql(%w[johnny.apple@email.com])
+        expect(user_emails("first_name eq 'Jane'")).to eql(%w[jane.doe@email.com jane.c.smith@email.com])
       end
 
-      context "with :neq operation" do
-        it "correctly filters the records" do
-          emails = User.where.not(email: "johnny.apple@email.com").pluck(:email)
-          expect(user_emails("email neq 'johnny.apple@email.com'")).to eql(emails)
-        end
+      it "supports filtering by :integer field" do
+        expect(user_emails("score eq 180")).to eql(%w[ringo@domain.com george@domain.com])
+        expect(user_emails("score eq 170")).to eql(%w[paul@domain.com])
+      end
+
+      it "supports filtering by :decimal field" do
+        expect(user_emails("balance eq -123921349440.03")).to eql(%w[john.doe@email.com])
+        expect(user_emails("balance eq -1.12")).to eql(%w[jane.doe@email.com])
+        expect(user_emails("balance eq 0.0045")).to eql(%w[jane.c.smith@email.com])
+        expect(user_emails("balance eq 42.9")).to eql(%w[rory.gallagher@email.com paul@domain.com])
+        expect(user_emails("balance eq 9000192.0012450")).to eql(%w[johnny.apple@email.com])
+        expect(user_emails("balance eq 42.9000001")).to eql(%w[george@domain.com])
+        expect(user_emails("balance eq 10000.00001")).to eql(%w[excluded@email.com])
+      end
+    end
+
+    context "with :neq operation" do
+      it "supports filtering by :string field" do
+        emails = User.where.not(email: "johnny.apple@email.com").pluck(:email)
+        expect(user_emails("email neq 'johnny.apple@email.com'")).to eql(emails)
       end
     end
   end
