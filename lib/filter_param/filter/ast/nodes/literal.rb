@@ -5,7 +5,7 @@ module FilterParam
     module AST
       module Nodes
         class Literal < Node
-          TYPES = %i[null string int decimal boolean date datetime].freeze
+          TYPES = %i[null string integer decimal boolean date datetime].freeze
 
           attr_reader :type, :value
 
@@ -20,7 +20,7 @@ module FilterParam
             case type
             when :date, :datetime
               :temporal
-            when :int, :decimal
+            when :integer, :decimal
               :numeric
             else
               type
@@ -43,7 +43,7 @@ module FilterParam
             @value = value == "true"
           end
 
-          def coerce_to_int!
+          def coerce_to_integer!
             @value = Integer(value)
           end
 

@@ -84,11 +84,11 @@ module FilterParam
     end
 
     def field_type(field_name)
-      fields_hash.dig(field_name, :type)
+      fields_hash.dig(field_name.to_s, :type)
     end
 
     def field_permitted?(field_name)
-      fields_hash.key? field_name
+      fields_hash.key? field_name.to_s
     end
 
     private

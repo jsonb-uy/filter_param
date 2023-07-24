@@ -10,7 +10,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
                                           .field(:birth_date, type: :date)
                                           .field(:member_since, type: :datetime)
                                           .field(:balance, type: :decimal)
-                                          .field(:age, type: :int)
+                                          .field(:age, type: :integer)
                                           .field(:active, type: :boolean)
 
     described_class.new(definition)
