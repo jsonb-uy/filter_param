@@ -213,19 +213,30 @@ RSpec.describe FilterParam::Definition do
     end
 
     context "with :eq operation" do
-      it "supports filtering by :string field" do
+      it "allows :null value" do
+        expect(user_emails("last_name eq null")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com])
+        expect(user_emails("score eq null")).to eql(%w[excluded@email.com])
+        expect(user_emails("balance eq null")).to eql(%w[ringo@domain.com])
+
+        null_status_emails = User.where(active: nil).pluck(:email)
+        expect(user_emails("active eq null")).to eql(null_status_emails)
+        expect(user_emails("birth_date eq null")).to eql(%w[paul@domain.com excluded@email.com])
+
+        null_member_since_emails = User.where(member_since: nil).pluck(:email)
+        expect(user_emails("member_since eq null")).to eql(null_member_since_emails)
+      end
+
+      it "allows :string value" do
         expect(user_emails("email eq 'johnny.apple@email.com'")).to eql(%w[johnny.apple@email.com])
         expect(user_emails("first_name eq 'Jane'")).to eql(%w[jane.doe@email.com jane.c.smith@email.com])
-        expect(user_emails("last_name eq null")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com])
       end
 
-      it "supports filtering by :integer field" do
+      it "allows :integer value" do
         expect(user_emails("score eq 180")).to eql(%w[ringo@domain.com george@domain.com])
         expect(user_emails("score eq 170")).to eql(%w[paul@domain.com])
-        expect(user_emails("score eq null")).to eql(%w[excluded@email.com])
       end
 
-      it "supports filtering by :decimal field" do
+      it "allows :decimal value" do
         expect(user_emails("balance eq -123921349440.03")).to eql(%w[john.doe@email.com])
         expect(user_emails("balance eq -1.12")).to eql(%w[jane.doe@email.com])
         expect(user_emails("balance eq 0.0045")).to eql(%w[jane.c.smith@email.com])
@@ -233,89 +244,114 @@ RSpec.describe FilterParam::Definition do
         expect(user_emails("balance eq 9000192.0012450")).to eql(%w[johnny.apple@email.com])
         expect(user_emails("balance eq 42.9000001")).to eql(%w[george@domain.com])
         expect(user_emails("balance eq 10000.00001")).to eql(%w[excluded@email.com])
-        expect(user_emails("balance eq null")).to eql(%w[ringo@domain.com])
       end
 
-      it "supports filtering by :boolean field" do
+      it "allows :boolean value" do
         active_emails = User.where(active: true).pluck(:email)
         invactive_emails = User.where(active: false).pluck(:email)
-        null_status_emails = User.where(active: nil).pluck(:email)
 
         expect(user_emails("active eq true")).to eql(active_emails)
         expect(user_emails("active eq false")).to eql(invactive_emails)
-        expect(user_emails("active eq null")).to eql(null_status_emails)
       end
 
-      it "supports filtering by :date field" do
+      it "allows :date value" do
         expect(user_emails("birth_date eq '1985-05-01'")).to eql(%w[john.doe@email.com])
         expect(user_emails("birth_date eq '1985-05-02'")).to eql(%w[jane.doe@email.com jane.c.smith@email.com])
         expect(user_emails("birth_date eq '1986-06-10'")).to eql(%w[rory.gallagher@email.com])
         expect(user_emails("birth_date eq '1987-06-10'")).to eql(%w[johnny.apple@email.com])
         expect(user_emails("birth_date eq '1985-07-10'")).to eql(%w[ringo@domain.com])
         expect(user_emails("birth_date eq '1989-01-12'")).to eql(%w[george@domain.com])
-        expect(user_emails("birth_date eq null")).to eql(%w[paul@domain.com excluded@email.com])
       end
 
-      it "supports filtering by :datetime field" do
-        null_member_since_emails = User.where(member_since: nil).pluck(:email)
-
+      it "allows :datetime value" do
         expect(user_emails("member_since eq '2023-03-01T08:09:00+07:00'")).to eql(%w[john.doe@email.com paul@domain.com])
         expect(user_emails("member_since eq '2023-03-01T01:09:01.000Z'")).to eql(%w[jane.doe@email.com])
         expect(user_emails("member_since eq '2023-03-01T09:09:00+09:00'")).to eql(%w[jane.c.smith@email.com])
         expect(user_emails("member_since eq '2023-03-02T00:00:00.000Z'")).to eql(%w[rory.gallagher@email.com])
-        expect(user_emails("member_since eq null")).to eql(null_member_since_emails)
       end
     end
 
     context "with :neq operation" do
-      it "supports filtering by :string field" do
-        emails = User.where.not(email: "johnny.apple@email.com").pluck(:email)
+      it "allows :null value" do
         non_null_last_name_emails = User.where.not(last_name: nil).pluck(:email)
+        expect(user_emails("last_name neq null")).to eql(non_null_last_name_emails)
+
+        non_null_score_emails = User.where.not(score: nil).pluck(:email)
+        expect(user_emails("score neq null")).to eql(non_null_score_emails)
+
+        non_null_balance_emails = User.where.not(balance: nil).pluck(:email)
+        expect(user_emails("balance neq null")).to eql(non_null_balance_emails)
+
+        non_null_status_emails = User.where.not(active: nil).pluck(:email)
+        expect(user_emails("active neq null")).to eql(non_null_status_emails)
+
+        non_null_birth_date_emails = User.where.not(birth_date: nil).pluck(:email)
+        expect(user_emails("birth_date neq null")).to eql(non_null_birth_date_emails)
+
+        non_null_member_since_emails = User.where.not(member_since: nil).pluck(:email)
+        expect(user_emails("member_since neq null")).to eql(non_null_member_since_emails)
+      end
+
+      it "allows :string value" do
+        emails = User.where.not(email: "johnny.apple@email.com").pluck(:email)
 
         expect(user_emails("email neq 'johnny.apple@email.com'")).to eql(emails)
-        expect(user_emails("last_name neq null")).to eql(non_null_last_name_emails)
       end
 
-      it "supports filtering by :integer field" do
+      it "allows :integer value" do
         emails = User.where.not(score: 170).pluck(:email)
-        non_null_score_emails = User.where.not(score: nil).pluck(:email)
 
         expect(user_emails("score neq 170")).to eql(emails)
-        expect(user_emails("score neq null")).to eql(non_null_score_emails)
       end
 
-      it "supports filtering by :decimal field" do
+      it "allows :decimal value" do
         emails = User.where.not(balance: "42.9").pluck(:email)
-        non_null_balance_emails = User.where.not(balance: nil).pluck(:email)
 
         expect(user_emails("balance neq 42.9")).to eql(emails)
-        expect(user_emails("balance neq null")).to eql(non_null_balance_emails)
       end
 
-      it "supports filtering by :boolean field" do
+      it "allows :boolean value" do
         active_emails = User.where(active: true).pluck(:email)
         inactive_emails = User.where(active: false).pluck(:email)
-        non_null_status_emails = User.where.not(active: nil).pluck(:email)
 
         expect(user_emails("active neq false")).to eql(active_emails)
         expect(user_emails("active neq true")).to eql(inactive_emails)
-        expect(user_emails("active neq null")).to eql(non_null_status_emails)
       end
 
-      it "supports filtering by :date field" do
+      it "allows :date value" do
         emails = User.where.not(birth_date: "1985-05-02").pluck(:email)
-        non_null_birth_date_emails = User.where.not(birth_date: nil).pluck(:email)
 
         expect(user_emails("birth_date neq '1985-05-02'")).to eql(emails)
-        expect(user_emails("birth_date neq null")).to eql(non_null_birth_date_emails)
       end
 
-      it "supports filtering by :datetime field" do
+      it "allows :datetime value" do
         emails = User.where.not(member_since: "2023-03-01T08:09:00+07:00").pluck(:email)
-        non_null_member_since_emails = User.where.not(member_since: nil).pluck(:email)
 
         expect(user_emails("member_since neq '2023-03-01T08:09:00+07:00'")).to eql(emails)
-        expect(user_emails("member_since neq null")).to eql(non_null_member_since_emails)
+      end
+    end
+
+    context "with :gt operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name gt null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active gt true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("last_name > ?", "Doe").pluck(:email)
+
+        expect(user_emails("last_name gt 'Doe'")).to eql(emails)
+      end
+
+      it "allows :integer value" do
+        expect(user_emails("score gt 160")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com])
+      end
+
+      it "allows :decimal value" do
+        expect(user_emails("balance gt 42.90")).to eql(%w[johnny.apple@email.com george@domain.com excluded@email.com])
       end
     end
   end
