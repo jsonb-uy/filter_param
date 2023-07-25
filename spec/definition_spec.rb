@@ -199,7 +199,7 @@ RSpec.describe FilterParam::Definition do
   describe "#filter!" do
     subject(:definition) do
       definition = described_class.new
-      definition.field(:first_name)
+      definition.fields(:first_name, :last_name)
       definition.field(:email, type: :string)
       definition.field(:score, type: :integer)
       definition.field(:balance, type: :decimal)
@@ -216,11 +216,13 @@ RSpec.describe FilterParam::Definition do
       it "supports filtering by :string field" do
         expect(user_emails("email eq 'johnny.apple@email.com'")).to eql(%w[johnny.apple@email.com])
         expect(user_emails("first_name eq 'Jane'")).to eql(%w[jane.doe@email.com jane.c.smith@email.com])
+        expect(user_emails("last_name eq null")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com])
       end
 
       it "supports filtering by :integer field" do
         expect(user_emails("score eq 180")).to eql(%w[ringo@domain.com george@domain.com])
         expect(user_emails("score eq 170")).to eql(%w[paul@domain.com])
+        expect(user_emails("score eq null")).to eql(%w[excluded@email.com])
       end
 
       it "supports filtering by :decimal field" do
@@ -231,6 +233,37 @@ RSpec.describe FilterParam::Definition do
         expect(user_emails("balance eq 9000192.0012450")).to eql(%w[johnny.apple@email.com])
         expect(user_emails("balance eq 42.9000001")).to eql(%w[george@domain.com])
         expect(user_emails("balance eq 10000.00001")).to eql(%w[excluded@email.com])
+        expect(user_emails("balance eq null")).to eql(%w[ringo@domain.com])
+      end
+
+      it "supports filtering by :boolean field" do
+        active_emails = User.where(active: true).pluck(:email)
+        invactive_emails = User.where(active: false).pluck(:email)
+        no_status_emails = User.where(active: nil).pluck(:email)
+
+        expect(user_emails("active eq true")).to eql(active_emails)
+        expect(user_emails("active eq false")).to eql(invactive_emails)
+        expect(user_emails("active eq null")).to eql(no_status_emails)
+      end
+
+      it "supports filtering by :date field" do
+        expect(user_emails("birth_date eq '1985-05-01'")).to eql(%w[john.doe@email.com])
+        expect(user_emails("birth_date eq '1985-05-02'")).to eql(%w[jane.doe@email.com jane.c.smith@email.com])
+        expect(user_emails("birth_date eq '1986-06-10'")).to eql(%w[rory.gallagher@email.com])
+        expect(user_emails("birth_date eq '1987-06-10'")).to eql(%w[johnny.apple@email.com])
+        expect(user_emails("birth_date eq '1985-07-10'")).to eql(%w[ringo@domain.com])
+        expect(user_emails("birth_date eq '1989-01-12'")).to eql(%w[george@domain.com])
+        expect(user_emails("birth_date eq null")).to eql(%w[paul@domain.com excluded@email.com])
+      end
+
+      it "supports filtering by :datetime field" do
+        no_member_since_emails = User.where(member_since: nil).pluck(:email)
+
+        expect(user_emails("member_since eq '2023-03-01T08:09:00+07:00'")).to eq(%w[john.doe@email.com paul@domain.com])
+        expect(user_emails("member_since eq '2023-03-01T01:09:01.000Z'")).to eq(%w[jane.doe@email.com])
+        expect(user_emails("member_since eq '2023-03-01T09:09:00+09:00'")).to eq(%w[jane.c.smith@email.com])
+        expect(user_emails("member_since eq '2023-03-02T00:00:00.000Z'")).to eq(%w[rory.gallagher@email.com])
+        expect(user_emails("member_since eq null")).to eq(no_member_since_emails)
       end
     end
 
