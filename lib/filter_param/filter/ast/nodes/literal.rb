@@ -45,22 +45,26 @@ module FilterParam
 
           def coerce_to_integer!
             @value = Integer(value)
+          rescue ArgumentError
+            raise FilterParam::InvalidFilterValue.new("Invalid Integer: #{value}")
           end
 
           def coerce_to_decimal!
             @value = BigDecimal(value)
+          rescue ArgumentError
+            raise FilterParam::InvalidFilterValue.new("Invalid Decimal: #{value}")
           end
 
           def coerce_to_date!
             @value = Date.iso8601(value)
           rescue Date::Error
-            raise FilterParam::InvalidFilterValue.new("Invalid Date: #{value}")
+            raise FilterParam::InvalidFilterValue.new("Invalid ISO8601 Date: #{value}")
           end
 
           def coerce_to_datetime!
             @value = DateTime.iso8601(value)
           rescue Date::Error
-            raise FilterParam::InvalidFilterValue.new("Invalid Datetime: #{value}")
+            raise FilterParam::InvalidFilterValue.new("Invalid ISO8601 Datetime: #{value}")
           end
         end
       end
