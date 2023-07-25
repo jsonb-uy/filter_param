@@ -319,13 +319,13 @@ RSpec.describe FilterParam::Definition do
       end
 
       it "allows :date value" do
-        emails = User.where.not(birth_date: "1985-05-02").pluck(:email)
+        emails = User.where.not(birth_date: Date.parse("1985-05-02")).pluck(:email)
 
         expect(user_emails("birth_date neq '1985-05-02'")).to eql(emails)
       end
 
       it "allows :datetime value" do
-        emails = User.where.not(member_since: "2023-03-01T08:09:00+07:00").pluck(:email)
+        emails = User.where.not(member_since: DateTime.parse("2023-03-01T08:09:00+07:00")).pluck(:email)
 
         expect(user_emails("member_since neq '2023-03-01T08:09:00+07:00'")).to eql(emails)
       end
@@ -352,6 +352,58 @@ RSpec.describe FilterParam::Definition do
 
       it "allows :decimal value" do
         expect(user_emails("balance gt 42.90")).to eql(%w[johnny.apple@email.com george@domain.com excluded@email.com])
+      end
+
+      it "allows :date value" do
+        emails = User.where("birth_date > ?", Date.parse("1985-05-02")).pluck(:email)
+
+        expect(user_emails("birth_date gt '1985-05-02'")).to eql(emails)
+      end
+
+      it "allows :datetime value" do
+        emails = User.where("member_since > ?", DateTime.parse("2023-03-01T08:09:00+07:00")).pluck(:email)
+
+        expect(user_emails("member_since gt '2023-03-01T08:09:00+07:00'")).to eql(emails)
+      end
+    end
+
+    context "with :ge operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name ge null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active ge true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("last_name >= ?", "Doe").pluck(:email)
+
+        expect(user_emails("last_name ge 'Doe'")).to eql(emails)
+      end
+
+      it "allows :integer value" do
+        emails = User.where("score >= ?", 160).pluck(:email)
+
+        expect(user_emails("score ge 160")).to eql(emails)
+      end
+
+      it "allows :decimal value" do
+        emails = User.where("balance >= ?", 42.9).pluck(:email)
+
+        expect(user_emails("balance ge 42.90")).to eql(emails)
+      end
+
+      it "allows :date value" do
+        emails = User.where("birth_date >= ?", Date.parse("1985-05-02")).pluck(:email)
+
+        expect(user_emails("birth_date ge '1985-05-02'")).to eql(emails)
+      end
+
+      it "allows :datetime value" do
+        emails = User.where("member_since >= ?", DateTime.parse("2023-03-01T08:09:00+07:00")).pluck(:email)
+
+        expect(user_emails("member_since ge '2023-03-01T08:09:00+07:00'")).to eql(emails)
       end
     end
   end
