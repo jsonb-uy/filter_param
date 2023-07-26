@@ -22,6 +22,10 @@ module FilterParam
         def quote(value)
           ActiveRecord::Base.connection.quote(value)
         end
+
+        def data_type(field)
+          definition.field_type(field)
+        end
       end
     end
   end

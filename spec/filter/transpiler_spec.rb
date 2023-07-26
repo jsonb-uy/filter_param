@@ -308,7 +308,7 @@ RSpec.describe FilterParam::Filter::Transpiler do
 
     context "with :pr operation" do
       it "transpiles to SQL correctly" do
-        expect(transpiler.transpile!("name pr")).to eql("first_name IS NOT NULL")
+        expect(transpiler.transpile!("name pr")).to eql("first_name IS NOT NULL AND TRIM(first_name) != ''")
         expect(transpiler.transpile!("active pr")).to eql("active IS NOT NULL")
         expect(transpiler.transpile!("age pr")).to eql("age IS NOT NULL")
         expect(transpiler.transpile!("balance pr")).to eql("balance IS NOT NULL")

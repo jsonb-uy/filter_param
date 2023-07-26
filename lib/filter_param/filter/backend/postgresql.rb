@@ -38,7 +38,9 @@ module FilterParam
         end
 
         def evaluate_pr(field)
-          "#{field} IS NOT NULL"
+          return "#{field} IS NOT NULL" unless data_type(field) == :string
+
+          "#{field} IS NOT NULL AND TRIM(#{field}) != ''"
         end
 
         def evaluate_and(left, right)

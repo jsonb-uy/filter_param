@@ -55,9 +55,9 @@ class User < ActiveRecord::Base
                 score: 180,
                 birth_date: "1989-01-12",
                 balance: BigDecimal("42.9000001"))
-    User.create(email: "excluded@email.com",
-                first_name: "Excluded",
-                last_name: "Record",
+    User.create(email: "edmund@email.com",
+                first_name: "Edmund",
+                last_name: "   ",
                 balance: BigDecimal("10000.00001"))
   end
 end
