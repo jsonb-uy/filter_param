@@ -406,5 +406,181 @@ RSpec.describe FilterParam::Definition do
         expect(user_emails("member_since ge '2023-03-01T08:09:00+07:00'")).to eql(emails)
       end
     end
+
+    context "with :lt operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name lt null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active lt false") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("last_name < ?", "Doe").pluck(:email)
+
+        expect(user_emails("last_name lt 'Doe'")).to eql(emails)
+      end
+
+      it "allows :integer value" do
+        emails = User.where("score < ?", 160).pluck(:email)
+
+        expect(user_emails("score lt 160")).to eql(emails)
+      end
+
+      it "allows :decimal value" do
+        emails = User.where("balance < ?", 42.9).pluck(:email)
+
+        expect(user_emails("balance lt 42.90")).to eql(emails)
+      end
+
+      it "allows :date value" do
+        emails = User.where("birth_date < ?", Date.parse("1985-05-02")).pluck(:email)
+
+        expect(user_emails("birth_date lt '1985-05-02'")).to eql(emails)
+      end
+
+      it "allows :datetime value" do
+        emails = User.where("member_since < ?", DateTime.parse("2023-03-01T08:09:00+07:00")).pluck(:email)
+
+        expect(user_emails("member_since lt '2023-03-01T08:09:00+07:00'")).to eql(emails)
+      end
+    end
+
+    context "with :le operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name le null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active le false") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("last_name <= ?", "Doe").pluck(:email)
+
+        expect(user_emails("last_name le 'Doe'")).to eql(emails)
+      end
+
+      it "allows :integer value" do
+        emails = User.where("score <= ?", 160).pluck(:email)
+
+        expect(user_emails("score le 160")).to eql(emails)
+      end
+
+      it "allows :decimal value" do
+        emails = User.where("balance <= ?", 42.9).pluck(:email)
+
+        expect(user_emails("balance le 42.90")).to eql(emails)
+      end
+
+      it "allows :date value" do
+        emails = User.where("birth_date <= ?", Date.parse("1985-05-02")).pluck(:email)
+
+        expect(user_emails("birth_date le '1985-05-02'")).to eql(emails)
+      end
+
+      it "allows :datetime value" do
+        emails = User.where("member_since <= ?", DateTime.parse("2023-03-01T08:09:00+07:00")).pluck(:email)
+
+        expect(user_emails("member_since le '2023-03-01T08:09:00+07:00'")).to eql(emails)
+      end
+    end
+
+    context "with :sw operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name sw null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active sw false") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "does not allow :integer value" do
+        expect { user_emails("score sw 160") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected integer/)
+      end
+
+      it "does not allow :decimal value" do
+        expect { user_emails("balance sw 42.9") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected decimal/)
+      end
+
+      it "does not allow :date value" do
+        expect { user_emails("birth_date sw '1985-05-02'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected date/)
+      end
+
+      it "does not allow :datetime value" do
+        expect { user_emails("member_since sw '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected datetime/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("email like ?", "john%").pluck(:email)
+
+        expect(user_emails("email sw 'john'")).to eql(emails)
+      end
+    end
+
+    context "with :ew operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name ew null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active ew true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "does not allow :integer value" do
+        expect { user_emails("score ew 160") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected integer/)
+      end
+
+      it "does not allow :decimal value" do
+        expect { user_emails("balance ew 42.9") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected decimal/)
+      end
+
+      it "does not allow :date value" do
+        expect { user_emails("birth_date ew '1985-05-02'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected date/)
+      end
+
+      it "does not allow :datetime value" do
+        expect { user_emails("member_since ew '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected datetime/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("email like ?", "%domain.com").pluck(:email)
+
+        expect(user_emails("email ew 'domain.com'")).to eql(emails)
+      end
+    end
+
+    context "with :co operation" do
+      it "does not allow :null value" do
+        expect { user_emails("last_name co null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+      end
+
+      it "does not allow :boolean value" do
+        expect { user_emails("active co true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+      end
+
+      it "does not allow :integer value" do
+        expect { user_emails("score co 160") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected integer/)
+      end
+
+      it "does not allow :decimal value" do
+        expect { user_emails("balance co 42.9") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected decimal/)
+      end
+
+      it "does not allow :date value" do
+        expect { user_emails("birth_date co '1985-05-02'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected date/)
+      end
+
+      it "does not allow :datetime value" do
+        expect { user_emails("member_since co '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected datetime/)
+      end
+
+      it "allows :string value" do
+        emails = User.where("email like ?", "%doe%").pluck(:email)
+
+        expect(user_emails("email co 'doe'")).to eql(emails)
+      end
+    end
   end
 end
