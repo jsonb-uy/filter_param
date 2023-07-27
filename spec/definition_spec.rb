@@ -622,5 +622,17 @@ RSpec.describe FilterParam::Definition do
         expect(user_emails("member_since pr")).to eql(emails)
       end
     end
+
+    context "with :not operation" do
+      it "negates a field expression" do
+        non_null_last_name_emails = User.where.not(last_name: nil).pluck(:email)
+        expect(user_emails("not last_name eq null")).to eql(non_null_last_name_emails)
+
+        non_doe_last_name_emails = User.where.not(last_name: "Doe").pluck(:email)
+        expect(user_emails("not last_name eq 'Doe'")).to eql(non_doe_last_name_emails)
+
+        expect(user_emails("not last_name pr")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com edmund@email.com])
+      end
+    end
   end
 end
