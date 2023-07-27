@@ -6,9 +6,8 @@ module FilterParam
       class Postgresql < Base
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
-          node = visit_node(unary_exp.exp)
 
-          evaluate(op, node)
+          evaluate(op, unary_exp.exp)
         end
 
         def visit_comparison(comparison)
@@ -34,13 +33,30 @@ module FilterParam
         end
 
         def evaluate_not(expression)
-          "NOT #{expression}"
+          operator = expression.try(:op)
+          inverse_operators = { eq: :neq, neq: :eq, pr: :not_pr }
+          inverse_operator = inverse_operators[operator]
+          return "NOT #{visit_node(expression)}" unless inverse_operator
+
+          return evaluate(inverse_operator, expression.exp) if operator == :pr
+
+          field = visit_node(expression.field)
+          literal = visit_node(expression.literal)
+          evaluate(inverse_operator, field, literal)
         end
 
         def evaluate_pr(field)
+          field = visit_node(field)
           return "#{field} IS NOT NULL" unless data_type(field) == :string
 
           "(#{field} IS NOT NULL AND TRIM(#{field}) != '')"
+        end
+
+        def evaluate_not_pr(field)
+          field = visit_node(field)
+          return "#{field} IS NULL" unless data_type(field) == :string
+
+          "(#{field} IS NULL OR TRIM(#{field}) = '')"
         end
 
         def evaluate_and(left, right)

@@ -195,16 +195,22 @@ RSpec.describe FilterParam::Filter::Transpiler do
 
     context "with :not operation" do
       it "transpiles to SQL correctly" do
-        expect(transpiler.transpile!("not name eq null")).to eql("NOT first_name IS NULL")
-        expect(transpiler.transpile!("not active eq true")).to eql("NOT active = 1")
-        expect(transpiler.transpile!("not active eq false")).to eql("NOT active = 0")
-        expect(transpiler.transpile!("not name eq 'John'")).to eql("NOT first_name = 'John'")
-        expect(transpiler.transpile!("not age eq 100")).to eql("NOT age = 100")
+        expect(transpiler.transpile!("not name eq null")).to eql("first_name IS NOT NULL")
+        expect(transpiler.transpile!("not name pr")).to eql("(first_name IS NULL OR TRIM(first_name) = '')")
+        expect(transpiler.transpile!("not active pr")).to eql("active IS NULL")
+        expect(transpiler.transpile!("not active eq true")).to eql("active != 1")
+        expect(transpiler.transpile!("not active eq false")).to eql("active != 0")
+        expect(transpiler.transpile!("not name eq 'John'")).to eql("first_name != 'John'")
+        expect(transpiler.transpile!("not age pr")).to eql("age IS NULL")
+        expect(transpiler.transpile!("not age eq 100")).to eql("age != 100")
         expect(transpiler.transpile!("not(age eq 100)")).to eql("NOT (age = 100)")
-        expect(transpiler.transpile!("not balance eq 9182841.1923")).to eql("NOT balance = 9182841.1923")
-        expect(transpiler.transpile!("not birth_date eq '2023-04-01'")).to eql("NOT birth_date = '2023-04-01'")
-        expect(transpiler.transpile!("not member_since eq '2023-04-01T22:30:05.019254+08:00'")).to eql("NOT member_since = '2023-04-01 14:30:05.019254'")
-        expect(transpiler.transpile!("not member_since eq '2023-04-01T22:30:05.019+08:00'")).to eql("NOT member_since = '2023-04-01 14:30:05.019000'")
+        expect(transpiler.transpile!("not balance pr")).to eql("balance IS NULL")
+        expect(transpiler.transpile!("not balance eq 9182841.1923")).to eql("balance != 9182841.1923")
+        expect(transpiler.transpile!("not birth_date pr")).to eql("birth_date IS NULL")
+        expect(transpiler.transpile!("not birth_date eq '2023-04-01'")).to eql("birth_date != '2023-04-01'")
+        expect(transpiler.transpile!("not member_since pr")).to eql("member_since IS NULL")
+        expect(transpiler.transpile!("not member_since eq '2023-04-01T22:30:05.019254+08:00'")).to eql("member_since != '2023-04-01 14:30:05.019254'")
+        expect(transpiler.transpile!("not member_since eq '2023-04-01T22:30:05.019+08:00'")).to eql("member_since != '2023-04-01 14:30:05.019000'")
       end
     end
 
