@@ -1,4 +1,4 @@
-require_relative "backend/postgresql"
+require_relative "backend/sql"
 
 module FilterParam
   module Filter
@@ -30,7 +30,7 @@ module FilterParam
       end
 
       def transpile_to_sql!(ast)
-        Backend::Postgresql.new(definition).visit_node(ast)
+        Backend::Sql.new(definition).visit_node(ast)
       end
     end
   end

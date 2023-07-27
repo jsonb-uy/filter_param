@@ -1,9 +1,22 @@
-require_relative "base"
-
 module FilterParam
   module Filter
     module Backend
-      class Postgresql < Base
+      class Sql < Filter::AST::Visitor
+        def visit_group(group)
+          "(#{visit_node(group.exp)})"
+        end
+
+        def visit_field(field)
+          field_options = definition.field_options(field.name)
+          return field if field_options.nil?
+
+          field_options[:rename].presence || field.name
+        end
+
+        def visit_literal(literal)
+          literal.value
+        end
+
         def visit_unary_expression(unary_exp)
           op = unary_exp.op
 
@@ -27,6 +40,10 @@ module FilterParam
         end
 
         private
+
+        def data_type(field)
+          definition.field_type(field)
+        end
 
         def evaluate(operator, *operands)
           send("evaluate_#{operator}", *operands)
@@ -115,6 +132,10 @@ module FilterParam
           pattern = "%#{value}%"
 
           "#{field} LIKE #{quote(pattern)}"
+        end
+
+        def quote(value)
+          ActiveRecord::Base.connection.quote(value)
         end
       end
     end
