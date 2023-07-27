@@ -30,6 +30,8 @@ module FilterParam
     #   * rename [String, Proc] rename field in the formatted output.
     #     This can be a Proc code block that receives the :name as argument and
     #     returns a transformed field name.
+    #   * value [Proc] pre-process literal operand values. This receives the :value
+    #     argument parsed from the expression string and returns a transformed field value.
     #
     # @return [self] Definition instance
     def field(name, **options)
@@ -83,10 +85,21 @@ module FilterParam
       )
     end
 
+    # Returns the field data type. Known types are
+    # :string(default), :integer, :boolean, :decimal, :date, and :datetime
+    #
+    # @param [String, Symbol] field_name
+    #
+    # @return [Symbol]
     def field_type(field_name)
       fields_hash.dig(field_name.to_s, :type)
     end
 
+    # Checks whether a given field is whitelisted.
+    #
+    # @param [String, Symbol] field_name
+    #
+    # @return [TrueClass, FalseClass]
     def field_permitted?(field_name)
       fields_hash.key? field_name.to_s
     end
