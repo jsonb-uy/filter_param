@@ -654,6 +654,18 @@ RSpec.describe FilterParam::Definition do
 
         expect(user_emails("not last_name pr")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com edmund@email.com])
       end
+
+      it "negates a group expression" do
+        expect(user_emails("not(last_name neq 'Doe' or score gt 100)")).to eql(%w[john.doe@email.com])
+      end
+    end
+
+    it "supports :and operation" do
+      expect(user_emails("email ew 'domain.com' and score ge 180")).to eql(%w[ringo@domain.com george@domain.com])
+    end
+
+    it "supports :or operation" do
+      expect(user_emails("not last_name pr or last_name eq 'Apple'")).to eql(%w[johnny.apple@email.com paul@domain.com ringo@domain.com george@domain.com edmund@email.com])
     end
   end
 end
