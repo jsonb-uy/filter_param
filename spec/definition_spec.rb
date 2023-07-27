@@ -625,11 +625,32 @@ RSpec.describe FilterParam::Definition do
 
     context "with :not operation" do
       it "negates a field expression" do
-        non_null_last_name_emails = User.where.not(last_name: nil).pluck(:email)
-        expect(user_emails("not last_name eq null")).to eql(non_null_last_name_emails)
+        emails = User.where.not(last_name: nil).pluck(:email)
+        expect(user_emails("not last_name eq null")).to eql(emails)
 
-        non_doe_last_name_emails = User.where.not(last_name: "Doe").pluck(:email)
-        expect(user_emails("not last_name eq 'Doe'")).to eql(non_doe_last_name_emails)
+        emails = User.where.not(last_name: "Doe").pluck(:email)
+        expect(user_emails("not last_name eq 'Doe'")).to eql(emails)
+
+        emails = User.where(last_name: "Doe").pluck(:email)
+        expect(user_emails("not last_name neq 'Doe'")).to eql(emails)
+
+        emails = User.where.not("last_name > ?", "Doe").pluck(:email)
+        expect(user_emails("not last_name gt 'Doe'")).to eql(emails)
+
+        emails = User.where.not("last_name < ?", "Doe").pluck(:email)
+        expect(user_emails("not last_name lt 'Doe'")).to eql(emails)
+
+        emails = User.where.not("last_name <= ?", "Doe").pluck(:email)
+        expect(user_emails("not last_name le 'Doe'")).to eql(emails)
+
+        emails = User.where.not("last_name like ?", "Do%").pluck(:email)
+        expect(user_emails("not last_name sw 'Do'")).to eql(emails)
+
+        emails = User.where.not("last_name like ?", "%oe").pluck(:email)
+        expect(user_emails("not last_name ew 'oe'")).to eql(emails)
+
+        emails = User.where.not("last_name like ?", "%o%").pluck(:email)
+        expect(user_emails("not last_name co 'o'")).to eql(emails)
 
         expect(user_emails("not last_name pr")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com edmund@email.com])
       end
