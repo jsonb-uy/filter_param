@@ -7,10 +7,10 @@ module FilterParam
         end
 
         def visit_field(field)
-          field_options = definition.field_options(field.name)
-          return field if field_options.nil?
+          options = field_options(field.name)
+          return field if options.nil?
 
-          field_options[:rename].presence || field.name
+          options[:rename].presence || field.name
         end
 
         def visit_literal(literal)
@@ -25,10 +25,11 @@ module FilterParam
 
         def visit_comparison(comparison)
           op = comparison.op
-          field = visit_node(comparison.field)
-          literal = visit_node(comparison.literal)
+          actual_field_name = comparison.field.name
+          aliased_field_name = visit_node(comparison.field)
+          literal_value = field_value(actual_field_name, visit_node(comparison.literal))
 
-          evaluate(op, field, literal)
+          evaluate(op, aliased_field_name, literal_value)
         end
 
         def visit_logical_expression(expression)
@@ -41,8 +42,19 @@ module FilterParam
 
         private
 
-        def data_type(field)
-          definition.field_type(field)
+        def field_data_type(field_name)
+          definition.field_type(field_name)
+        end
+
+        def field_options(field_name)
+          definition.field_options(field_name)
+        end
+
+        def field_value(field_name, literal_value)
+          transform_logic = field_options(field_name)[:value]
+          return literal_value if transform_logic.nil?
+
+          transform_logic.call(literal_value)
         end
 
         def evaluate(operator, *operands)
@@ -63,17 +75,17 @@ module FilterParam
         end
 
         def evaluate_pr(field)
-          field = visit_node(field)
-          return "#{field} IS NOT NULL" unless data_type(field) == :string
+          field_name = visit_node(field)
+          return "#{field_name} IS NOT NULL" unless field_data_type(field_name) == :string
 
-          "(#{field} IS NOT NULL AND TRIM(#{field}) != '')"
+          "(#{field_name} IS NOT NULL AND TRIM(#{field_name}) != '')"
         end
 
         def evaluate_not_pr(field)
-          field = visit_node(field)
-          return "#{field} IS NULL" unless data_type(field) == :string
+          field_name = visit_node(field)
+          return "#{field_name} IS NULL" unless field_data_type(field_name) == :string
 
-          "(#{field} IS NULL OR TRIM(#{field}) = '')"
+          "(#{field_name} IS NULL OR TRIM(#{field_name}) = '')"
         end
 
         def evaluate_and(left, right)

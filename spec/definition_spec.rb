@@ -212,6 +212,15 @@ RSpec.describe FilterParam::Definition do
       definition.filter!(User.all, expression).pluck(:email)
     end
 
+    context "with Proc :value field option" do
+      it "pre-processes the field value in the expression string" do
+        definition.field(:score, type: :integer, value: ->(value) { value + 10 })
+
+        scores = definition.filter!(User.all, "score eq 90 or score eq 160").pluck(:score)
+        expect(scores).to eql([100, 170])
+      end
+    end
+
     context "with :eq operation" do
       it "allows :null value" do
         expect(user_emails("last_name eq null")).to eql(%w[paul@domain.com ringo@domain.com george@domain.com])
