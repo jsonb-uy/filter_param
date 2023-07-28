@@ -18,34 +18,35 @@ module FilterParam
       rule(:identifier) { match("[a-zA-Z_]") >> digit.maybe }
       rule(:table) { identifier.repeat(1) >> dot }
       rule(:field) { (table.maybe >> identifier.repeat(1)).as(:f) }
+      rule(:scope_name) { identifier.repeat(1) }
 
       # Literals / types
-      rule(:null) { (str("null").as(:null)).as(:val) }
-      rule(:boolean) { (str("true") | str("false")).as(:val) }
+      rule(:null) { str("null").as(:null) }
+      rule(:boolean) { (str("true") | str("false")).as(:boolean) }
 
       rule(:integer) do
         (
           (hyphen.maybe >> zero_nonsig >> sig_number) |
           (hyphen.maybe.ignore >> zero >> zero_nonsig)
-        ).as(:val)
+        ).as(:integer)
       end
 
       rule(:decimal) do
         (
           (hyphen.maybe >> zero_nonsig >> sig_number >> dot >> digit.repeat(1)) |
           (hyphen.maybe >> zero >> zero_nonsig >> dot >> digit.repeat(1))
-        ).as(:val)
+        ).as(:decimal)
       end
 
       rule(:string) do
-        (single_quote >> (escape_seq | match("[^\']")).repeat.as(:val) >> single_quote) |
-          (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:val) >> double_quote)
+        (single_quote >> (escape_seq | match("[^\']")).repeat.as(:string) >> single_quote) |
+          (double_quote >> (escape_seq | match("[^\"]")).repeat.as(:string) >> double_quote)
       end
       rule(:date_yyyy) { digit.repeat(4) }
       rule(:date_mm) { (zero >> non_zero_digit) | (str("1") >> match("[0-2]")) }
       rule(:date_md) { (zero >> non_zero_digit) | (match("[1-2]") >> digit) | (str("3") >> match("[0-1]")) }
       rule(:date_iso8601) { date_yyyy >> hyphen >> date_mm >> hyphen >> date_md }
-      rule(:date) { quoted date_iso8601.as(:val) }
+      rule(:date) { quoted date_iso8601.as(:date) }
       rule(:time_hh_mi) do
         (((zero | str("1")) >> digit) | (str("2") >> match("[0-3]"))) >>
           str(":").maybe >> ((zero >> digit) | (match("[1-5]") >> digit))
@@ -54,7 +55,7 @@ module FilterParam
       rule(:time_hh_mi_ss_sss) { time_hh_mi_ss >> dot >> digit.repeat(3, 3) }
       rule(:time_tz) { str("Z") | (match("[\+\-]") >> time_hh_mi) }
       rule(:datetime_iso8601) { date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz }
-      rule(:datetime) { quoted datetime_iso8601.as(:val) }
+      rule(:datetime) { quoted datetime_iso8601.as(:datetime) }
 
       # Operations
       rule(:op_filter_binary) do
@@ -69,17 +70,19 @@ module FilterParam
       rule(:literal) { (null | boolean | decimal | integer | datetime | date | string) }
       rule(:literal_paren) { lparen >> space? >> (literal | literal_paren) >> space? >> rparen }
       rule(:value) { literal_paren | (space >> (literal | literal_paren)) }
-      rule(:field_exp) { (field >> space >> (op_filter_unary | (op_filter_binary >> value))).as(:exp) }
+      rule(:field_exp) { (field >> space >> (op_filter_unary | (op_filter_binary >> value.as(:val)))).as(:exp) }
       rule(:group) do
         empty_group.ignore |
-          (lparen >> (binary_exp | unary_exp | field_exp) >> rparen).as(:group) |
-          (lparen >> group >> rparen)
+          (lparen >> space? >> (binary_exp | unary_exp | field_exp) >> space? >> rparen).as(:group) |
+          (lparen >> space? >> group >> space? >> rparen)
       end
       rule(:empty_group) do
         (lparen >> space? >> empty_group >> space? >> rparen) | (lparen >> space? >> rparen)
       end
       rule(:empty_exp) { (space | str("")).ignore }
-      rule(:primary) { group | field_exp }
+      rule(:scope_args) { literal >> space? >> (str(",") >> space? >> literal).repeat(0) }
+      rule(:scope) { scope_name.as(:name) >> lparen >> space? >> scope_args.maybe.as(:args) >> space? >> rparen }
+      rule(:primary) { group | field_exp | scope.as(:scope) }
 
       rule(:unary_exp) do
         (op_logic_unary >> (space | lparen.present?) >> primary.as(:right)).as(:exp) | primary
