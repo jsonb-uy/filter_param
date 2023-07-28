@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FilterParam::Filter::Transpiler do
+RSpec.describe FilterParam::Transpiler do
   subject(:transpiler) { new_transpiler }
 
   def new_transpiler(definition = nil)

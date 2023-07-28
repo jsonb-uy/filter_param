@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe FilterParam::Filter::Parser do
+RSpec.describe FilterParam::Parser do
   def parse(expression)
     described_class.new.parse(expression)
   end
 
   def parse_value(expression)
-    parse(expression)[:exp][:val].str
+    parse(expression)[:exp][:val].values.first.str
   end
 
   describe "#tree" do

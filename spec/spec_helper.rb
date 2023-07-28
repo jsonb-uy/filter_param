@@ -7,7 +7,7 @@ if ENV.fetch("COVERAGE", nil) == "true"
   require "simplecov"
 
   SimpleCov.start
-  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+  # SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 end
 
 require "filter_param"

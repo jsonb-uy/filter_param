@@ -78,7 +78,7 @@ module FilterParam
     # @param [String] expression Filter expression.
     #
     def filter!(ar_relation, expression)
-      transpiler = Filter::Transpiler.new(self)
+      transpiler = Transpiler.new(self)
 
       ar_relation.where(
         transpiler.transpile!(expression)
@@ -117,7 +117,7 @@ module FilterParam
     end
 
     def known_field_types
-      @known_field_types ||= Filter::AST::Nodes::Literal::TYPES.reject { |t| t == :null }
+      @known_field_types ||= AST::Literal::TYPES.reject { |t| t == :null }
     end
 
     def validate_field_options!(field, options)
