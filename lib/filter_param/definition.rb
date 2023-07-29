@@ -1,5 +1,7 @@
 module FilterParam
   class Definition
+    FIELD_TYPES = %i[boolean string integer decimal date datetime].freeze
+
     attr_reader :fields_hash
 
     # Creates a new FilterParam definition that whitelists the columns that are allowed to
@@ -116,15 +118,11 @@ module FilterParam
       options
     end
 
-    def known_field_types
-      @known_field_types ||= AST::Literal::TYPES.reject { |t| t == :null }
-    end
-
     def validate_field_options!(field, options)
       type = options[:type]
-      return if type.in?(known_field_types)
+      return if type.in?(FIELD_TYPES)
 
-      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{known_field_types}.")
+      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{FIELD_TYPES}.")
     end
   end
 end

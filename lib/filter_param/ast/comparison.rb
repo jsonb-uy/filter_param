@@ -31,7 +31,7 @@ module FilterParam
         return if literal_type_allowed?
 
         value = literal.value.present? ? "(#{literal.value})" : ""
-        raise FilterParam::InvalidFilterValue.new(
+        raise FilterParam::InvalidLiteral.new(
           "Unexpected #{literal.type} value#{value} for operator '#{op}'."
         )
       end

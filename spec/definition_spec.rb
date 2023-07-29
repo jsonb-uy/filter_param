@@ -342,11 +342,11 @@ RSpec.describe FilterParam::Definition do
 
     context "with :gt operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name gt null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name gt null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active gt true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active gt true") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "allows :string value" do
@@ -378,11 +378,11 @@ RSpec.describe FilterParam::Definition do
 
     context "with :ge operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name ge null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name ge null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active ge true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active ge true") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "allows :string value" do
@@ -418,11 +418,11 @@ RSpec.describe FilterParam::Definition do
 
     context "with :lt operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name lt null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name lt null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active lt false") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active lt false") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "allows :string value" do
@@ -458,11 +458,11 @@ RSpec.describe FilterParam::Definition do
 
     context "with :le operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name le null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name le null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active le false") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active le false") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "allows :string value" do
@@ -498,27 +498,27 @@ RSpec.describe FilterParam::Definition do
 
     context "with :sw operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name sw null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name sw null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active sw false") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active sw false") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "does not allow :integer value" do
-        expect { user_emails("score sw 160") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected integer/)
+        expect { user_emails("score sw 160") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected integer/)
       end
 
       it "does not allow :decimal value" do
-        expect { user_emails("balance sw 42.9") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected decimal/)
+        expect { user_emails("balance sw 42.9") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected decimal/)
       end
 
       it "does not allow :date value" do
-        expect { user_emails("birth_date sw '1985-05-02'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected date/)
+        expect { user_emails("birth_date sw '1985-05-02'") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected date/)
       end
 
       it "does not allow :datetime value" do
-        expect { user_emails("member_since sw '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected datetime/)
+        expect { user_emails("member_since sw '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected datetime/)
       end
 
       it "allows :string value" do
@@ -530,27 +530,27 @@ RSpec.describe FilterParam::Definition do
 
     context "with :ew operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name ew null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name ew null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active ew true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active ew true") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "does not allow :integer value" do
-        expect { user_emails("score ew 160") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected integer/)
+        expect { user_emails("score ew 160") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected integer/)
       end
 
       it "does not allow :decimal value" do
-        expect { user_emails("balance ew 42.9") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected decimal/)
+        expect { user_emails("balance ew 42.9") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected decimal/)
       end
 
       it "does not allow :date value" do
-        expect { user_emails("birth_date ew '1985-05-02'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected date/)
+        expect { user_emails("birth_date ew '1985-05-02'") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected date/)
       end
 
       it "does not allow :datetime value" do
-        expect { user_emails("member_since ew '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected datetime/)
+        expect { user_emails("member_since ew '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected datetime/)
       end
 
       it "allows :string value" do
@@ -562,27 +562,27 @@ RSpec.describe FilterParam::Definition do
 
     context "with :co operation" do
       it "does not allow :null value" do
-        expect { user_emails("last_name co null") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected null/)
+        expect { user_emails("last_name co null") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected null/)
       end
 
       it "does not allow :boolean value" do
-        expect { user_emails("active co true") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected boolean/)
+        expect { user_emails("active co true") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected boolean/)
       end
 
       it "does not allow :integer value" do
-        expect { user_emails("score co 160") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected integer/)
+        expect { user_emails("score co 160") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected integer/)
       end
 
       it "does not allow :decimal value" do
-        expect { user_emails("balance co 42.9") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected decimal/)
+        expect { user_emails("balance co 42.9") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected decimal/)
       end
 
       it "does not allow :date value" do
-        expect { user_emails("birth_date co '1985-05-02'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected date/)
+        expect { user_emails("birth_date co '1985-05-02'") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected date/)
       end
 
       it "does not allow :datetime value" do
-        expect { user_emails("member_since co '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidFilterValue, /Unexpected datetime/)
+        expect { user_emails("member_since co '2023-03-01T08:09:00+07:00'") }.to raise_error(FilterParam::InvalidLiteral, /Unexpected datetime/)
       end
 
       it "allows :string value" do

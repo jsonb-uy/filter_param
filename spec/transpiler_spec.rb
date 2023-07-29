@@ -118,78 +118,78 @@ RSpec.describe FilterParam::Transpiler do
     end
 
     context "with invalid integer value" do
-      it "raises an InvalidFilterValue error" do
+      it "raises an InvalidLiteral error" do
         expect do
           transpiler.transpile!("age eq 'ten'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Integer/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid Integer/)
 
         expect do
           transpiler.transpile!("age eq '0.10'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Integer/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid Integer/)
       end
     end
 
     context "with invalid decimal value" do
-      it "raises an InvalidFilterValue error" do
+      it "raises an InvalidLiteral error" do
         expect do
           transpiler.transpile!("balance eq 'ten'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Decimal/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid Decimal/)
 
         expect do
           transpiler.transpile!("balance eq '0.10e'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid Decimal/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid Decimal/)
       end
     end
 
     context "with invalid iso8601 date " do
-      it "raises an InvalidFilterValue error" do
+      it "raises an InvalidLiteral error" do
         expect do
           transpiler.transpile!("birth_date eq '2023-02-31'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Date/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-09-31'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Date/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-06-31'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Date/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '06-31-2023'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Date/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Date/)
 
         expect do
           transpiler.transpile!("birth_date eq '2023-00-00'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Date/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Date/)
       end
     end
 
     context "with invalid iso8601 datetime" do
-      it "raises an InvalidFilterValue error" do
+      it "raises an InvalidLiteral error" do
         expect do
           transpiler.transpile!("member_since eq '2023-02-31T08:30:01.999Z'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Datetime/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-13-15T15:30:01.999'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Datetime/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-02-15T25:30:01.999'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Datetime/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-02-15T23:60:01.999'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Datetime/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-00-10'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Datetime/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Datetime/)
 
         expect do
           transpiler.transpile!("member_since eq '2023-11-00'")
-        end.to raise_error(FilterParam::InvalidFilterValue, /Invalid ISO8601 Datetime/)
+        end.to raise_error(FilterParam::InvalidLiteral, /Invalid ISO8601 Datetime/)
       end
     end
 
@@ -230,15 +230,15 @@ RSpec.describe FilterParam::Transpiler do
 
     context "with :eq_ci operation" do
       it "transpiles to SQL correctly" do
-        expect { transpiler.transpile!("name eq_ci null") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active eq_ci true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active eq_ci false") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("name eq_ci null") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active eq_ci true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active eq_ci false") }.to raise_error(FilterParam::InvalidLiteral)
         expect(transpiler.transpile!("name eq_ci 'John'")).to eql("lower(first_name) = 'john'")
-        expect { transpiler.transpile!("age eq_ci 100") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("balance eq_ci 9182841.1923") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("birth_date eq_ci '2023-04-01'") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("member_since eq_ci '2023-04-01T22:30:05.019254+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("member_since eq_ci '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("age eq_ci 100") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("balance eq_ci 9182841.1923") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("birth_date eq_ci '2023-04-01'") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("member_since eq_ci '2023-04-01T22:30:05.019254+08:00'") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("member_since eq_ci '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
 
@@ -258,9 +258,9 @@ RSpec.describe FilterParam::Transpiler do
 
     context "with :lt operation" do
       it "transpiles to SQL correctly" do
-        expect { transpiler.transpile!("name lt null") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active lt true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active lt false") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("name lt null") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active lt true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active lt false") }.to raise_error(FilterParam::InvalidLiteral)
         expect(transpiler.transpile!("name lt 'John'")).to eql("first_name < 'John'")
         expect(transpiler.transpile!("age lt 100")).to eql("age < 100")
         expect(transpiler.transpile!("balance lt 9182841.1923")).to eql("balance < 9182841.1923")
@@ -272,9 +272,9 @@ RSpec.describe FilterParam::Transpiler do
 
     context "with :le operation" do
       it "transpiles to SQL correctly" do
-        expect { transpiler.transpile!("name le null") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active le true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active le false") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("name le null") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active le true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active le false") }.to raise_error(FilterParam::InvalidLiteral)
         expect(transpiler.transpile!("name le 'John'")).to eql("first_name <= 'John'")
         expect(transpiler.transpile!("age le 100")).to eql("age <= 100")
         expect(transpiler.transpile!("balance le 9182841.1923")).to eql("balance <= 9182841.1923")
@@ -286,9 +286,9 @@ RSpec.describe FilterParam::Transpiler do
 
     context "with :gt operation" do
       it "transpiles to SQL correctly" do
-        expect { transpiler.transpile!("name gt null") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active gt true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active gt false") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("name gt null") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active gt true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active gt false") }.to raise_error(FilterParam::InvalidLiteral)
         expect(transpiler.transpile!("name gt 'John'")).to eql("first_name > 'John'")
         expect(transpiler.transpile!("age gt 100")).to eql("age > 100")
         expect(transpiler.transpile!("balance gt 9182841.1923")).to eql("balance > 9182841.1923")
@@ -300,9 +300,9 @@ RSpec.describe FilterParam::Transpiler do
 
     context "with :ge operation" do
       it "transpiles to SQL correctly" do
-        expect { transpiler.transpile!("name ge null") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active ge true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active ge false") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("name ge null") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active ge true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active ge false") }.to raise_error(FilterParam::InvalidLiteral)
         expect(transpiler.transpile!("name ge 'John'")).to eql("first_name >= 'John'")
         expect(transpiler.transpile!("age ge 100")).to eql("age >= 100")
         expect(transpiler.transpile!("balance ge 9182841.1923")).to eql("balance >= 9182841.1923")
@@ -326,36 +326,36 @@ RSpec.describe FilterParam::Transpiler do
     context "with :sw operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name sw 'Jo'")).to eql("first_name LIKE 'Jo%'")
-        expect { transpiler.transpile!("active sw true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active sw false") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("age sw 100") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("balance sw 193.12") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("birth_date sw '2023-04-01'") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("member_since sw '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active sw true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active sw false") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("age sw 100") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("balance sw 193.12") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("birth_date sw '2023-04-01'") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("member_since sw '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
 
     context "with :ew operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name ew 'Jo'")).to eql("first_name LIKE '%Jo'")
-        expect { transpiler.transpile!("active ew true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active ew false") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("age ew 100") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("balance ew 193.12") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("birth_date ew '2023-04-01'") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("member_since ew '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active ew true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active ew false") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("age ew 100") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("balance ew 193.12") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("birth_date ew '2023-04-01'") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("member_since ew '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
 
     context "with :co operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name co 'oh'")).to eql("first_name LIKE '%oh%'")
-        expect { transpiler.transpile!("active co true") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("active co false") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("age co 100") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("balance co 193.12") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("birth_date co '2023-04-01'") }.to raise_error(FilterParam::InvalidFilterValue)
-        expect { transpiler.transpile!("member_since co '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidFilterValue)
+        expect { transpiler.transpile!("active co true") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("active co false") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("age co 100") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("balance co 193.12") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("birth_date co '2023-04-01'") }.to raise_error(FilterParam::InvalidLiteral)
+        expect { transpiler.transpile!("member_since co '2023-04-01T22:30:05.019+08:00'") }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
 

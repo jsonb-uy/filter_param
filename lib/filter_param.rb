@@ -5,12 +5,19 @@ require "active_record"
 require "active_support"
 require "active_support/core_ext/object/inclusion"
 require_relative "filter_param/ast/node"
-require_relative "filter_param/ast/literal"
 require_relative "filter_param/ast/field"
 require_relative "filter_param/ast/group"
 require_relative "filter_param/ast/logical_expression"
 require_relative "filter_param/ast/unary_expression"
 require_relative "filter_param/ast/comparison"
+require_relative "filter_param/ast/literal"
+require_relative "filter_param/ast/literals/null"
+require_relative "filter_param/ast/literals/string"
+require_relative "filter_param/ast/literals/boolean"
+require_relative "filter_param/ast/literals/integer"
+require_relative "filter_param/ast/literals/decimal"
+require_relative "filter_param/ast/literals/date"
+require_relative "filter_param/ast/literals/datetime"
 require_relative "filter_param/visitor"
 require_relative "filter_param/field_node_validator"
 require_relative "filter_param/transformer"
@@ -24,8 +31,7 @@ module FilterParam
   class UnknownType < BaseError; end
   class ExpressionError < BaseError; end
   class UnpermittedField < ExpressionError; end
-  class InvalidFilterValue < ExpressionError; end
-  class TypeMismatch < ExpressionError; end
+  class InvalidLiteral < ExpressionError; end
   class ParseError < ExpressionError; end
 
   # Creates a new FilterParam definition that whitelists the columns that are allowed to
