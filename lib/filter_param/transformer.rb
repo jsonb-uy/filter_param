@@ -20,7 +20,7 @@ module FilterParam
       field = Field.new(f)
       declared_type = definition.field_type(field.name)
 
-      Comparison.new(op, field, literal.type_cast!(declared_type))
+      Comparison.new(op, field, literal.type_cast(declared_type))
     end
   end
 end

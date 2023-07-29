@@ -5,11 +5,13 @@ module FilterParam
         TRUE = new("true")
         FALSE = new("false")
 
-        private_class_method :new
-
         def initialize(value)
           @value = value.to_s == "true"
         end
+
+        private_class_method :new
+
+        private
 
         def to_boolean
           self

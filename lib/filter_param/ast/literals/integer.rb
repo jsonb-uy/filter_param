@@ -8,6 +8,8 @@ module FilterParam
           raise InvalidLiteral.new("Invalid Integer: #{value}")
         end
 
+        private
+
         def to_boolean
           return Literals::Boolean::FALSE if value.zero?
 

@@ -10,6 +10,8 @@ module FilterParam
           raise InvalidLiteral.new("Invalid Decimal: #{value}")
         end
 
+        private
+
         def to_integer
           Literals::Integer.new(value)
         end

@@ -6,6 +6,8 @@ module FilterParam
           @value = value.to_s
         end
 
+        private
+
         def to_boolean
           return Literals::Boolean::TRUE if value == "true"
 

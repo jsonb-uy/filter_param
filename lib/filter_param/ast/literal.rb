@@ -7,7 +7,9 @@ module FilterParam
         @value = value
       end
 
-      def type_cast!(type)
+      def type_cast(type)
+        return self if type.blank?
+
         send("to_#{type}")
       end
     end
