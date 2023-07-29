@@ -31,7 +31,7 @@ module FilterParam
         end
 
         def to_datetime
-          Literals::Date.new(value)
+          Literals::DateTime.new(value)
         end
       end
     end
