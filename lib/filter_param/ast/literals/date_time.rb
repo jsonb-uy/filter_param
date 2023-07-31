@@ -3,7 +3,7 @@ require "date"
 module FilterParam
   module AST
     module Literals
-      class DateTime < Literal
+      class DateTime < Date
         def initialize(value)
           @value = ::DateTime.iso8601(value.to_s)
         rescue ::Date::Error

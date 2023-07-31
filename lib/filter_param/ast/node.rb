@@ -2,9 +2,13 @@ module FilterParam
   module AST
     class Node
       def accept(visitor)
-        visit_method = "visit_#{self.class.name.demodulize.underscore}"
+        visitor.send(visit_method, self)
+      end
 
-        visitor.send(visit_method.to_sym, self)
+      private
+
+      def visit_method
+        "visit_#{self.class.name.demodulize.underscore}".to_sym
       end
     end
   end

@@ -18,14 +18,7 @@ module FilterParam
       literal
     end
 
-    def visit_comparison(comparison)
-      visit_node(comparison.field)
-      visit_node(comparison.literal)
-
-      comparison
-    end
-
-    def visit_logical_expression(expression)
+    def visit_binary_expression(expression)
       visit_node(expression.left)
       visit_node(expression.right)
 

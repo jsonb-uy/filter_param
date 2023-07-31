@@ -12,6 +12,12 @@ module FilterParam
 
         send("to_#{type}")
       end
+
+      private
+
+      def visit_method
+        :visit_literal
+      end
     end
   end
 end

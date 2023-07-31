@@ -38,7 +38,7 @@ module FilterParam
       evaluate(op, aliased_field_name, literal_value)
     end
 
-    def visit_logical_expression(expression)
+    def visit_binary_expression(expression)
       op = expression.op
       left = visit_node(expression.left)
       right = visit_node(expression.right)
