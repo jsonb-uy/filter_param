@@ -10,6 +10,13 @@ module FilterParam
       end
 
       alias to_s name
+
+      def to_sql(context)
+        field_definition = context.fields[name]
+        return name if field_definition.nil?
+
+        field_definition[:rename].presence || name
+      end
     end
   end
 end
