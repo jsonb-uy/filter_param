@@ -5,6 +5,8 @@ module FilterParam
         attr_reader :operator, :operands
 
         def initialize(operator, *operands)
+          super()
+
           @operator = operator
           @operands = operands
         end
@@ -22,6 +24,12 @@ module FilterParam
 
           @operand = operand
         end
+
+        private
+
+        def visit_method
+          :visit_unary_expression
+        end
       end
 
       class BinaryExpression < Expression
@@ -32,6 +40,12 @@ module FilterParam
 
           @left_operand = left_operand
           @right_operand = right_operand
+        end
+
+        private
+
+        def visit_method
+          :visit_binary_expression
         end
       end
 
@@ -47,8 +61,8 @@ module FilterParam
 
         private
 
-        def literal_allowed?(literal)
-          false
+        def literal_allowed?(_)
+          true
         end
 
         def validate_literal!(literal)
@@ -60,6 +74,64 @@ module FilterParam
           )
         end
       end
+
+      class StringAttributeExpression < AttributeExpression
+        private
+
+        def literal_allowed?(literal)
+          literal.is_a?(Literals::String)
+        end
+      end
+
+      class NonNullAttributeExpression < AttributeExpression
+        private
+
+        def literal_allowed?(literal)
+          !literal.is_a?(Literals::Null)
+        end
+      end
+
+      class And < BinaryExpression; end
+      class Or < BinaryExpression; end
+      class EqCi < StringAttributeExpression; end
+      class Co < StringAttributeExpression; end
+      class Sw < StringAttributeExpression; end
+      class Ew < StringAttributeExpression; end
+
+      class Not < UnaryExpression
+        def inverse
+          @inverse ||= operand
+        end
+      end
+
+      class Pr < UnaryExpression
+        def inverse
+          @inverse ||= Npr.new(operand)
+        end
+      end
+
+      class Npr < UnaryExpression
+        def inverse
+          @inverse ||= Pr.new(operand)
+        end
+      end
+
+      class Eq < AttributeExpression
+        def inverse
+          @inverse ||= Neq.new(attribute, literal)
+        end
+      end
+
+      class Neq < AttributeExpression
+        def inverse
+          @inverse ||= Eq.new(attribute, literal)
+        end
+      end
+
+      class Ge < NonNullAttributeExpression; end
+      class Gt < NonNullAttributeExpression; end
+      class Le < NonNullAttributeExpression; end
+      class Lt < NonNullAttributeExpression; end
     end
   end
 end

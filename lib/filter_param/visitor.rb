@@ -19,16 +19,16 @@ module FilterParam
     end
 
     def visit_binary_expression(expression)
-      visit_node(expression.left)
-      visit_node(expression.right)
+      visit_node(expression.left_operand)
+      visit_node(expression.right_operand)
 
       expression
     end
 
-    def visit_unary_expression(unary_exp)
-      visit_node(unary_exp.exp)
+    def visit_unary_expression(expression)
+      visit_node(expression.operand)
 
-      unary_exp
+      expression
     end
 
     def visit_node(node)

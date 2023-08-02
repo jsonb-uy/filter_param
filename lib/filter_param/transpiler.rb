@@ -9,7 +9,7 @@ module FilterParam
     end
 
     def visit_group(group)
-      "(#{visit_node(group.exp)})"
+      "(#{visit_node(group.expression)})"
     end
 
     def visit_field(field)
@@ -24,26 +24,15 @@ module FilterParam
     end
 
     def visit_unary_expression(unary_exp)
-      op = unary_exp.op
-
-      evaluate(op, unary_exp.exp)
-    end
-
-    def visit_comparison(comparison)
-      op = comparison.op
-      actual_field_name = comparison.field.name
-      aliased_field_name = visit_node(comparison.field)
-      literal_value = field_value(actual_field_name, visit_node(comparison.literal))
-
-      evaluate(op, aliased_field_name, literal_value)
+      evaluate(expression.operator, expression.operand)
     end
 
     def visit_binary_expression(expression)
       op = expression.op
-      left = visit_node(expression.left)
-      right = visit_node(expression.right)
+      left = visit_node(expression.left_operand)
+      right = visit_node(expression.right_operand)
 
-      evaluate(op, left, right)
+      evaluate(expression.operator, left, right)
     end
 
     private
