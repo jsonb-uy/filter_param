@@ -13,10 +13,6 @@ module FilterParam
         send("to_#{type}")
       end
 
-      def to_sql(context)
-        ActiveRecord::Base.connection.quote(value)
-      end
-
       private
 
       def visit_method

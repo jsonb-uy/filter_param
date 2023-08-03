@@ -2,16 +2,27 @@ module FilterParam
   module AST
     module Expressions
       class Expression < Node
-        attr_reader :operator, :operands
+        def self.for(operator)
+          "Expressions::#{operator.to_s.camelize}".safe_constantize
+        end
 
-        def initialize(operator, *operands)
+        def self.operator
+          @operator ||= self.class.name.demodulize.underscore.to_sym
+        end
+
+        attr_reader :operands
+
+        def initialize(*operands)
           super()
 
-          @operator = operator
           @operands = operands
         end
 
-        def inverse
+        def operator
+          self.class.operator
+        end
+
+        def negation
           nil
         end
       end
@@ -19,8 +30,8 @@ module FilterParam
       class UnaryExpression < Expression
         attr_reader :operand
 
-        def initialize(operator, operand)
-          super(operator, operands)
+        def initialize(operand)
+          super(operand)
 
           @operand = operand
         end
@@ -35,8 +46,8 @@ module FilterParam
       class BinaryExpression < Expression
         attr_reader :left_operand, :right_operand
 
-        def initialize(operator, left_operand, right_operand)
-          super(operator, left_operand, right_operand)
+        def initialize(left_operand, right_operand)
+          super(left_operand, right_operand)
 
           @left_operand = left_operand
           @right_operand = right_operand
@@ -53,8 +64,8 @@ module FilterParam
         alias attribute left_operand
         alias literal right_operand
 
-        def initialize(operator, attribute, literal)
-          super(operator, attribute, literal)
+        def initialize(attribute, literal)
+          super(attribute, literal)
 
           validate_literal!(literal)
         end
@@ -93,45 +104,45 @@ module FilterParam
 
       class And < BinaryExpression; end
       class Or < BinaryExpression; end
-      class EqCi < StringAttributeExpression; end
-      class Co < StringAttributeExpression; end
-      class Sw < StringAttributeExpression; end
-      class Ew < StringAttributeExpression; end
+      class EqualCaseInsensitive < StringAttributeExpression; end
+      class Contains < StringAttributeExpression; end
+      class StartsWith < StringAttributeExpression; end
+      class EndsWith < StringAttributeExpression; end
 
       class Not < UnaryExpression
-        def inverse
-          @inverse ||= operand
+        def negation
+          @negation ||= operand
         end
       end
 
       class Pr < UnaryExpression
-        def inverse
-          @inverse ||= Npr.new(operand)
+        def negation
+          @negation ||= NotPresent.new(operand)
         end
       end
 
-      class Npr < UnaryExpression
-        def inverse
-          @inverse ||= Pr.new(operand)
+      class NotPresent < UnaryExpression
+        def negation
+          @negation ||= Present.new(operand)
         end
       end
 
-      class Eq < AttributeExpression
-        def inverse
-          @inverse ||= Neq.new(attribute, literal)
+      class Equal < AttributeExpression
+        def negation
+          @negation ||= Equal.new(attribute, literal)
         end
       end
 
-      class Neq < AttributeExpression
-        def inverse
-          @inverse ||= Eq.new(attribute, literal)
+      class NotEqual < AttributeExpression
+        def negation
+          @negation ||= NotEqual.new(attribute, literal)
         end
       end
 
-      class Ge < NonNullAttributeExpression; end
-      class Gt < NonNullAttributeExpression; end
-      class Le < NonNullAttributeExpression; end
-      class Lt < NonNullAttributeExpression; end
+      class GreaterThenEqual < NonNullAttributeExpression; end
+      class GreaterThan < NonNullAttributeExpression; end
+      class LessThanEqual < NonNullAttributeExpression; end
+      class LessThan < NonNullAttributeExpression; end
     end
   end
 end
