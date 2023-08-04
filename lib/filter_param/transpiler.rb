@@ -23,16 +23,16 @@ module FilterParam
       literal.value
     end
 
-    def visit_unary_expression(unary_exp)
-      evaluate(expression.operator, expression.operand)
+    def visit_unary_expression(expression)
+      evaluate(expression.operator_symbol, expression.operand)
     end
 
     def visit_binary_expression(expression)
-      op = expression.op
-      left = visit_node(expression.left_operand)
-      right = visit_node(expression.right_operand)
+      operator_symbol = expression.operator_symbol
+      left_operand = visit_node(expression.left_operand)
+      right_operand = visit_node(expression.right_operand)
 
-      evaluate(expression.operator, left, right)
+      evaluate(operator_symbol, left_operand, right_operand)
     end
 
     private
@@ -57,7 +57,7 @@ module FilterParam
     end
 
     def evaluate_not(expression)
-      operator = expression.try(:op)
+      operator = expression.try(:operator)
       inverse_operators = { eq: :neq, neq: :eq, pr: :not_pr }
       inverse_operator = inverse_operators[operator]
       return "NOT #{visit_node(expression)}" unless inverse_operator

@@ -1,12 +1,12 @@
 module FilterParam
   module AST
     class Group < Node
-      attr_reader :exp
+      attr_reader :expression
 
-      def initialize(exp)
+      def initialize(expression)
         super()
 
-        @exp = exp
+        @expression = expression
       end
     end
   end

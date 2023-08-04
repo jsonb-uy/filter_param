@@ -5,7 +5,7 @@ module FilterParam
     end
 
     def visit_group(group)
-      visit_node(group.exp)
+      visit_node(group.expression)
 
       group
     end
