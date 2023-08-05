@@ -87,14 +87,18 @@ module FilterParam
       )
     end
 
-    # Returns the field data type. Known types are
+    # Returns the field data type, name, and rename values. Known data types are
     # :string(default), :integer, :boolean, :decimal, :date, and :datetime
     #
     # @param [String, Symbol] field_name
     #
-    # @return [Symbol]
-    def field_type(field_name)
-      fields_hash.dig(field_name.to_s, :type)
+    # @return [Hash]
+    def field_info(field_name)
+      field_name = field_name.to_s
+      info = fields_hash[field_name]
+      return nil if info.nil?
+
+      { name: field_name, type: info[:type], rename: info[:rename] }
     end
 
     # Checks whether a given field is whitelisted.

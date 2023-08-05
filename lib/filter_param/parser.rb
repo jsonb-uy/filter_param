@@ -16,7 +16,7 @@ module FilterParam
     rule(:hyphen) { str("-") }
     rule(:identifier) { match("[a-zA-Z_]") >> digit.maybe }
     rule(:table) { identifier.repeat(1) >> dot }
-    rule(:attribute) { (table.maybe >> identifier.repeat(1)).as(:f) }
+    rule(:attribute) { (table.maybe >> identifier.repeat(1)).as(:attribute) }
     rule(:scope_name) { identifier.repeat(1) }
 
     # Literals / types
@@ -59,11 +59,11 @@ module FilterParam
     # Operations
     rule(:op_attr_binary) do
       (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
-        str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:op)
+        str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:operator)
     end
-    rule(:op_attr_unary) { str("pr").as(:op) }
-    rule(:op_logic_binary) { (str("and") | str("or")).as(:op) }
-    rule(:op_logic_unary) { str("not").as(:op) }
+    rule(:op_attr_unary) { str("pr").as(:operator) }
+    rule(:op_logic_binary) { (str("and") | str("or")).as(:operator) }
+    rule(:op_logic_unary) { str("not").as(:operator) }
 
     # Expressions
     rule(:literal) { (null | boolean | decimal | integer | datetime | date | string) }

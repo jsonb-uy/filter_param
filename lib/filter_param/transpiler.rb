@@ -13,10 +13,7 @@ module FilterParam
     end
 
     def visit_field(field)
-      options = field_options(field.name)
-      return field if options.nil?
-
-      options[:rename].presence || field.name
+      field.actual_name
     end
 
     def visit_literal(literal)

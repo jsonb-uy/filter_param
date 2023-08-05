@@ -11,17 +11,24 @@ module FilterParam
     rule(datetime: simple(:value)) { Literals::DateTime.new(value) }
     rule(exp: simple(:exp))        { exp }
     rule(group: simple(:exp))      { Group.new(exp) }
-    rule(op: simple(:op), right: simple(:exp)) { Expressions::UnaryExpression.new(op, exp) }
-    rule(f: simple(:f), op: simple(:op)) do
-      Expressions::UnaryExpression.new(op, Field.new(f, definition.field_type(f)))
+    rule(attribute: simple(:attribute_name)) do
+      Field.new(attribute_name, definition.field_type(attribute_name))
     end
-    rule(left: simple(:left), op: simple(:op), right: simple(:right)) do
-      Expressions::BinaryExpression.new(op, left, right)
-    end
-    rule(f: simple(:f), op: simple(:op), val: simple(:literal)) do
-      field = Field.new(f, definition.field_type(f))
+    rule(operator: simple(:operator), right: simple(:exp)) { Expressions::UnaryExpression.new(operator, exp) }
+    rule(attribute: simple(:attribute_name), operator: simple(:operator)) do
+      attribute_declaration = definition.field_info(attribute_name)
+      attribute = Field.new(attribute_declaration[:type], attribute_name, attribute_declaration[:rename])
 
-      Expressions::BinaryExpression.new(op, field, literal.type_cast(field.type))
+      Expressions::UnaryExpression.new(operator, attribute)
+    end
+    rule(left: simple(:left), operator: simple(:operator), right: simple(:right)) do
+      Expressions::BinaryExpression.new(operator, left, right)
+    end
+    rule(attribute: simple(:attribute_name), operator: simple(:operator), val: simple(:literal)) do
+      attribute_declaration = definition.field_info(attribute_name)
+      attribute = Field.new(attribute_declaration[:type], attribute_name, attribute_declaration[:rename])
+
+      Expressions::BinaryExpression.new(operator, attribute, literal.type_cast(attribute.type))
     end
   end
 end
