@@ -11,16 +11,17 @@ module FilterParam
     rule(datetime: simple(:value)) { Literals::DateTime.new(value) }
     rule(exp: simple(:exp))        { exp }
     rule(group: simple(:exp))      { Group.new(exp) }
-    rule(op: simple(:op), right: simple(:exp)) { UnaryExpression.new(op, exp) }
-    rule(f: simple(:f), op: simple(:op)) { UnaryExpression.new(op, Field.new(f)) }
+    rule(op: simple(:op), right: simple(:exp)) { Expressions::UnaryExpression.new(op, exp) }
+    rule(f: simple(:f), op: simple(:op)) do
+      Expressions::UnaryExpression.new(op, Field.new(f, definition.field_type(f)))
+    end
     rule(left: simple(:left), op: simple(:op), right: simple(:right)) do
-      BinaryExpression.new(op, left, right)
+      Expressions::BinaryExpression.new(op, left, right)
     end
     rule(f: simple(:f), op: simple(:op), val: simple(:literal)) do
-      field = Field.new(f)
-      declared_type = definition.field_type(field.name)
+      field = Field.new(f, definition.field_type(f))
 
-      BinaryExpression.new(op, field, literal.type_cast(declared_type))
+      Expressions::BinaryExpression.new(op, field, literal.type_cast(field.type))
     end
   end
 end
