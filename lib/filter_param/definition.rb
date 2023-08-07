@@ -40,8 +40,7 @@ module FilterParam
       name = name.to_s
       return if name.blank?
 
-      fields_hash[name] = preprocess_field_options(name, options)
-      validate_field_options!(name, fields_hash[name])
+      fields_hash[name] = Field.new(name, options[:type], options[:rename])
 
       self
     end
@@ -63,17 +62,6 @@ module FilterParam
       self
     end
 
-    # Get column options
-    #
-    # @param [String] name column name
-    #
-    # @return [Hash, NilClass] Default options
-    def field_options(name)
-      return nil if @fields_hash[name].nil?
-
-      @fields_hash[name].dup
-    end
-
     # Filters an :ar_relation by the filter :expression
     #
     # @param [ActiveRecord::Relation] ar_relation Relation to filter
@@ -87,18 +75,16 @@ module FilterParam
       )
     end
 
-    # Returns the field data type, name, and rename values. Known data types are
-    # :string(default), :integer, :boolean, :decimal, :date, and :datetime
+    # Returns the declared Field instance
     #
     # @param [String, Symbol] field_name
     #
-    # @return [Hash]
-    def field_info(field_name)
-      field_name = field_name.to_s
-      info = fields_hash[field_name]
-      return nil if info.nil?
+    # @return [Field]
+    def find_field!(field_name)
+      field = fields_hash[field_name.to_s].presence
+      return field if field
 
-      { name: field_name, type: info[:type], rename: info[:rename] }
+      raise UnknownField.new("Unknown field: '#{field_name}'")
     end
 
     # Checks whether a given field is whitelisted.
@@ -108,25 +94,6 @@ module FilterParam
     # @return [TrueClass, FalseClass]
     def field_permitted?(field_name)
       fields_hash.key? field_name.to_s
-    end
-
-    private
-
-    def preprocess_field_options(field, options)
-      options[:type] ||= :string
-      options[:type] = options[:type].to_sym
-      rename = options[:rename]
-      return options unless rename.is_a?(Proc)
-
-      options[:rename] = options[:rename].call(field)
-      options
-    end
-
-    def validate_field_options!(field, options)
-      type = options[:type]
-      return if type.in?(FIELD_TYPES)
-
-      raise UnknownType.new("Unknown type '#{type}' for field '#{field}'. Allowed types: #{FIELD_TYPES}.")
     end
   end
 end

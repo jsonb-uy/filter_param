@@ -163,39 +163,6 @@ RSpec.describe FilterParam::Definition do
     end
   end
 
-  describe "#field_options" do
-    it "returns the field's configured options" do
-      definition.field(:email, rename: "eadd")
-      definition.field(:age, type: :integer)
-
-      expect(definition.field_options("email")).to eql(rename: "eadd", type: :string)
-      expect(definition.field_options("age")).to eql(type: :integer)
-    end
-  end
-
-  describe "#field_type" do
-    it "defaults to :string if the field has no configured type" do
-      definition.field(:email)
-
-      expect(definition.field_type(:email)).to eql(:string)
-    end
-
-    it "returns the field's configured type" do
-      definition.field(:email, type: :string)
-      definition.field(:age, type: :integer)
-      definition.field(:balance, type: :decimal)
-      definition.field(:active, type: :boolean)
-      definition.field(:birth_date, type: :date)
-      definition.field(:member_since, type: :datetime)
-
-      expect(definition.field_type(:email)).to eql(:string)
-      expect(definition.field_type(:age)).to eql(:integer)
-      expect(definition.field_type(:balance)).to eql(:decimal)
-      expect(definition.field_type(:birth_date)).to eql(:date)
-      expect(definition.field_type(:member_since)).to eql(:datetime)
-    end
-  end
-
   describe "#filter!" do
     subject(:definition) do
       definition = described_class.new

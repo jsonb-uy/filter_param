@@ -10,12 +10,12 @@ module FilterParam
       group
     end
 
-    def visit_field(field)
-      field
+    def visit_attribute(attribute)
+      attribute
     end
 
     def visit_literal(literal)
-      literal
+      literal.type_cast(attribute.type)
     end
 
     def visit_binary_expression(expression)
@@ -38,5 +38,9 @@ module FilterParam
     private
 
     attr_reader :definition
+
+    def declared_field(field_name)
+      definition.find_field!(field_name)
+    end
   end
 end

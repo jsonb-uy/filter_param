@@ -3,17 +3,16 @@ module FilterParam
     def transpile!(expression)
       return nil if expression.blank?
 
-      expression_to_ast!(expression)
-        .then { |ast| check_field_permissions!(ast) }
-        .then { |ast| visit_node(ast) }
+      ast = expression_to_ast!(expression)
+      visit_node(ast)
     end
 
     def visit_group(group)
       "(#{visit_node(group.expression)})"
     end
 
-    def visit_field(field)
-      field.actual_name
+    def visit_attribute(attribute)
+      declared_field(attribute.name).rename || attribute.name
     end
 
     def visit_literal(literal)
@@ -21,7 +20,10 @@ module FilterParam
     end
 
     def visit_unary_expression(expression)
-      evaluate(expression.operator_symbol, expression.operand)
+      operator_symbol = expression.operator_symbol
+      operand = visit_node(expression.operand)
+
+      evaluate(operator_symbol, operand)
     end
 
     def visit_binary_expression(expression)
@@ -33,21 +35,6 @@ module FilterParam
     end
 
     private
-
-    def field_data_type(field_name)
-      definition.field_type(field_name)
-    end
-
-    def field_options(field_name)
-      definition.field_options(field_name)
-    end
-
-    def field_value(field_name, literal_value)
-      transform_logic = field_options(field_name)[:value]
-      return literal_value if transform_logic.nil?
-
-      transform_logic.call(literal_value)
-    end
 
     def evaluate(operator, *operands)
       send("evaluate_#{operator}", *operands)
@@ -145,11 +132,7 @@ module FilterParam
     def expression_to_ast!(expression)
       parse_tree = Parser.new.parse(expression, reporter: Parslet::ErrorReporter::Deepest.new)
 
-      Transformer.new.apply(parse_tree, definition: definition)
-    end
-
-    def check_field_permissions!(ast)
-      FieldNodeValidator.new(definition).visit_node(ast)
+      Transformer.new.apply(parse_tree)
     end
   end
 end
