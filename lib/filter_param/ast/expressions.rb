@@ -7,12 +7,16 @@ module FilterParam
         def initialize(operator_symbol, *operands)
           super()
 
-          @operator_symbol = operator_symbol
+          @operator_symbol = operator_symbol.to_sym
           @operands = operands
         end
 
         def operator
           @operator ||= Operators::Operator.for(operator_symbol)
+        end
+
+        def comparison?
+          operator.is_a?(Operators::AttributeOperator)
         end
       end
 

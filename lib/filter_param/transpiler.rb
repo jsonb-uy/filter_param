@@ -30,6 +30,7 @@ module FilterParam
       operator_symbol = expression.operator_symbol
       left_operand = visit_node(expression.left_operand)
       right_operand = visit_node(expression.right_operand)
+      right_operand = field_value(left_operand, right_operand) if expression.comparison?
 
       evaluate(operator_symbol, left_operand, right_operand)
     end

@@ -40,7 +40,7 @@ module FilterParam
       name = name.to_s
       return if name.blank?
 
-      fields_hash[name] = Field.new(name, options[:type], options[:rename])
+      fields_hash[name] = Field.new(name, options[:type], options)
 
       self
     end

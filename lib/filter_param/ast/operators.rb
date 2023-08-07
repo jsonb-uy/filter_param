@@ -128,7 +128,7 @@ module FilterParam
         end
       end
 
-      class NotPresent < AttributeOperator
+      class NotPresent < Operator
         def inverse
           @inverse ||= Present.new(operand)
         end
