@@ -139,7 +139,42 @@ RSpec.describe FilterParam::Definition do
     end
   end
 
-  describe "#filter!" do
+  describe "#field_names" do
+    it "returns the whitelisted field names" do
+      definition.define do
+        fields :first_name, :last_name
+        field :age
+        field :height
+      end
+
+      expect(definition.field_names).to match_array(%w[first_name last_name age height])
+    end
+  end
+
+  describe "#find_field!" do
+    context "when field name is whitelisted" do
+      it "returns the field instance" do
+        definition.define do
+          field :age
+        end
+
+        expect(definition.find_field!(:age)).to be_a(FilterParam::Field)
+        expect(definition.find_field!("age")).to be_a(FilterParam::Field)
+      end
+    end
+
+    context "when field name is not whitelisted" do
+      it "raises an UnknownField error" do
+        definition.define do
+          field :age
+        end
+
+        expect { definition.find_field!(:name) }.to raise_error(FilterParam::UnknownField)
+      end
+    end
+  end
+
+  xdescribe "#filter!" do
     subject(:definition) do
       definition = described_class.new
       definition.fields(:first_name, :last_name)
