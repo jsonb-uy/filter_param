@@ -22,7 +22,6 @@ module FilterParam
     attr_reader :value_transformer
 
     def field_rename(rename)
-      return name if rename.blank?
       return rename.call(name) if rename.is_a?(Proc)
 
       rename

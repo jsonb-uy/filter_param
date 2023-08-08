@@ -12,7 +12,7 @@ module FilterParam
     end
 
     def visit_attribute(attribute)
-      declared_field(attribute.name).rename || attribute.name
+      declared_field(attribute.name).rename.presence || attribute.name
     end
 
     def visit_literal(literal)

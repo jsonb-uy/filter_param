@@ -7,7 +7,7 @@ RSpec.describe FilterParam::Definition do
     context "with fields defined" do
       before do
         definition.define do
-          fields :first_name, :last_name
+          fields :first_name, :last_name, type: :string
           field :email
         end
       end
@@ -76,7 +76,7 @@ RSpec.describe FilterParam::Definition do
       it "defaults the field's type to :string" do
         definition.field(:email)
 
-        expect(definition.fields_hash["email"]).to eql(type: :string)
+        expect(definition.find_field!("email").type).to eql(:string)
       end
     end
 
@@ -95,34 +95,25 @@ RSpec.describe FilterParam::Definition do
                   .field(:created_at, type: :datetime)
                   .field(:active, type: :boolean)
 
-        expect(definition.fields_hash).to eql(
-          {
-            "email" => { type: :string },
-            "age" => { type: :integer },
-            "birth_date" => { type: :date },
-            "created_at" => { type: :datetime },
-            "weight" => { type: :decimal },
-            "active" => { type: :boolean }
-          }
-        )
+        expect(definition.find_field!("email").type).to eql(:string)
+        expect(definition.find_field!("age").type).to eql(:integer)
+        expect(definition.find_field!("birth_date").type).to eql(:date)
+        expect(definition.find_field!("created_at").type).to eql(:datetime)
+        expect(definition.find_field!("weight").type).to eql(:decimal)
+        expect(definition.find_field!("active").type).to eql(:boolean)
       end
     end
   end
 
   describe "#fields" do
-    it "whitelists a list of sort fields with the same default options" do
-      definition.fields(:first_name, :last_name, some_option: "someval1")
-      definition.fields(:phone, some_option: "someval2")
-      definition.fields(:email)
+    it "whitelists a list of fields with the same configuration" do
+      definition.fields(:weight, :height, type: :decimal)
+      definition.fields(:phone, :email, type: :string)
 
-      expect(definition.fields_hash).to eql(
-        {
-          "email" => { type: :string },
-          "first_name" => { some_option: "someval1", type: :string },
-          "last_name" => { some_option: "someval1", type: :string },
-          "phone" => { some_option: "someval2", type: :string }
-        }
-      )
+      expect(definition.find_field!("weight").type).to eql(:decimal)
+      expect(definition.find_field!("height").type).to eql(:decimal)
+      expect(definition.find_field!("phone").type).to eql(:string)
+      expect(definition.find_field!("email").type).to eql(:string)
     end
 
     it "returns the same Definition instance" do
@@ -137,18 +128,13 @@ RSpec.describe FilterParam::Definition do
 
     context "with Proc :rename option value" do
       it "sets the :rename value to the transformed :name" do
-        definition.fields(:first_name, :last_name, some_option: "someval1", rename: ->(name) { "users.#{name}" })
-        definition.fields(:phone, some_option: "someval2")
-        definition.fields(:email)
+        definition.fields(:weight, :height, type: :decimal, rename: ->(name) { "dim.#{name}" })
+        definition.fields(:phone, :email, type: :string)
 
-        expect(definition.fields_hash).to eql(
-          {
-            "email" => { type: :string },
-            "first_name" => { some_option: "someval1", rename: "users.first_name", type: :string },
-            "last_name" => { some_option: "someval1", rename: "users.last_name", type: :string },
-            "phone" => { some_option: "someval2", type: :string }
-          }
-        )
+        expect(definition.find_field!("weight").rename).to eql("dim.weight")
+        expect(definition.find_field!("height").rename).to eql("dim.height")
+        expect(definition.find_field!("phone").rename).to be_nil
+        expect(definition.find_field!("email").rename).to be_nil
       end
     end
   end
