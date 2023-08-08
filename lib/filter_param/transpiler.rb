@@ -29,8 +29,12 @@ module FilterParam
     def visit_binary_expression(expression)
       operator_symbol = expression.operator_symbol
       left_operand = visit_node(expression.left_operand)
-      right_operand = visit_node(expression.right_operand)
-      right_operand = field_value(left_operand, right_operand) if expression.comparison?
+      right_operand = if expression.comparison?
+                        literal = expression.right_operand
+                        field_value(left_operand, visit_node(literal))
+                      else
+                        visit_node(expression.right_operand)
+                      end
 
       evaluate(operator_symbol, left_operand, right_operand)
     end
@@ -42,6 +46,7 @@ module FilterParam
     end
 
     def evaluate_not(expression)
+      
       operator = expression.try(:operator)
       inverse_operators = { eq: :neq, neq: :eq, pr: :not_pr }
       inverse_operator = inverse_operators[operator]

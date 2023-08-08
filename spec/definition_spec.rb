@@ -7,19 +7,20 @@ RSpec.describe FilterParam::Definition do
     context "with fields defined" do
       before do
         definition.define do
-          fields :first_name, :last_name, some_option: "someval"
+          fields :first_name, :last_name
           field :email
         end
       end
 
-      it "defines the whitelisted filter fields and their configuration" do
-        expect(definition.fields_hash).to eql(
-          {
-            "email" => { type: :string },
-            "first_name" => { some_option: "someval", type: :string },
-            "last_name" => { some_option: "someval", type: :string }
-          }
-        )
+      it "whitelists the fields" do
+        email_field = definition.find_field!("email")
+        first_name = definition.find_field!("first_name")
+        last_name = definition.find_field!("last_name")
+
+        expect(definition.field_names).to match_array(%w[email first_name last_name])
+        expect(email_field.type).to eq(:string)
+        expect(first_name.type).to eq(:string)
+        expect(last_name.type).to eq(:string)
       end
     end
 
@@ -31,25 +32,18 @@ RSpec.describe FilterParam::Definition do
   end
 
   describe "#field" do
-    it "whitelists a filter field and sets its configuration" do
-      definition.field(:email, some_option: "someval1")
-      definition.field(:first_name, some_option: "someval2")
-      definition.field(:last_name)
+    it "whitelists a filter field" do
+      definition.field(:age, type: :integer)
 
-      expect(definition.fields_hash).to eql(
-        {
-          "email" => { some_option: "someval1", type: :string },
-          "first_name" => { some_option: "someval2", type: :string },
-          "last_name" => { type: :string }
-        }
-      )
+      expect(definition.field_names).to match_array(%w[age])
+      expect(definition.find_field!("age").type).to eq(:integer)
     end
 
     it "ignores blank field name" do
       definition.field("")
       definition.field(nil)
 
-      expect(definition.fields_hash).to be_empty
+      expect(definition.field_names).to be_empty
     end
 
     it "returns the Definition instance" do
@@ -57,14 +51,11 @@ RSpec.describe FilterParam::Definition do
     end
 
     context "with String :rename option value" do
-      it "sets the :rename value" do
+      it "sets the field :rename value" do
         definition.field(:last_name, rename: "surname")
 
-        expect(definition.fields_hash).to eql(
-          {
-            "last_name" => { rename: "surname", type: :string }
-          }
-        )
+        last_name_field = definition.find_field!("last_name")
+        expect(last_name_field.rename).to eql("surname")
       end
     end
 
@@ -73,12 +64,11 @@ RSpec.describe FilterParam::Definition do
         definition.field(:email, rename: ->(name) { "users.#{name}" })
         definition.field(:last_name, rename: ->(_) { "surname" })
 
-        expect(definition.fields_hash).to eql(
-          {
-            "email" => { rename: "users.email", type: :string },
-            "last_name" => { rename: "surname", type: :string }
-          }
-        )
+        email_field = definition.find_field!("email")
+        last_name_field = definition.find_field!("last_name")
+
+        expect(email_field.rename).to eql("users.email")
+        expect(last_name_field.rename).to eql("surname")
       end
     end
 

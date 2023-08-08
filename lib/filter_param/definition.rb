@@ -2,8 +2,6 @@ module FilterParam
   class Definition
     FIELD_TYPES = %i[boolean string integer decimal date datetime].freeze
 
-    attr_reader :fields_hash
-
     # Creates a new FilterParam definition that whitelists the columns that are allowed to
     # filtered (i.e. used in SQL WHERE condition).
     def initialize
@@ -87,6 +85,13 @@ module FilterParam
       raise UnknownField.new("Unknown field: '#{field_name}'")
     end
 
+    # Returns the declared Field names
+    #
+    # @return [String]
+    def field_names
+      fields_hash.keys
+    end
+
     # Checks whether a given field is whitelisted.
     #
     # @param [String, Symbol] field_name
@@ -95,5 +100,9 @@ module FilterParam
     def field_permitted?(field_name)
       fields_hash.key? field_name.to_s
     end
+
+    private
+
+    attr_reader :fields_hash
   end
 end
