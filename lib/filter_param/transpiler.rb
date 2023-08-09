@@ -20,14 +20,16 @@ module FilterParam
     end
 
     def visit_unary_expression(expression)
-      operator = expression.operator
-      operand = visit_node(expression.operand)
+      operator_symbol = expression.operator
+      operand = expression.operand
+      return transpile_negated_expression(operand) if operator_symbol == :not
 
-      transpile_expression(operator, operand)
+      operand = visit_node(operand)
+      Operator.for(operator_symbol).sql(operand)
     end
 
     def visit_binary_expression(expression)
-      operator = expression.operator
+      operator_symbol = expression.operator
       left_operand = visit_node(expression.left_operand)
       right_operand = if expression.right_operand.is_a?(Literal)
                         attribute_name = left_operand
@@ -38,32 +40,21 @@ module FilterParam
                         visit_node(right_operand)
                       end
 
-      transpile_expression(operator, left_operand, right_operand)
+      Operator.for(operator_symbol).sql(left_operand, right_operand)
     end
 
     private
 
     def ast(string_expression)
-      parse_tree = Parser.new.parse(expression, reporter: Parslet::ErrorReporter::Deepest.new)
+      parse_tree = Parser.new.parse(string_expression, reporter: Parslet::ErrorReporter::Deepest.new)
 
       Transformer.new.apply(parse_tree)
     end
 
-    def transpile_expression(operator, *operands)
-      send("transpile_#{operator}", *operands)
-    end
+    def transpile_not_expression(expression)
+      operands = expression.operands.map { |operand| visit_node(operand) }
 
-    def transpile_not(expression)
-      operator = expression.try(:operator)
-      inverse_operators = { eq: :neq, neq: :eq, pr: :not_pr }
-      inverse_operator = inverse_operators[operator]
-      return "NOT #{visit_node(expression)}" unless inverse_operator
-
-      return transpile_expression(inverse_operator, expression.exp) if operator == :pr
-
-      field = visit_node(expression.field)
-      literal = visit_node(expression.literal)
-      transpile_expression(inverse_operator, field, literal)
+      Operator.for(:not).sql(expression.operator, *operands)
     end
 
     def transpile_pr(field)
@@ -88,20 +79,8 @@ module FilterParam
       "#{left} OR #{right}"
     end
 
-    def transpile_eq(field, value)
-      return "#{field} IS NULL" if value.nil?
-
-      "#{field} = #{quote(value)}"
-    end
-
     def transpile_eq_ci(field, value)
       "lower(#{field}) = #{quote(value.downcase)}"
-    end
-
-    def transpile_neq(field, value)
-      return "#{field} IS NOT NULL" if value.nil?
-
-      "#{field} != #{quote(value)}"
     end
 
     def transpile_lt(field, value)
@@ -136,10 +115,6 @@ module FilterParam
       pattern = "%#{value}%"
 
       "#{field} LIKE #{quote(pattern)}"
-    end
-
-    def quote(value)
-      ActiveRecord::Base.connection.quote(value)
     end
   end
 end
