@@ -1,7 +1,5 @@
 module FilterParam
   class Definition
-    FIELD_TYPES = %i[boolean string integer decimal date datetime].freeze
-
     # Creates a new FilterParam definition that whitelists the columns that are allowed to
     # filtered (i.e. used in SQL WHERE condition).
     def initialize

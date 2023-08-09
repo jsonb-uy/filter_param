@@ -3,22 +3,29 @@ module FilterParam
     module Operators
       class Operator < Node
         class << self
-          def registry
-            @@registry ||= {}
+          def register(operator_symbol, clazz)
+            operator_symbol = operator_symbol.to_s
+            registry[operator_symbol] ||= clazz
           end
 
-          def register(operator_symbol, clazz, type = :binary)
-            registry[operator_symbol] ||= {}
-            registry[operator_symbol] ||= { class: clazz, type: type }
-            operator_symbol
+          def reset_registry!
+            @registry = {}
+
+            true
           end
 
           def for(operator_symbol)
-            registry[operator_symbol][:class]
+            registry[operator_symbol.to_s]
           end
 
           def inverse_operator
             nil
+          end
+
+          private
+
+          def registry
+            @registry ||= {}
           end
         end
       end

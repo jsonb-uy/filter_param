@@ -2,29 +2,21 @@ module FilterParam
   module AST
     module Expressions
       class Expression < Node
-        attr_reader :operator_symbol, :operands
+        attr_reader :operator, :operands
 
-        def initialize(operator_symbol, *operands)
+        def initialize(operator, *operands)
           super()
 
-          @operator_symbol = operator_symbol.to_sym
+          @operator = operator.to_sym
           @operands = operands
-        end
-
-        def operator
-          @operator ||= Operators::Operator.for(operator_symbol)
-        end
-
-        def comparison?
-          operator.is_a?(Operators::AttributeOperator)
         end
       end
 
       class UnaryExpression < Expression
         attr_reader :operand
 
-        def initialize(operator_symbol, operand)
-          super(operator_symbol, operand)
+        def initialize(operator, operand)
+          super(operator, operand)
 
           @operand = operand
         end
@@ -33,8 +25,8 @@ module FilterParam
       class BinaryExpression < Expression
         attr_reader :left_operand, :right_operand
 
-        def initialize(operator_symbol, left_operand, right_operand)
-          super(operator_symbol, left_operand, right_operand)
+        def initialize(operator, left_operand, right_operand)
+          super(operator, left_operand, right_operand)
 
           @left_operand = left_operand
           @right_operand = right_operand

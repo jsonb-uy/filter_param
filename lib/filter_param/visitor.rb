@@ -43,7 +43,7 @@ module FilterParam
       definition.find_field!(field_name)
     end
 
-    def field_value(field_name, value)
+    def transform_field_value(field_name, value)
       declared_field(field_name).transform_value(value)
     end
   end
