@@ -11,19 +11,21 @@ module FilterParam
     rule(datetime: simple(:value)) { Literals::DateTime.new(value) }
     rule(exp: simple(:exp))        { exp }
     rule(group: simple(:exp))      { Group.new(exp) }
-    rule(operator: simple(:operator), right: simple(:exp)) { Expressions::UnaryExpression.new(operator, exp) }
+    rule(operator: simple(:operator), right: simple(:exp)) do
+      Expressions::UnaryExpression.new(operator.to_s, exp)
+    end
     rule(attribute: simple(:attribute_name), operator: simple(:operator)) do
       attribute = Attribute.new(attribute_name)
 
-      Expressions::UnaryExpression.new(operator, attribute)
+      Expressions::UnaryExpression.new(operator.to_s, attribute)
     end
     rule(left: simple(:left), operator: simple(:operator), right: simple(:right)) do
-      Expressions::BinaryExpression.new(operator, left, right)
+      Expressions::BinaryExpression.new(operator.to_s, left, right)
     end
     rule(attribute: simple(:attribute_name), operator: simple(:operator), val: simple(:literal)) do
       attribute = Attribute.new(attribute_name)
 
-      Expressions::BinaryExpression.new(operator, attribute, literal)
+      Expressions::BinaryExpression.new(operator.to_s, attribute, literal)
     end
   end
 end

@@ -101,7 +101,7 @@ RSpec.describe FilterParam::Transpiler do
       it "raises unpermitted field error" do
         expect do
           transpiler.transpile!("last_name eq 'Doe'")
-        end.to raise_error(FilterParam::UnpermittedField)
+        end.to raise_error(FilterParam::UnknownField)
       end
     end
 

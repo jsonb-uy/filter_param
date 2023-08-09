@@ -1,6 +1,6 @@
 module FilterParam
   module Operators
-    class Not < Operator
+    class Not < AttributeFilterOperator
       def self.tag
         :not
       end
@@ -17,7 +17,7 @@ module FilterParam
         operator.sql(*expression_operands)
       end
     end
-
-    Operator.register(Not)
   end
 end
+
+FilterParam::Operator.register(FilterParam::Operators::Not)

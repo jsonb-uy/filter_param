@@ -2,18 +2,12 @@ module FilterParam
   class Operator
     class << self
       def register(operator_clazz)
-        operator_tag = operator_clazz.tag.to_s
-        registry[operator_tag] ||= operator_clazz
-      end
-
-      def reset_registry!
-        @registry = {}
-
-        true
+        operator_tag = operator_clazz.tag
+        registry[operator_tag] = operator_clazz
       end
 
       def for(operator_tag)
-        registry[operator_tag.to_s]
+        registry[operator_tag]
       end
 
       def negated_sql(*operands)

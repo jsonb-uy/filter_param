@@ -11,16 +11,6 @@ RSpec.describe FilterParam::Operator do
     end
   end
 
-  describe ".reset_registry!" do
-    it "clears the operator registry" do
-      described_class.register(operator_class)
-
-      described_class.reset_registry!
-
-      expect(described_class.for("op")).to be_nil
-    end
-  end
-
   describe ".for" do
     it "returns the operator class given the tag" do
       described_class.register(operator_class)

@@ -1,6 +1,6 @@
 module FilterParam
   module Operators
-    class Equal < Operator
+    class Equal < AttributeFilterOperator
       def self.tag
         :eq
       end
@@ -15,7 +15,7 @@ module FilterParam
         Operators::NotEqual.sql(attribute_name, value)
       end
     end
-
-    Operator.register(Equal)
   end
 end
+
+FilterParam::Operator.register(FilterParam::Operators::Equal)
