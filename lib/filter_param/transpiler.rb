@@ -7,7 +7,7 @@ module FilterParam
     def transpile!(string_expression)
       return nil if string_expression.blank?
 
-      ast_root = ast(string_expression)
+      ast_root = parse(string_expression)
       visit(ast_root)
     end
 
@@ -15,12 +15,18 @@ module FilterParam
 
     attr_reader :definition
 
-    def declared_field(field_name)
-      definition.find_field!(field_name)
+    def parse(string_expression)
+      parse_tree = Parser.new.parse(string_expression, reporter: Parslet::ErrorReporter::Deepest.new)
+
+      Transformer.new.apply(parse_tree)
+    end
+
+    def field(name)
+      definition.find_field!(name)
     end
 
     def transform_field_value(field_name, value)
-      declared_field(field_name).transform_value(value)
+      field(field_name).transform_value(value)
     end
 
     def visit(node)
@@ -32,7 +38,7 @@ module FilterParam
     end
 
     def visit_attribute(attribute)
-      declared_field(attribute.name).rename.presence || attribute.name
+      field(attribute.name)
     end
 
     def visit_literal(literal)
@@ -52,47 +58,22 @@ module FilterParam
       operator_symbol = expression.operator
       operator = Operator.for(operator_symbol)
 
-      if operator < Operators::AttributeFilterOperator
-        attribute_name = visit(expression.left_operand)
-        declared_type = declared_field(attribute_name).type
-        literal = expression.right_operand.type_cast(declared_type)
+      if operator < Operators::FieldValueFilterOperator
+        field = visit(expression.left_operand)
+        literal = expression.right_operand.type_cast(field.type)
+        value = visit(literal)
 
-        value = transform_field_value(attribute_name, visit(literal))
-        return operator.sql(attribute_name, value)
+        return operator.sql(field, value)
       end
 
       operator.sql(visit(expression.left_operand),
                    visit(expression.right_operand))
     end
 
-    def ast(string_expression)
-      parse_tree = Parser.new.parse(string_expression, reporter: Parslet::ErrorReporter::Deepest.new)
-
-      Transformer.new.apply(parse_tree)
-    end
-
-    def transpile_not_expression(expression)
+    def transpile_negated_expression(expression)
       operands = expression.operands.map { |operand| visit(operand) }
 
       Operator.for(:not).sql(expression.operator, *operands)
-    end
-
-    def transpile_pr(field)
-      field_name = visit(field)
-      return "#{field_name} IS NOT NULL" unless field_data_type(field_name) == :string
-
-      "(#{field_name} IS NOT NULL AND TRIM(#{field_name}) != '')"
-    end
-
-    def transpile_not_pr(field)
-      field_name = visit(field)
-      return "#{field_name} IS NULL" unless field_data_type(field_name) == :string
-
-      "(#{field_name} IS NULL OR TRIM(#{field_name}) = '')"
-    end
-
-    def transpile_eq_ci(field, value)
-      "lower(#{field}) = #{quote(value.downcase)}"
     end
 
     def transpile_lt(field, value)

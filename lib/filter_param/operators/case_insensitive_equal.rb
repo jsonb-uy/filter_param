@@ -1,16 +1,13 @@
 module FilterParam
   module Operators
-    class CaseInsensitiveEqual < AttributeFilterOperator
-      def self.tag
-        :eq_ci
-      end
+    class CaseInsensitiveEqual < FieldValueFilterOperator
+      operator_tag :eq_ci
+      field_type :string
 
-      def self.value_valid?(value)
-        value.is_a?(String)
-      end
+      def self.sql(field, value)
+        super
 
-      def self.sql(attribute_name, value)
-        "lower(#{field}) = #{quote(value.downcase)}"
+        "lower(#{field.sql_name}) = #{sql_quote(value.downcase)}"
       end
     end
   end

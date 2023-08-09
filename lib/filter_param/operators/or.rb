@@ -1,9 +1,7 @@
 module FilterParam
   module Operators
     class Or < Operator
-      def self.tag
-        :and
-      end
+      operator_tag :or
 
       def self.sql(left, right)
         "#{left} OR #{right}"

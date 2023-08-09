@@ -17,6 +17,10 @@ module FilterParam
       value_transformer.call(value)
     end
 
+    def sql_name
+      rename.presence || name
+    end
+
     private
 
     attr_reader :value_transformer

@@ -1,14 +1,12 @@
 module FilterParam
   module Operators
-    class Not < AttributeFilterOperator
-      def self.tag
-        :not
-      end
+    class Not < Operator
+      operator_tag :not
 
       def self.sql(expression_operator, *expression_operands)
         operator = Operator.for(expression_operator)
 
-        "NOT #{operator.sql(*expression_operands)}"
+        operator.negated_sql(*expression_operands)
       end
 
       def self.negated_sql(expression_operator, *expression_operands)
