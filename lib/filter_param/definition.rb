@@ -90,15 +90,6 @@ module FilterParam
       fields_hash.keys
     end
 
-    # Checks whether a given field is whitelisted.
-    #
-    # @param [String, Symbol] field_name
-    #
-    # @return [TrueClass, FalseClass]
-    def field_permitted?(field_name)
-      fields_hash.key? field_name.to_s
-    end
-
     private
 
     attr_reader :fields_hash

@@ -26,10 +26,6 @@ module FilterParam
       definition.find_field!(name)
     end
 
-    def transform_field_value(field_name, value)
-      field(field_name).transform_value(value)
-    end
-
     def visit(node)
       node.accept(self)
     end
