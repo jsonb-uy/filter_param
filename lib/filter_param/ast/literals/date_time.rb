@@ -11,7 +11,7 @@ module FilterParam
         end
 
         def data_type
-          :date_time
+          :datetime
         end
 
         private

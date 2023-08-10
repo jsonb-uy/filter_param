@@ -10,7 +10,7 @@ module FilterParam
           raise InvalidLiteral.new("Invalid Decimal: #{value}")
         end
 
-        def date_type
+        def data_type
           :decimal
         end
 

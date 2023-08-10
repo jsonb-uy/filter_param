@@ -35,7 +35,9 @@ module FilterParam
     end
 
     def visit_group(group)
-      "(#{visit(group.expression)})"
+      expression = visit(group.expression)
+
+      Operator.for(:group).sql(expression)
     end
 
     def visit_attribute(attribute)
@@ -62,6 +64,7 @@ module FilterParam
       if operator < Operators::FieldFilterOperator
         field = visit(expression.left_operand)
         literal = expression.right_operand.type_cast(field.type)
+        literal.value = field.transform_value(literal.value)
 
         return operator.sql(field, literal)
       end
