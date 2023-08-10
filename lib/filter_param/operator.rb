@@ -18,27 +18,15 @@ module FilterParam
         registry[operator_tag]
       end
 
+      def negated_sql(*operands)
+        "NOT #{sql(*operands)}"
+      end
+
       private
 
       def registry
         @registry ||= {}
       end
-    end
-
-    attr_reader :definition
-
-    def initialize(definition)
-      @definition = definition
-    end
-
-    def negated_sql(*operands)
-      "NOT #{sql(*operands)}"
-    end
-
-    private
-
-    def sql_quote(value)
-      ActiveRecord::Base.connection.quote(value)
     end
   end
 end

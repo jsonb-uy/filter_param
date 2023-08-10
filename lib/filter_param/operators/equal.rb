@@ -7,7 +7,6 @@ module FilterParam
         super
 
         return "#{field.sql_name} IS NULL" if value.nil?
-
         "#{field.sql_name} = #{sql_quote(value)}"
       end
 

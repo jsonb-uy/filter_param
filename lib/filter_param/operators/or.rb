@@ -7,8 +7,6 @@ module FilterParam
         "#{left} OR #{right}"
       end
     end
-
-    Operator.register(Or)
   end
 end
 

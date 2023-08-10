@@ -2,14 +2,14 @@ module FilterParam
   module AST
     module Literals
       class Boolean < Literal
-        TRUE = new("true")
-        FALSE = new("false")
-
         def initialize(value)
-          @value = value.to_s == "true"
+          @value = (value.to_s == "true")
         end
 
         private_class_method :new
+
+        TRUE = new("true")
+        FALSE = new("false")
 
         private
 

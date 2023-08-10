@@ -5,6 +5,12 @@ module FilterParam
         def sql(field, value)
           super(field)
         end
+
+        private
+
+        def sql_quote(value)
+          ActiveRecord::Base.connection.quote(value)
+        end
       end
     end
   end

@@ -4,8 +4,6 @@ module FilterParam
       attr_reader :expression
 
       def initialize(expression)
-        super()
-
         @expression = expression
       end
     end
