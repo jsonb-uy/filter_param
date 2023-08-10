@@ -1,7 +1,7 @@
 module FilterParam
   module Operators
     class Group < Operator
-      operator_tag :group, internal: true
+      operator_tag :group
 
       def self.sql(expression)
         "(#{expression})"

@@ -1,22 +1,23 @@
 module FilterParam
   class Operator
     class << self
-      def tag
-        @operator_tag
+      def type
+        return :unary if method(:sql).arity == 1
+
+        :binary
       end
 
-      def internal?
-        @internal_operator
-      end
-
-      def operator_tag(operator_tag, options = {})
+      def operator_tag(operator_tag)
         @operator_tag ||= operator_tag
-        @internal = options[:internal].presence || false
       end
 
       def register(operator_clazz)
         operator_tag = operator_clazz.tag
         registry[operator_tag] = operator_clazz
+      end
+
+      def tag
+        @operator_tag
       end
 
       def for(operator_tag)
@@ -27,10 +28,22 @@ module FilterParam
         "NOT #{sql(*operands)}"
       end
 
+      def binaries
+        @binaries ||= registry.values
+                              .select { |op| op < self && op.type == :binary }
+                              .map(&:tag)
+      end
+
+      def unaries
+        @unaries ||= registry.values
+                             .select { |op| op < self && op.type == :unary }
+                             .map(&:tag)
+      end
+
       private
 
       def registry
-        @registry ||= {}
+        @@registry ||= {}
       end
     end
   end

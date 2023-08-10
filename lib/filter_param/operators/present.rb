@@ -1,6 +1,6 @@
 module FilterParam
   module Operators
-    class Present < Operator
+    class Present < FieldFilterOperator
       operator_tag :pr
 
       def self.sql(field)

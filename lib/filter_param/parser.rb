@@ -58,10 +58,9 @@ module FilterParam
 
     # Operations
     rule(:op_attr_binary) do
-      (str("eq_ci") | str("eq") | str("neq") | str("le") | str("lt") |
-        str("sw") | str("ew") | str("co") | str("ge") | str("gt")).as(:operator)
+      binary_attr_operators.as(:operator)
     end
-    rule(:op_attr_unary) { str("pr").as(:operator) }
+    rule(:op_attr_unary) { (unary_attr_operators).as(:operator) }
     rule(:op_logic_binary) { (str("and") | str("or")).as(:operator) }
     rule(:op_logic_unary) { str("not").as(:operator) }
 
@@ -108,6 +107,21 @@ module FilterParam
 
     def quoted(atom_or_seq)
       (single_quote >> atom_or_seq >> single_quote) | (double_quote >> atom_or_seq >> double_quote)
+    end
+
+    def binary_attr_operators
+      @@binary_attr_ops = operators_to_atoms(Operators::FieldFilterOperator.binaries.map(&:to_s))
+    end
+
+    def unary_attr_operators
+      @@unary_attr_ops = operators_to_atoms(Operators::FieldFilterOperator.unaries.map(&:to_s))
+    end
+
+    def operators_to_atoms(operators)
+      operators.sort_by(&:length)
+               .reverse
+               .map { |tag| str(tag) }
+               .reduce(:|)
     end
 
     def raise_parse_error!(parse_cause)
