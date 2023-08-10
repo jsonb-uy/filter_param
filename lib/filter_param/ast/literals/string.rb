@@ -6,6 +6,10 @@ module FilterParam
           @value = value.to_s
         end
 
+        def data_type
+          :string
+        end
+
         private
 
         def to_boolean

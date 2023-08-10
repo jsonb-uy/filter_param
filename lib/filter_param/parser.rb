@@ -51,7 +51,7 @@ module FilterParam
         str(":").maybe >> ((zero >> digit) | (match("[1-5]") >> digit))
     end
     rule(:time_hh_mi_ss) { time_hh_mi >> str(":") >> ((zero >> digit) | (match("[1-5]") >> digit)) }
-    rule(:time_hh_mi_ss_sss) { time_hh_mi_ss >> dot >> digit.repeat(3, 3) }
+    rule(:time_hh_mi_ss_sss) { time_hh_mi_ss >> dot >> digit.repeat(3, 6) }
     rule(:time_tz) { str("Z") | (match("[\+\-]") >> time_hh_mi) }
     rule(:datetime_iso8601) { date_iso8601 >> str("T") >> (time_hh_mi_ss_sss | time_hh_mi_ss) >> time_tz }
     rule(:datetime) { quoted datetime_iso8601.as(:datetime) }

@@ -10,6 +10,10 @@ module FilterParam
           raise InvalidLiteral.new("Invalid Decimal: #{value}")
         end
 
+        def date_type
+          :decimal
+        end
+
         private
 
         def to_integer

@@ -174,7 +174,7 @@ RSpec.describe FilterParam::Definition do
     end
   end
 
-  xdescribe "#filter!" do
+  describe "#filter!" do
     subject(:definition) do
       definition = described_class.new
       definition.fields(:first_name, :last_name)

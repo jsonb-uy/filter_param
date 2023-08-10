@@ -8,6 +8,7 @@ module FilterParam
       return nil if string_expression.blank?
 
       ast_root = parse(string_expression)
+
       visit(ast_root)
     end
 
@@ -42,7 +43,7 @@ module FilterParam
     end
 
     def visit_literal(literal)
-      literal.value
+      literal
     end
 
     def visit_unary_expression(expression)
@@ -58,12 +59,11 @@ module FilterParam
       operator_symbol = expression.operator
       operator = Operator.for(operator_symbol)
 
-      if operator < Operators::FieldValueFilterOperator
+      if operator < Operators::FieldFilterOperator
         field = visit(expression.left_operand)
         literal = expression.right_operand.type_cast(field.type)
-        value = visit(literal)
 
-        return operator.sql(field, value)
+        return operator.sql(field, literal)
       end
 
       operator.sql(visit(expression.left_operand),
@@ -74,40 +74,6 @@ module FilterParam
       operands = expression.operands.map { |operand| visit(operand) }
 
       Operator.for(:not).sql(expression.operator, *operands)
-    end
-
-    def transpile_lt(field, value)
-      "#{field} < #{quote(value)}"
-    end
-
-    def transpile_le(field, value)
-      "#{field} <= #{quote(value)}"
-    end
-
-    def transpile_gt(field, value)
-      "#{field} > #{quote(value)}"
-    end
-
-    def transpile_ge(field, value)
-      "#{field} >= #{quote(value)}"
-    end
-
-    def transpile_sw(field, value)
-      pattern = "#{value}%"
-
-      "#{field} LIKE #{quote(pattern)}"
-    end
-
-    def transpile_ew(field, value)
-      pattern = "%#{value}"
-
-      "#{field} LIKE #{quote(pattern)}"
-    end
-
-    def transpile_co(field, value)
-      pattern = "%#{value}%"
-
-      "#{field} LIKE #{quote(pattern)}"
     end
   end
 end

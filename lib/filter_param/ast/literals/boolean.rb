@@ -6,6 +6,10 @@ module FilterParam
           @value = (value.to_s == "true")
         end
 
+        def data_type
+          :boolean
+        end
+
         private_class_method :new
 
         TRUE = new("true")

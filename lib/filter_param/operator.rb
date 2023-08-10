@@ -5,8 +5,13 @@ module FilterParam
         @operator_tag
       end
 
-      def operator_tag(operator_tag)
+      def internal?
+        @internal_operator
+      end
+
+      def operator_tag(operator_tag, options = {})
         @operator_tag ||= operator_tag
+        @internal = options[:internal].presence || false
       end
 
       def register(operator_clazz)

@@ -6,6 +6,10 @@ module FilterParam
       class Null < Literal
         include Singleton
 
+        def data_type
+          :null
+        end
+
         def type_cast(type)
           self
         end

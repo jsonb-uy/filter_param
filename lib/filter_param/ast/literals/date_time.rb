@@ -5,9 +5,13 @@ module FilterParam
     module Literals
       class DateTime < Date
         def initialize(value)
-          @value = ::DateTime.iso8601(value.to_s)
+          @value = ::DateTime.iso8601(value.to_s).utc
         rescue ::Date::Error
           raise FilterParam::InvalidLiteral.new("Invalid ISO8601 Datetime: #{value}")
+        end
+
+        def data_type
+          :date_time
         end
 
         private

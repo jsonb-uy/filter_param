@@ -10,6 +10,10 @@ module FilterParam
           raise FilterParam::InvalidLiteral.new("Invalid ISO8601 Date: #{value}")
         end
 
+        def data_type
+          :date
+        end
+
         private
 
         def to_string

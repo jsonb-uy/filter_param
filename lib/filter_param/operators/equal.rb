@@ -1,17 +1,18 @@
 module FilterParam
   module Operators
-    class Equal < FieldValueFilterOperator
+    class Equal < FieldFilterOperator
       operator_tag :eq
 
-      def self.sql(field, value)
+      def self.sql(field, literal)
         super
 
-        return "#{field.sql_name} IS NULL" if value.nil?
-        "#{field.sql_name} = #{sql_quote(value)}"
+        return "#{field.sql_name} IS NULL" if literal.value.nil?
+
+        "#{field.sql_name} = #{sql_quote(literal.value)}"
       end
 
-      def self.negated_sql(field, value)
-        Operators::NotEqual.sql(field, value)
+      def self.negated_sql(field, literal)
+        Operators::NotEqual.sql(field, literal)
       end
     end
   end

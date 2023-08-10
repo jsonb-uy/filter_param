@@ -8,6 +8,10 @@ module FilterParam
           raise InvalidLiteral.new("Invalid Integer: #{value}")
         end
 
+        def data_type
+          :integer
+        end
+
         private
 
         def to_boolean

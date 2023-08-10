@@ -198,8 +198,8 @@ RSpec.describe FilterParam::Transpiler do
         expect(transpiler.transpile!("not name eq null")).to eql("first_name IS NOT NULL")
         expect(transpiler.transpile!("not name pr")).to eql("(first_name IS NULL OR TRIM(first_name) = '')")
         expect(transpiler.transpile!("not active pr")).to eql("active IS NULL")
-        expect(transpiler.transpile!("not active eq true")).to eql("active != 1").or eql("active != TRUE")
-        expect(transpiler.transpile!("not active eq false")).to eql("active != 0").or eql("active != FALSE")
+        expect(transpiler.transpile!("not active eq true")).to eql("active != 1").or eql("active != true")
+        expect(transpiler.transpile!("not active eq false")).to eql("active != 0").or eql("active != false")
         expect(transpiler.transpile!("not name eq 'John'")).to eql("first_name != 'John'")
         expect(transpiler.transpile!("not age pr")).to eql("age IS NULL")
         expect(transpiler.transpile!("not age eq 100")).to eql("age != 100")
@@ -217,8 +217,8 @@ RSpec.describe FilterParam::Transpiler do
     context "with :eq operation" do
       it "transpiles to SQL correctly" do
         expect(transpiler.transpile!("name eq null")).to eql("first_name IS NULL")
-        expect(transpiler.transpile!("active eq true")).to eql("active = 1").or eql("active = TRUE")
-        expect(transpiler.transpile!("active eq false")).to eql("active = 0").or eql("active = FALSE")
+        expect(transpiler.transpile!("active eq true")).to eql("active = 1").or eql("active = true")
+        expect(transpiler.transpile!("active eq false")).to eql("active = 0").or eql("active = false")
         expect(transpiler.transpile!("name eq 'John'")).to eql("first_name = 'John'")
         expect(transpiler.transpile!("age eq 100")).to eql("age = 100")
         expect(transpiler.transpile!("balance eq 9182841.1923")).to eql("balance = 9182841.1923")

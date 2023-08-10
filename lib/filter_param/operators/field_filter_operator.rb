@@ -1,27 +1,34 @@
 module FilterParam
   module Operators
     class FieldFilterOperator < Operator
-      attr_reader :field_types
+      class << self
+        attr_reader :literal_data_types
 
-      def self.field_type(*data_types)
-        @field_types ||= Set.new
-        @field_types.merge(data_types)
-        @field_types
-      end
+        def literal_data_type(*data_types)
+          @literal_data_types ||= Set.new
+          @literal_data_types.merge(data_types)
+          @literal_data_types
+        end
 
-      def self.sql(field)
-        validate_field!(field)
-      end
+        def sql(field, literal)
+          validate_literal!(literal)
+        end
 
-      private
+        private
 
-      def validate_field!(field)
-        return if field_types.blank?
-        return if field.type.in?(field_types)
+        def validate_literal!(literal)
+          return if literal.nil?
+          return if literal_data_types.nil?
+          return if literal.data_type.in?(literal_data_types)
 
-        raise FilterParam::InvalidLiteral.new(
-          "Unexpected #{field.type} operand for operator '#{tag}'."
-        )
+          raise FilterParam::InvalidLiteral.new(
+            "Unexpected #{literal.data_type} '#{literal.value}' for operator '#{tag}'."
+          )
+        end
+
+        def sql_quote(value)
+          ActiveRecord::Base.connection.quote(value)
+        end
       end
     end
   end
