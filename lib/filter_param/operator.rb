@@ -29,18 +29,18 @@ module FilterParam
       end
 
       def binaries
-        @binaries ||= registry.values
-                              .select { |op| op < self && op.type == :binary }
-                              .map(&:tag)
+        @binaries ||= with_type(:binary).map(&:tag)
       end
 
       def unaries
-        @unaries ||= registry.values
-                             .select { |op| op < self && op.type == :unary }
-                             .map(&:tag)
+        @unaries ||= with_type(:unary).map(&:tag)
       end
 
       private
+
+      def with_type(type)
+        registry.values.select { |op| op < self && op.type == type }
+      end
 
       def registry
         @@registry ||= {}
