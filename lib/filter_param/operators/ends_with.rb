@@ -2,7 +2,7 @@ module FilterParam
   module Operators
     class EndsWith < FieldFilterOperator
       operator_tag :ew
-      literal_data_type :string
+      operand_data_type :string
 
       def self.sql(field, literal)
         super

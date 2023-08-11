@@ -2,7 +2,7 @@ module FilterParam
   module Operators
     class StartsWith < FieldFilterOperator
       operator_tag :sw
-      literal_data_type :string
+      operand_data_type :string
 
       def self.sql(field, literal)
         super

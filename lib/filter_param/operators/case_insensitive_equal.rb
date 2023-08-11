@@ -2,7 +2,7 @@ module FilterParam
   module Operators
     class CaseInsensitiveEqual < FieldFilterOperator
       operator_tag :eq_ci
-      literal_data_type :string
+      operand_data_type :string
 
       def self.sql(field, literal)
         super

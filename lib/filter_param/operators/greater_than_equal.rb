@@ -2,7 +2,7 @@ module FilterParam
   module Operators
     class GreaterThanEqual < FieldFilterOperator
       operator_tag :ge
-      literal_data_type :string, :integer, :decimal, :date, :datetime
+      operand_data_type :string, :integer, :decimal, :date, :datetime
 
       def self.sql(field, literal)
         super

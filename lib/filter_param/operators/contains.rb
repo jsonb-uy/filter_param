@@ -2,7 +2,7 @@ module FilterParam
   module Operators
     class Contains < FieldFilterOperator
       operator_tag :co
-      literal_data_type :string
+      operand_data_type :string
 
       def self.sql(field, literal)
         super
