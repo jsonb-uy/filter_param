@@ -21,6 +21,13 @@ RSpec.describe FilterParam::AST::Literals::Boolean do
     end
   end
 
+  describe "#value" do
+    it "returns boolean value" do
+      expect(true_literal.value).to be(true)
+      expect(false_literal.value).to be(false)
+    end
+  end
+
   describe "#type_cast" do
     context "when to :string" do
       context "when true" do
@@ -43,7 +50,9 @@ RSpec.describe FilterParam::AST::Literals::Boolean do
     context "when to :boolean" do
       it "returns the same boolean instance" do
         expect(false_literal.type_cast(:boolean)).to eql(false_literal)
+        expect(false_literal.data_type).to eql(:boolean)
         expect(true_literal.type_cast(:boolean)).to eql(true_literal)
+        expect(true_literal.data_type).to eql(:boolean)
       end
     end
 
@@ -67,7 +76,7 @@ RSpec.describe FilterParam::AST::Literals::Boolean do
 
     context "when to :decimal" do
       context "when true" do
-        it "returns an decimal literal with value '1'" do
+        it "returns a decimal literal with value '1'" do
           int_literal = true_literal.type_cast(:decimal)
           expect(int_literal.data_type).to eql(:decimal)
           expect(int_literal.value).to eql(1.0)

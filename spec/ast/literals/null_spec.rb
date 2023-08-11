@@ -20,10 +20,17 @@ RSpec.describe FilterParam::AST::Literals::Null do
     end
   end
 
+  describe "#value" do
+    it "returns nil" do
+      expect(null_literal.value).to be_nil
+    end
+  end
+
   describe "#type_cast" do
     context "when to :string" do
       it "returns the same null instance" do
-        expect(null_literal.type_cast(:string)).to eql(null_literal)
+        expect(null_literal.type_cast(:string)).to be(null_literal)
+        expect(null_literal.data_type).to eql(:null)
       end
     end
 
