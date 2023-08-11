@@ -24,10 +24,6 @@ module FilterParam
         registry[operator_tag]
       end
 
-      def negated_sql(*operands)
-        "NOT #{sql(*operands)}"
-      end
-
       def binaries
         @binaries ||= with_type(:binary).map(&:tag)
       end

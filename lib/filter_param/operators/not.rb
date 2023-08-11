@@ -5,8 +5,9 @@ module FilterParam
 
       def self.sql(expression_operator, *expression_operands)
         operator = Operator.for(expression_operator)
+        return operator.negated_sql(*expression_operands) if operator.respond_to?(:negated_sql)
 
-        operator.negated_sql(*expression_operands)
+        "NOT #{operator.sql(*expression_operands)}"
       end
 
       def self.negated_sql(expression_operator, *expression_operands)
