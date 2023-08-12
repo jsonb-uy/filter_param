@@ -59,7 +59,7 @@ RSpec.describe FilterParam::AST::Literals::DateTime do
 
     context "when to :decimal" do
       it "raises an error" do
-        expect { datetime_literal.type_cast(:integer) }.to raise_error(FilterParam::InvalidLiteral)
+        expect { datetime_literal.type_cast(:decimal) }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
 

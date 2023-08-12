@@ -13,7 +13,7 @@ module FilterParam
         private
 
         def to_boolean
-          return Literals::Boolean::TRUE if value == "true"
+          return Literals::Boolean::TRUE if value.downcase == "true"
 
           Literals::Boolean::FALSE
         end

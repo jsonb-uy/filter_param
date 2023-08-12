@@ -57,7 +57,7 @@ RSpec.describe FilterParam::AST::Literals::Date do
 
     context "when to :decimal" do
       it "raises an error" do
-        expect { date_literal.type_cast(:integer) }.to raise_error(FilterParam::InvalidLiteral)
+        expect { date_literal.type_cast(:decimal) }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
 
