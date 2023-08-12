@@ -9,12 +9,6 @@ module FilterParam
 
         "NOT #{operator.sql(*expression_operands)}"
       end
-
-      def self.negated_sql(expression_operator, *expression_operands)
-        operator = Operator.for(expression_operator)
-
-        operator.sql(*expression_operands)
-      end
     end
   end
 end
