@@ -13,7 +13,7 @@ module FilterParam
         cast_method = "to_#{type}"
         return send(cast_method) if respond_to?(cast_method, true)
 
-        raise InvalidLiteral.new("'#{value}' is not a #{type}")
+        raise InvalidLiteral.new("Cannot cast '#{value}' to #{type}")
       end
 
       private

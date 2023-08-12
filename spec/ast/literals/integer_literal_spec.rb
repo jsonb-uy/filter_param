@@ -46,13 +46,13 @@ RSpec.describe FilterParam::AST::Literals::Integer do
     context "when to :boolean" do
       context "when value is not 0" do
         it "returns a TRUE boolean literal" do
-          boolean_literal_1 = described_class.new(1).type_cast(:boolean)
-          expect(boolean_literal_1.data_type).to eql(:boolean)
-          expect(boolean_literal_1.value).to be(true)
+          boolean_literal1 = described_class.new("1").type_cast(:boolean)
+          expect(boolean_literal1.data_type).to eql(:boolean)
+          expect(boolean_literal1.value).to be(true)
 
-          boolean_literal_2 = described_class.new(2).type_cast(:boolean)
-          expect(boolean_literal_2.data_type).to eql(:boolean)
-          expect(boolean_literal_2.value).to be(true)
+          boolean_literal2 = described_class.new("2").type_cast(:boolean)
+          expect(boolean_literal2.data_type).to eql(:boolean)
+          expect(boolean_literal2.value).to be(true)
         end
       end
 
@@ -66,20 +66,21 @@ RSpec.describe FilterParam::AST::Literals::Integer do
     end
 
     context "when to :integer" do
-      it "returns the same integer instance" do
+      it "returns the same integer literal" do
         expect(int_literal.type_cast(:integer)).to be(int_literal)
+        expect(int_literal.data_type).to eql(:integer)
       end
     end
 
     context "when to :decimal" do
       it "returns a decimal literal" do
-        decimal_literal_1 = described_class.new("10").type_cast(:decimal)
-        expect(decimal_literal_1.data_type).to eql(:decimal)
-        expect(decimal_literal_1.value).to eql(10.0)
+        decimal_literal1 = described_class.new("10").type_cast(:decimal)
+        expect(decimal_literal1.data_type).to eql(:decimal)
+        expect(decimal_literal1.value).to eql(10.0)
 
-        decimal_literal_2 = described_class.new("0").type_cast(:decimal)
-        expect(decimal_literal_2.data_type).to eql(:decimal)
-        expect(decimal_literal_2.value).to eql(0.0)
+        decimal_literal2 = described_class.new("0").type_cast(:decimal)
+        expect(decimal_literal2.data_type).to eql(:decimal)
+        expect(decimal_literal2.value).to eql(0.0)
       end
     end
 

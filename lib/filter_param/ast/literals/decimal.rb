@@ -17,7 +17,7 @@ module FilterParam
         private
 
         def to_integer
-          Literals::Integer.new(value)
+          Literals::Integer.new(value.to_i)
         end
 
         def to_decimal

@@ -48,7 +48,7 @@ RSpec.describe FilterParam::AST::Literals::Boolean do
     end
 
     context "when to :boolean" do
-      it "returns the same boolean instance" do
+      it "returns the same boolean literal" do
         expect(false_literal.type_cast(:boolean)).to eql(false_literal)
         expect(false_literal.data_type).to eql(:boolean)
         expect(true_literal.type_cast(:boolean)).to eql(true_literal)
