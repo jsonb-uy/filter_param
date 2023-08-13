@@ -3,7 +3,7 @@ module FilterParam
     class Scope < Node
       attr_reader :name, :args
 
-      def initialize(ar_relation, name, args)
+      def initialize(name, args)
         @name = name.to_s
         @args = args
       end

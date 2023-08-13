@@ -118,7 +118,7 @@ module FilterParam
     #
     # @return [Field]
     def find_scope!(scope_name)
-      scope = scopes_hash[field_name.to_s].presence
+      scope = scopes_hash[scope_name.to_s].presence
       return scope if scope
 
       raise UnknownScope.new("Unknown scope: '#{scope_name}'")

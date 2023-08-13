@@ -38,7 +38,16 @@ module FilterParam
     end
 
     def visit_scope(scope)
-      scope.sql
+      actual_scope_name = definition.find_scope!(scope.name).actual_name
+
+      scope_args = scope.args.map { |arg| visit(arg) }
+
+      scope_sql = ar_relation.send(actual_scope_name, scope_args)
+                             .where_clause
+                             .ast
+                             .to_sql
+
+      "(#{scope_sql})"
     end
 
     def visit_attribute(attribute)
