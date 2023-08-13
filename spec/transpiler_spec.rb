@@ -3,7 +3,7 @@
 RSpec.describe FilterParam::Transpiler do
   subject(:transpiler) { new_transpiler }
 
-  def new_transpiler(definition = nil)
+  def new_transpiler(relation = User.all, definition = nil)
     definition ||= FilterParam::Definition.new
                                           .field(:name, rename: :first_name)
                                           .field(:first_name)
@@ -13,7 +13,7 @@ RSpec.describe FilterParam::Transpiler do
                                           .field(:age, type: :integer)
                                           .field(:active, type: :boolean)
 
-    described_class.new(definition)
+    described_class.new(relation, definition)
   end
 
   describe "#transpile!" do

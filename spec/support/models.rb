@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  scope :with_status, ->(status) { where(status: status) }
+
   def self.create_test_data
     User.delete_all
     User.create(email: "john.doe@email.com",

@@ -9,7 +9,7 @@ module FilterParam
 
         pattern = "#{literal.value}%"
 
-        "#{field.sql_name} LIKE #{sql_quote(pattern)}"
+        "#{field.actual_name} LIKE #{sql_quote(pattern)}"
       end
     end
   end

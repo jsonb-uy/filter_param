@@ -1,6 +1,7 @@
 module FilterParam
   class Transpiler
-    def initialize(definition)
+    def initialize(ar_relation, definition)
+      @ar_relation = ar_relation
       @definition = definition
     end
 
@@ -14,7 +15,7 @@ module FilterParam
 
     private
 
-    attr_reader :definition
+    attr_reader :ar_relation, :definition
 
     def parse(string_expression)
       parse_tree = Parser.new.parse(string_expression, reporter: Parslet::ErrorReporter::Deepest.new)
@@ -34,6 +35,10 @@ module FilterParam
       expression = visit(group.expression)
 
       Operator.for(:group).sql(expression)
+    end
+
+    def visit_scope(scope)
+      scope.sql
     end
 
     def visit_attribute(attribute)
@@ -59,10 +64,10 @@ module FilterParam
 
       if operator < Operators::FieldFilterOperator
         field = visit(expression.left_operand)
-        literal = expression.right_operand.type_cast(field.type)
+        literal = expression.right_operand
         literal.value = field.transform_value(literal.value)
 
-        return operator.sql(field, literal)
+        return operator.sql(field, literal.type_cast(field.type))
       end
 
       operator.sql(visit(expression.left_operand),

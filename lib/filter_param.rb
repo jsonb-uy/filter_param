@@ -8,6 +8,7 @@ require_relative "filter_param/ast/node"
 require_relative "filter_param/ast/attribute"
 require_relative "filter_param/ast/expressions"
 require_relative "filter_param/ast/group"
+require_relative "filter_param/ast/scope"
 require_relative "filter_param/ast/literal"
 require_relative "filter_param/ast/literals/null"
 require_relative "filter_param/ast/literals/string"
@@ -37,6 +38,7 @@ require_relative "filter_param/transformer"
 require_relative "filter_param/parser"
 require_relative "filter_param/transpiler"
 require_relative "filter_param/field"
+require_relative "filter_param/scope"
 require_relative "filter_param/definition"
 require_relative "filter_param/version"
 
@@ -45,6 +47,7 @@ module FilterParam
   class UnknownType < BaseError; end
   class ExpressionError < BaseError; end
   class UnknownField < BaseError; end
+  class UnknownScope < BaseError; end
   class InvalidLiteral < ExpressionError; end
   class ParseError < ExpressionError; end
 

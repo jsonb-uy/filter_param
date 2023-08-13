@@ -4,9 +4,9 @@ module FilterParam
       operator_tag :neq
 
       def self.sql(field, literal)
-        return "#{field.sql_name} IS NOT NULL" if literal.value.nil?
+        return "#{field.actual_name} IS NOT NULL" if literal.value.nil?
 
-        "#{field.sql_name} != #{sql_quote(literal.value)}"
+        "#{field.actual_name} != #{sql_quote(literal.value)}"
       end
 
       def self.negated_sql(field, literal)

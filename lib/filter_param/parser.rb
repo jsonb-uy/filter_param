@@ -79,8 +79,8 @@ module FilterParam
     end
     rule(:empty_exp) { (space | str("")).ignore }
     rule(:scope_args) { literal >> space? >> (str(",") >> space? >> literal).repeat(0) }
-    rule(:scope) { scope_name.as(:name) >> lparen >> space? >> scope_args.maybe.as(:args) >> space? >> rparen }
-    rule(:primary) { group | attr_exp | scope.as(:scope) }
+    rule(:scope) { scope_name.as(:scope) >> lparen >> space? >> scope_args.maybe.as(:args) >> space? >> rparen }
+    rule(:primary) { group | attr_exp | scope }
 
     rule(:unary_exp) do
       (op_logic_unary >> (space | lparen.present?) >> primary.as(:right)).as(:exp) | primary

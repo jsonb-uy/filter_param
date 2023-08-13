@@ -11,6 +11,12 @@ module FilterParam
     rule(datetime: simple(:value)) { Literals::DateTime.new(value) }
     rule(exp: simple(:exp))        { exp }
     rule(group: simple(:exp))      { Group.new(exp) }
+    rule(scope: simple(:name), args: simple(:scope_arg)) do
+      scope_args = scope_arg.nil? ? [] : [scope_arg]
+
+      AST::Scope.new(name, scope_args)
+    end
+    rule(scope: simple(:name), args: sequence(:scope_args)) { AST::Scope.new(name, scope_args) }
     rule(operator: simple(:operator), right: simple(:operand)) do
       Expressions::UnaryExpression.new(operator, operand)
     end

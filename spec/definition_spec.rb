@@ -5,14 +5,12 @@ RSpec.describe FilterParam::Definition do
 
   describe "#define" do
     context "with fields defined" do
-      before do
+      it "whitelists the fields" do
         definition.define do
           fields :first_name, :last_name, type: :string
           field :email
         end
-      end
 
-      it "whitelists the fields" do
         email_field = definition.find_field!("email")
         first_name = definition.find_field!("first_name")
         last_name = definition.find_field!("last_name")
@@ -24,7 +22,18 @@ RSpec.describe FilterParam::Definition do
       end
     end
 
-    context "with no fields defined" do
+    context "with scopes defined" do
+      it "whitelists the scope name" do
+        definition.define do
+          scopes :with_status, :with_surname
+          scope :with_first_name
+        end
+
+        expect(definition.scope_names).to match_array(%w[with_status with_surname with_first_name])
+      end
+    end
+
+    context "with no fields and scope defined" do
       it "raises an error" do
         expect { definition.define }.to raise_error(ArgumentError)
       end
@@ -37,6 +46,7 @@ RSpec.describe FilterParam::Definition do
 
       expect(definition.field_names).to match_array(%w[age])
       expect(definition.find_field!("age").type).to eq(:integer)
+      expect(definition.find_field!("age").actual_name).to eql("age")
     end
 
     it "ignores blank field name" do
@@ -51,24 +61,24 @@ RSpec.describe FilterParam::Definition do
     end
 
     context "with String :rename option value" do
-      it "sets the field :rename value" do
+      it "sets the field's actual name to the rename value" do
         definition.field(:last_name, rename: "surname")
 
         last_name_field = definition.find_field!("last_name")
-        expect(last_name_field.rename).to eql("surname")
+        expect(last_name_field.actual_name).to eql("surname")
       end
     end
 
     context "with Proc :rename option value" do
-      it "sets the :rename value to the transformed :name" do
+      it "sets the field's actual name to the value returned by the proc" do
         definition.field(:email, rename: ->(name) { "users.#{name}" })
         definition.field(:last_name, rename: ->(_) { "surname" })
 
         email_field = definition.find_field!("email")
         last_name_field = definition.find_field!("last_name")
 
-        expect(email_field.rename).to eql("users.email")
-        expect(last_name_field.rename).to eql("surname")
+        expect(email_field.actual_name).to eql("users.email")
+        expect(last_name_field.actual_name).to eql("surname")
       end
     end
 
@@ -127,14 +137,11 @@ RSpec.describe FilterParam::Definition do
     end
 
     context "with Proc :rename option value" do
-      it "sets the :rename value to the transformed :name" do
+      it "sets the fields' actual names to the value returned by the proc" do
         definition.fields(:weight, :height, type: :decimal, rename: ->(name) { "dim.#{name}" })
-        definition.fields(:phone, :email, type: :string)
 
-        expect(definition.find_field!("weight").rename).to eql("dim.weight")
-        expect(definition.find_field!("height").rename).to eql("dim.height")
-        expect(definition.find_field!("phone").rename).to be_nil
-        expect(definition.find_field!("email").rename).to be_nil
+        expect(definition.find_field!("weight").actual_name).to eql("dim.weight")
+        expect(definition.find_field!("height").actual_name).to eql("dim.height")
       end
     end
   end

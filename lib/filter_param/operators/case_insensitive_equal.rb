@@ -7,7 +7,7 @@ module FilterParam
       def self.sql(field, literal)
         super
 
-        "lower(#{field.sql_name}) = #{sql_quote(literal.value.downcase)}"
+        "lower(#{field.actual_name}) = #{sql_quote(literal.value.downcase)}"
       end
     end
   end

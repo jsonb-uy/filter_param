@@ -7,7 +7,7 @@ module FilterParam
       def self.sql(field, literal)
         super
 
-        "#{field.sql_name} <= #{sql_quote(literal.value)}"
+        "#{field.actual_name} <= #{sql_quote(literal.value)}"
       end
     end
   end

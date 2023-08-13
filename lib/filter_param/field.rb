@@ -2,7 +2,7 @@ module FilterParam
   class Field
     TYPES = %i[boolean string integer decimal date datetime].freeze
 
-    attr_reader :type, :name, :rename
+    attr_reader :type, :name
 
     def initialize(name, type, options = {})
       @name = name
@@ -17,13 +17,13 @@ module FilterParam
       value_transformer.call(value)
     end
 
-    def sql_name
+    def actual_name
       rename.presence || name
     end
 
     private
 
-    attr_reader :value_transformer
+    attr_reader :value_transformer, :rename
 
     def field_rename(rename)
       return rename.call(name) if rename.is_a?(Proc)
