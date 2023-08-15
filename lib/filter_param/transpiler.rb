@@ -42,7 +42,7 @@ module FilterParam
 
       scope_args = scope.args.map { |arg| visit(arg) }
 
-      scope_sql = ar_relation.send(actual_scope_name, scope_args)
+      scope_sql = ar_relation.send(actual_scope_name, *scope_args)
                              .where_clause
                              .ast
                              .to_sql
