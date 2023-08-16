@@ -11,18 +11,23 @@ module FilterParam
         end
 
         def sql(field, literal)
-          validate_operand!(literal)
+          validate_field!(field)
+          validate_literal!(literal)
         end
 
         private
 
-        def validate_operand!(operand)
-          return if operand.nil?
+        def validate_field!(field)
+          field.allow_operator?(tag)
+        end
+
+        def validate_literal!(literal)
+          return if literal.nil?
           return if operand_data_types.nil?
-          return if operand.data_type.in?(operand_data_types)
+          return if literal.data_type.in?(operand_data_types)
 
           raise FilterParam::InvalidLiteral.new(
-            "Unexpected #{operand.data_type} operand for operator '#{tag}'."
+            "Unexpected #{literal.data_type} operand for operator '#{tag}'."
           )
         end
 

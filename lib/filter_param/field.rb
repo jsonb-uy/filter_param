@@ -21,6 +21,10 @@ module FilterParam
       rename.presence || name
     end
 
+    def allow_operator?(operator)
+      true
+    end
+
     private
 
     attr_reader :value_transformer, :rename
