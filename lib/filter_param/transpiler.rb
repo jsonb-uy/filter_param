@@ -17,13 +17,17 @@ module FilterParam
 
     attr_reader :ar_relation, :definition
 
+    def ar_model
+      @ar_relation.model
+    end
+
     def parse(string_expression)
       parse_tree = Parser.new.parse(string_expression, reporter: Parslet::ErrorReporter::Deepest.new)
 
       Transformer.new.apply(parse_tree)
     end
 
-    def field(name)
+    def field_for_name(name)
       definition.find_field!(name)
     end
 
@@ -40,24 +44,21 @@ module FilterParam
     def visit_scope(scope)
       actual_scope_name = definition.find_scope!(scope.name)
                                     .actual_name
-
       scope_args = scope.args.map { |arg| visit(arg) }
 
-      scope_sql = ar_relation.model
-                             .send(actual_scope_name, *scope_args)
-                             .where_clause
-                             .ast
-                             .to_sql
+      scope_sql = ar_model.send(actual_scope_name, *scope_args)
+                          .select(ar_model.primary_key)
+                          .to_sql
 
-      "(#{scope_sql})"
+      "(#{ar_model.primary_key} IN (#{scope_sql}))"
     end
 
     def visit_attribute(attribute)
-      field(attribute.name)
+      field_for_name(attribute.name)
     end
 
     def visit_literal(literal)
-      literal
+      literal.value
     end
 
     def visit_unary_expression(expression)
