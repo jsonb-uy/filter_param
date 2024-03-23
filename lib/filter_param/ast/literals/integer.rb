@@ -3,7 +3,9 @@ module FilterParam
     module Literals
       class Integer < Literal
         def initialize(value)
-          @value = Integer(value.to_s)
+          whole_num = value.to_s.split(".").first
+
+          @value = Integer(whole_num)
         rescue ArgumentError
           raise InvalidLiteral.new("Invalid Integer: #{value}")
         end
