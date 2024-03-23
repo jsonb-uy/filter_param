@@ -9,7 +9,6 @@ RSpec.describe FilterParam::AST::Literals::Integer do
     context "when given value is not parseable to integer" do
       it "raises an error" do
         expect { described_class.new("some value") }.to raise_error(FilterParam::InvalidLiteral)
-        expect { described_class.new("2.1") }.to raise_error(FilterParam::InvalidLiteral)
       end
     end
   end
@@ -25,6 +24,8 @@ RSpec.describe FilterParam::AST::Literals::Integer do
       expect(described_class.new("42").value).to eql(42)
       expect(described_class.new("0000").value).to eql(0)
       expect(described_class.new("-1").value).to eql(-1)
+      expect(described_class.new("1024.85").value).to eql(1024)
+      expect(described_class.new("0.85").value).to eql(0)
     end
   end
 

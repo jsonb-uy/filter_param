@@ -122,10 +122,6 @@ RSpec.describe FilterParam::Transpiler do
         expect do
           transpiler.transpile!("age eq 'ten'")
         end.to raise_error(FilterParam::InvalidLiteral, /Invalid Integer/)
-
-        expect do
-          transpiler.transpile!("age eq '0.10'")
-        end.to raise_error(FilterParam::InvalidLiteral, /Invalid Integer/)
       end
     end
 
