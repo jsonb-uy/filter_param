@@ -87,9 +87,26 @@ module FilterParam
     end
 
     def transpile_negated_expression(expression)
+      operator_tag = expression.operator
+      operator = Operator.for(operator_tag)
+      not_operator = Operator.for(:not)
+
+      if operator < Operators::FieldFilterOperator
+        # TODO: refactor
+        if operator.type == :binary
+          field = visit(expression.left_operand)
+          literal = expression.right_operand
+          literal.value = field.transform_value(literal.value)
+
+          return not_operator.sql(operator_tag, field, literal.type_cast(field.type))
+        else
+          return not_operator.sql(operator_tag, visit(expression.operand))
+        end
+      end
+
       operands = expression.operands.map { |operand| visit(operand) }
 
-      Operator.for(:not).sql(expression.operator, *operands)
+      not_operator.sql(operator_tag, *operands)
     end
   end
 end
