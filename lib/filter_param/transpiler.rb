@@ -32,6 +32,8 @@ module FilterParam
     end
 
     def visit(node)
+      return node unless node.respond_to?(:accept)
+
       node.accept(self)
     end
 

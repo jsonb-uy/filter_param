@@ -81,6 +81,13 @@ RSpec.describe FilterParam::Transpiler do
       end
     end
 
+    context "with empty group expression" do
+      it "ignores the empty group" do
+        expect(transpiler.transpile!("(())")).to eql("")
+        expect(transpiler.transpile!("()")).to eql("")
+      end
+    end
+
     context "with invalid field format" do
       it "raises parse error" do
         expect do
