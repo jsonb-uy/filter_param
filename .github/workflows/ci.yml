@@ -17,6 +17,7 @@ jobs:
       RAILS_VERSION: ${{ matrix.rails }}
 
     strategy:
+      fail-fast: false
       matrix:
         rails: 
           - '4-2'
