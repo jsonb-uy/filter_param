@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Uy Jayson B"]
   spec.email = ["uy.json.dev@gmail.com"]
 
-  spec.summary = "API filter for ActiveRecord-based apps"
-  spec.description = "Filter records using a filter expression"
+  spec.summary = "SCIM-style API filter for ActiveRecord-based apps"
+  spec.description = "Filter records using a SCIM inspired filter expression"
   spec.homepage = "https://github.com/jsonb-uy/filter_param"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.3.0"
