@@ -5,8 +5,8 @@
 Quickly implement record filtering in your APIs using a filter expression inspired by [SCIM Query](https://datatracker.ietf.org/doc/html/rfc7644#section-3.4.2.2):
 
 ```ruby
-https://{some origin}/users?filter="first_name eq 'John' and last_name pr and
- not (active eq false or (birth_date < '1991-01-01' or birth_date eq null))" 
+https://{some origin}/users?filter="first_name eq 'John' and last_name pr and 
+  not (active eq false and (birth_date gt '1991-01-01' or birth_date eq null))"
 ```
 
 **TL;DR** See [ sample usage for Rails here ](#rails-usage). 
@@ -72,14 +72,23 @@ filter_param = FilterParam::Definition.new
 
 `field` method accepts the filter field name as the first argument. Any other configuration such as `:type` follows the name.
 
-#### 2. Transpile the filter expression from the parameter into SQL
+#### 2. Filter records using a filter expression
 
-The `filter!` method translates the filter expression string from your API's request parameter into an SQL:
+The `filter!` method accepts an `ActiveRecord_Relation` and the filter expression string from your API's request parameter. This method then transpiles the filter expression into SQL and returns a new `ActiveRecord_Relation` with the SQL conditions applied.
 
 ```ruby
-filter_param.filter!("")
+rel = filter_param.filter!(User.all, "first_name eq 'John' and last_name pr and not (active eq false and (birth_date gt '1991-01-
+01' or birth_date eq null))")
 ``` 
 
+To see the SQL that will be executed in the ActiveRecord relation:
+
+```ruby
+rel.to_sql
+=> "SELECT \"users\".* FROM \"users\" WHERE (first_name = 'John' AND 
+    (family_name IS NOT NULL AND TRIM(family_name) != '') AND 
+      NOT (active = 0 AND (birth_date > '1991-01-01' OR birth_date IS NULL)))"
+```
 
 ### Errors
 
