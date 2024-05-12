@@ -23,7 +23,7 @@ https://{some origin}/users?filter="first_name eq 'John' and last_name pr and
 * Allows custom filter operators
 * Expression grouping
 * Supports **MySQL**, **PostgreSQL**, and **SQLite**
-* Supports **Rails 4.2** and above
+* Supports **Rails 6** and above
 
 
 ## Installation
