@@ -50,9 +50,9 @@ jobs:
             bundler_version: 'latest'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby ${{ matrix.ruby_version }}
-        uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf
         with:
           ruby-version: ${{ matrix.ruby_version }}
           bundler: ${{ matrix.bundler_version }}
