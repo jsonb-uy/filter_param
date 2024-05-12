@@ -18,6 +18,7 @@ https://{some origin}/users?filter="first_name eq 'John' and last_name pr and
 * Column name aliasing / expose a different attribute name in the API
 * Pre-processing of filter values/literals
 * Type validation of filter values (e.g., date and datetime literals should be in standard ISO 8601 format)
+* Allows custom filter operators
 * Expression grouping
 * Supports **MySQL**, **PostgreSQL**, and **SQLite**
 * Supports **Rails 4.2** and above
