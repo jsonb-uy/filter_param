@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
   spec.files = Dir['CHANGELOG.md', 'LICENSE', 'README.md', 'lib/**/*']
   spec.require_paths = ["lib"]
   spec.add_dependency "parslet", "~> 2.0"
-  spec.add_dependency 'activerecord', '>= 4.2', '< 7.1'
-  spec.add_dependency 'activesupport', '>= 4.2', '< 7.1'
+  spec.add_dependency 'activerecord', '>= 6.0', '< 7.2'
+  spec.add_dependency 'activesupport', '>= 6.0', '< 7.2'
 
   spec.bindir        = "bin"
   spec.executables   = []
