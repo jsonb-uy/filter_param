@@ -1,5 +1,7 @@
 # FilterParam
 
+[![Gem Version](https://badge.fury.io/rb/filter_param.svg)](https://badge.fury.io/rb/filter_param) [![CI](https://github.com/jsonb-uy/filter_param/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jsonb-uy/filter_param/actions/workflows/ci.yml) [![codecov](https://codecov.io/gh/jsonb-uy/filter_param/graph/badge.svg?token=9242ULA2DC)](https://codecov.io/gh/jsonb-uy/filter_param) [![Maintainability](https://api.codeclimate.com/v1/badges/fb4df56368843000d1fd/maintainability)](https://codeclimate.com/github/jsonb-uy/filter_param/maintainability)
+
 ### Record Filtering for apps built on Rails/ActiveRecord 
 
 Quickly implement record filtering in your APIs using a filter expression inspired by [SCIM Query](https://datatracker.ietf.org/doc/html/rfc7644#section-3.4.2.2):
