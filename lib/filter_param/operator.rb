@@ -25,11 +25,11 @@ module FilterParam
       end
 
       def binaries
-        @binaries ||= with_type(:binary).map(&:tag)
+        with_type(:binary).map(&:tag)
       end
 
       def unaries
-        @unaries ||= with_type(:unary).map(&:tag)
+        with_type(:unary).map(&:tag)
       end
 
       private
