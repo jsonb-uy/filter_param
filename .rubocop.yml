@@ -3,9 +3,6 @@ AllCops:
     - 'Rakefile'
     - 'filter_param.gemspec'
   TargetRubyVersion: 2.3.0
-Naming/FileName:
-  Exclude:
-    - "lib/rotulus-page.rb"
 Style/Documentation:
   Enabled: false
 Style/FrozenStringLiteralComment:
