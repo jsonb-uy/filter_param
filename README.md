@@ -25,6 +25,42 @@ https://{some origin}/users?filter="first_name eq 'John' and last_name pr and
 * Supports **MySQL**, **PostgreSQL**, and **SQLite**
 * Supports **Rails 6** and above
 
+### Field Filter Operators
+| Operator | Description | Example |
+| ----------- | ----------- | ----------- |
+| `eq` | Equal | name eq 'John' |
+| `eq_ci` | Case-insensitive Equal | name eq_ci 'joHn' |
+| `neq` | Not Equal | name neq 'john' |
+| `co` | Contains | name co 'oh' |
+| `sw ` | Starts With | name sw 'J' |
+| `pr ` | Present (has value) | name pr |
+| `gt` | Greater than | age gt 42 |
+| `ge` | Greater than or equal to | price ge 19.80 |
+| `lt` | Less than | created_at lt '2023-03-01T08:09:00+07:00' |
+| `le` | Less than or equal to | birthdate le '1985-05-01' |
+
+### Logical Operators
+| Operator | Description |
+| ----------- | ----------- |
+| `and` | Logical "and" |
+| `or` | Logical "or" |
+| `not` | "Not" function |
+
+### Grouping Operator
+| Operator | Description |
+| ----------- | ----------- |
+| `()` | Precedence grouping |
+
+### Literals
+| Type | Filter Definition Symbol | Examples |
+|-----------|----------- | ----------- |
+| Boolean| `:boolean` | `true`, `false` |
+| Integer| `:integer` | 40012, 100, 0, -51 |
+| Decimal| `:decimal` | 4002.12, 0.05, -41.13 |
+| String| `:string` | 'foo bar' |
+| Date (ISO format) | `:date` | '2024-12-31' |
+| Timestamp (ISO format) | `:datetime` | '2023-03-01T01:09:01.000Z', '2023-03-01T09:09:00+09:00' |
+| Null | N/A | null |
 
 ## Installation
 
