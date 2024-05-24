@@ -55,9 +55,9 @@ RSpec.describe FilterParam::Parser do
       expect(exp[:val][:string].str).to eql("JOhn")
     end
 
-    it "parses :neq 'not equal' filter operator" do
-      exp = parse("name neq 'John'")[:exp]
-      expect(exp[:operator].str).to eql("neq")
+    it "parses :ne 'not equal' filter operator" do
+      exp = parse("name ne 'John'")[:exp]
+      expect(exp[:operator].str).to eql("ne")
       expect(exp[:attribute].str).to eql("name")
       expect(exp[:val][:string].str).to eql("John")
     end
@@ -230,7 +230,7 @@ RSpec.describe FilterParam::Parser do
     end
 
     it "parses :and logical operator" do
-      exp = parse("name eq 'jane' and surname neq 'doe'")[:exp]
+      exp = parse("name eq 'jane' and surname ne 'doe'")[:exp]
       left = exp[:left][:exp]
       right = exp[:right][:exp]
 
@@ -239,7 +239,7 @@ RSpec.describe FilterParam::Parser do
       expect(left[:operator].str).to eql("eq")
       expect(left[:val][:string].str).to eql("jane")
       expect(right[:attribute].str).to eql("surname")
-      expect(right[:operator].str).to eql("neq")
+      expect(right[:operator].str).to eql("ne")
       expect(right[:val][:string].str).to eql("doe")
     end
 
@@ -291,14 +291,14 @@ RSpec.describe FilterParam::Parser do
         expect { parse("(id eq(1))") }.not_to raise_error
         expect { parse("((id eq(1)))") }.not_to raise_error
 
-        expect { parse("id neq 1 and name neq 'John'") }.not_to raise_error
-        expect { parse("(id neq 1) and (name neq 'John')") }.not_to raise_error
-        expect { parse("((id neq 1)) and ((name neq 'John'))") }.not_to raise_error
-        expect { parse("(id neq 1 and name neq 'John')") }.not_to raise_error
-        expect { parse("((id neq 1 and name neq 'John'))") }.not_to raise_error
-        expect { parse("(((id neq 1) and (name neq 'John')))") }.not_to raise_error
-        expect { parse("id neq 1 and name neq 'John' and name neq 'Jane'") }.not_to raise_error
-        expect { parse("id neq 1 and(name eq 'John' or name eq 'Jane')") }.not_to raise_error
+        expect { parse("id ne 1 and name ne 'John'") }.not_to raise_error
+        expect { parse("(id ne 1) and (name ne 'John')") }.not_to raise_error
+        expect { parse("((id ne 1)) and ((name ne 'John'))") }.not_to raise_error
+        expect { parse("(id ne 1 and name ne 'John')") }.not_to raise_error
+        expect { parse("((id ne 1 and name ne 'John'))") }.not_to raise_error
+        expect { parse("(((id ne 1) and (name ne 'John')))") }.not_to raise_error
+        expect { parse("id ne 1 and name ne 'John' and name ne 'Jane'") }.not_to raise_error
+        expect { parse("id ne 1 and(name eq 'John' or name eq 'Jane')") }.not_to raise_error
       end
 
       it "ignores empty parentheses" do

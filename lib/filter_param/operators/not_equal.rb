@@ -1,7 +1,7 @@
 module FilterParam
   module Operators
     class NotEqual < FieldFilterOperator
-      operator_tag :neq
+      operator_tag :ne
 
       def self.sql(field, literal)
         return "#{field.actual_name} IS NOT NULL" if literal.value.nil?

@@ -265,63 +265,63 @@ RSpec.describe FilterParam::Definition do
       end
     end
 
-    context "with :neq operation" do
+    context "with :ne operation" do
       it "allows :null value" do
         non_null_last_name_emails = User.where.not(last_name: nil).pluck(:email)
-        expect(user_emails("last_name neq null")).to eql(non_null_last_name_emails)
+        expect(user_emails("last_name ne null")).to eql(non_null_last_name_emails)
 
         non_null_score_emails = User.where.not(score: nil).pluck(:email)
-        expect(user_emails("score neq null")).to eql(non_null_score_emails)
+        expect(user_emails("score ne null")).to eql(non_null_score_emails)
 
         non_null_balance_emails = User.where.not(balance: nil).pluck(:email)
-        expect(user_emails("balance neq null")).to eql(non_null_balance_emails)
+        expect(user_emails("balance ne null")).to eql(non_null_balance_emails)
 
         non_null_status_emails = User.where.not(active: nil).pluck(:email)
-        expect(user_emails("active neq null")).to eql(non_null_status_emails)
+        expect(user_emails("active ne null")).to eql(non_null_status_emails)
 
         non_null_birth_date_emails = User.where.not(birth_date: nil).pluck(:email)
-        expect(user_emails("birth_date neq null")).to eql(non_null_birth_date_emails)
+        expect(user_emails("birth_date ne null")).to eql(non_null_birth_date_emails)
 
         non_null_member_since_emails = User.where.not(member_since: nil).pluck(:email)
-        expect(user_emails("member_since neq null")).to eql(non_null_member_since_emails)
+        expect(user_emails("member_since ne null")).to eql(non_null_member_since_emails)
       end
 
       it "allows :string value" do
         emails = User.where.not(email: "johnny.apple@email.com").pluck(:email)
 
-        expect(user_emails("email neq 'johnny.apple@email.com'")).to eql(emails)
+        expect(user_emails("email ne 'johnny.apple@email.com'")).to eql(emails)
       end
 
       it "allows :integer value" do
         emails = User.where.not(score: 170).pluck(:email)
 
-        expect(user_emails("score neq 170")).to eql(emails)
+        expect(user_emails("score ne 170")).to eql(emails)
       end
 
       it "allows :decimal value" do
         emails = User.where.not(balance: "42.9").pluck(:email)
 
-        expect(user_emails("balance neq 42.9")).to eql(emails)
+        expect(user_emails("balance ne 42.9")).to eql(emails)
       end
 
       it "allows :boolean value" do
         active_emails = User.where(active: true).pluck(:email)
         inactive_emails = User.where(active: false).pluck(:email)
 
-        expect(user_emails("active neq false")).to eql(active_emails)
-        expect(user_emails("active neq true")).to eql(inactive_emails)
+        expect(user_emails("active ne false")).to eql(active_emails)
+        expect(user_emails("active ne true")).to eql(inactive_emails)
       end
 
       it "allows :date value" do
         emails = User.where.not(birth_date: Date.parse("1985-05-02")).pluck(:email)
 
-        expect(user_emails("birth_date neq '1985-05-02'")).to eql(emails)
+        expect(user_emails("birth_date ne '1985-05-02'")).to eql(emails)
       end
 
       it "allows :datetime value" do
         emails = User.where.not(member_since: DateTime.parse("2023-03-01T08:09:00+07:00")).pluck(:email)
 
-        expect(user_emails("member_since neq '2023-03-01T08:09:00+07:00'")).to eql(emails)
+        expect(user_emails("member_since ne '2023-03-01T08:09:00+07:00'")).to eql(emails)
       end
     end
 
@@ -626,7 +626,7 @@ RSpec.describe FilterParam::Definition do
         expect(user_emails("not last_name eq 'Doe'")).to eql(emails)
 
         emails = User.where(last_name: "Doe").pluck(:email)
-        expect(user_emails("not last_name neq 'Doe'")).to eql(emails)
+        expect(user_emails("not last_name ne 'Doe'")).to eql(emails)
 
         emails = User.where.not("last_name > ?", "Doe").pluck(:email)
         expect(user_emails("not last_name gt 'Doe'")).to eql(emails)
@@ -650,7 +650,7 @@ RSpec.describe FilterParam::Definition do
       end
 
       it "negates a group expression" do
-        expect(user_emails("not(last_name neq 'Doe' or score gt 100)")).to eql(%w[john.doe@email.com])
+        expect(user_emails("not(last_name ne 'Doe' or score gt 100)")).to eql(%w[john.doe@email.com])
       end
     end
 

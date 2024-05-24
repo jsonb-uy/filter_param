@@ -30,7 +30,7 @@ https://{some origin}/users?filter="first_name eq 'John' and last_name pr and
 | ----------- | ----------- | ----------- |
 | `eq` | Equal | name eq 'John' |
 | `eq_ci` | Case-insensitive Equal | name eq_ci 'joHn' |
-| `neq` | Not Equal | name neq 'john' |
+| `ne` | Not Equal | name ne 'john' |
 | `co` | Contains | name co 'oh' |
 | `sw ` | Starts With | name sw 'J' |
 | `pr ` | Present (has value) | name pr |
