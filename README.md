@@ -7,8 +7,8 @@
 Quickly implement record filtering in your APIs using a filter expression inspired by [SCIM Query](https://datatracker.ietf.org/doc/html/rfc7644#section-3.4.2.2):
 
 ```ruby
-https://{some origin}/users?filter="first_name eq 'John' and last_name pr and 
-  not (active eq false and (birth_date gt '1991-01-01' or birth_date eq null))"
+https://{some origin}/users?filter=first_name eq 'John' and last_name pr and 
+  not (active eq false and (birth_date gt '1991-01-01' or birth_date eq null))
 ```
 
 **TL;DR** See [ sample usage for Rails here ](#rails-usage). 
@@ -161,7 +161,7 @@ rel.to_sql
   | Environment Variable | Values | Example |
   | ----------- | ----------- |----------- |
   | `DB_ADAPTER` | **Default: :sqlite**. `sqlite`,`mysql2`, or `postgresql` | ```DB_ADAPTER=postgresql bundle exec rspec```<br/><br/> ```DB_ADAPTER=postgresql ./bin/console``` |
-  | `RAILS_VERSION` | **Default: 7-1** <br/><br/> `6-0`,`6-1`,`7-0`,`7-1` |```RAILS_VERSION=6-0 ./bin/setup```<br/><br/>```RAILS_VERSION=6-0 bundle exec rspec```<br/><br/> ```RAILS_VERSION=6-0 ./bin/console```|
+  | `RAILS_VERSION` | **Default: 8-0** <br/><br/> `6-0`,`6-1`,`7-0`,`7-1`, `7-2`, `8-0` |```RAILS_VERSION=8-0 ./bin/setup```<br/><br/>```RAILS_VERSION=8-0 bundle exec rspec```<br/><br/> ```RAILS_VERSION=8-0 ./bin/console```|
 
 
 <br/><br/>
